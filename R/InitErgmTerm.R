@@ -165,7 +165,7 @@ GWDECAY <- list(
     if(!is.null(emptynwstats)) emptynwstats <- emptynwstats / length(unique(.peek_vattrv(nw, ".LayerID")))
     name <- paste0(name,"_ML_sum")
     coef.names <- paste0(.lspec_coef.names(Ls),":",coef.names)
-  }else InitErgm_abort("Use the non-layer version.")
+  }else ergm_Init_abort("Use the non-layer version.")
 
   list(name = name, coef.names = coef.names, inputs = inputs, emptynwstats = emptynwstats, auxiliaries=auxiliaries, minval=0, maxval=network.size(nw), dependence=TRUE)
 }

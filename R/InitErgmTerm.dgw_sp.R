@@ -213,7 +213,7 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
   linfo <- .sp.handle_layers(nw, a, type, TRUE)
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste(conam,d,sep="")), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0)
-  else InitErgm_abort("Use desp() instead.")
+  else ergm_Init_abort("Use desp() instead.")
 }
 
 
@@ -292,7 +292,7 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwesp.fixed.",decay,sep="")
 
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order,decay,typecode,maxesp),auxiliaries=linfo$auxiliaries)
-    else InitErgm_abort("Use dgwesp() instead.")
+    else ergm_Init_abort("Use dgwesp() instead.")
   }
 }
 
@@ -358,7 +358,7 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   }
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else InitErgm_abort("Use ddsp() instead.")
+  else ergm_Init_abort("Use ddsp() instead.")
 }
 
 
@@ -430,7 +430,7 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwdsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else InitErgm_abort("Use dgwdspL() instead.")
+    else ergm_Init_abort("Use dgwdspL() instead.")
   }
 }
 
@@ -493,7 +493,7 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
     emptynwstats <- NULL
   }
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else InitErgm_abort("Use dnspL() instead.")
+  else ergm_Init_abort("Use dnspL() instead.")
 }
 
 
@@ -564,6 +564,6 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwnsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else InitErgm_abort("Use dgwnspL() instead.")
+    else ergm_Init_abort("Use dgwnspL() instead.")
   }
 }

@@ -8,7 +8,7 @@
 #  Copyright 2003-2017 Statnet Commons
 #######################################################################
 
-library(ergm)
+library(ergm.multi)
 n <- 10
 m <- 7
 
