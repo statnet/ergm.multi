@@ -54,13 +54,13 @@ stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 
 data(samplk)
 
-(layer <- summary(Layer(samplk1, samplk2)~mutual(Ls=c(~`1`,~`2`))))
+(layer <- summary(Layer(samplk1, samplk2)~mutualL(Ls=c(~`1`,~`2`))))
 m1 <- as.matrix(samplk1)
 m2 <- as.matrix(samplk2)
 (logic <- (sum(m1*t(m2)+m2*t(m1))/2))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 
-(layer <- summary(Layer(samplk1, samplk2)~mutual(Ls=c(~`1`,~`2`&`1`))))
+(layer <- summary(Layer(samplk1, samplk2)~mutualL(Ls=c(~`1`,~`2`&`1`))))
 m1 <- as.matrix(samplk1)
 m2 <- as.matrix(samplk2) * as.matrix(samplk1)
 (logic <- (sum(m1*t(m2)+m2*t(m1))/2))
@@ -96,14 +96,14 @@ stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 # Triadic effects
 
 data(florentine)
-(layer <- summary(Layer(m=flomarriage, b=flobusiness)~ddsp(0:10,Ls.path=c(~b,~b))))
-(logic <- summary(flobusiness~dsp(0:10)))
+(layer <- summary(Layer(m=flomarriage, b=flobusiness)~ddspL(0:10,Ls.path=c(~b,~b))))
+(logic <- summary(flobusiness~dspL(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
-(layer <- summary(Layer(m=flomarriage, b=flobusiness)~desp(0:10,Ls.path=c(~b,~b),L.base=~b)))
-(logic <- summary(flobusiness~esp(0:10)))
+(layer <- summary(Layer(m=flomarriage, b=flobusiness)~despL(0:10,Ls.path=c(~b,~b),L.base=~b)))
+(logic <- summary(flobusiness~espL(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
-(layer <- summary(Layer(m=flomarriage, b=flobusiness)~dnsp(0:10,Ls.path=c(~b,~b),L.base=~b)))
-(logic <- summary(flobusiness~nsp(0:10)))
+(layer <- summary(Layer(m=flomarriage, b=flobusiness)~dnspL(0:10,Ls.path=c(~b,~b),L.base=~b)))
+(logic <- summary(flobusiness~nspL(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 
 # MLE

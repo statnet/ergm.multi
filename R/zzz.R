@@ -11,7 +11,7 @@
 #' @import network
 #' @import statnet.common
 #' @import stats
-#' @import rlang
+## #' @import rlang
 
 .onAttach <- function(lib, pkg){
   #' @importFrom statnet.common statnetStartupMessage

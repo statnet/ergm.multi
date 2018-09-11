@@ -185,9 +185,9 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
 
 
 InitErgmProposal.blockdiagNonObserved <- function(arguments, nw){
-  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "randomtoggleList")
+  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "randomtoggleList", pkgname="ergm")
 }
 
 InitErgmProposal.blockdiagNonObservedTNT <- function(arguments, nw){
-  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "listTNT")
+  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "listTNT", pkgname="ergm")
 }
