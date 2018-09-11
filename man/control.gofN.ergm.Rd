@@ -112,3 +112,7 @@ processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
 intended to be used with \code{\link[=gofN]{gofN()}} specifically and will "inherit"
 as many control parameters from \code{\link{ergm}} fit as possible().
 }
+\details{
+Auxiliary function as user interface for fine-tuning ERGM Goodness-of-Fit
+Evaluation.
+}

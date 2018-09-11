@@ -183,7 +183,7 @@
 #routine is used (since it is safe for undirected graphs), irrespective of
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
-InitErgmTerm.desp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula","formula,list","logical"),
@@ -213,7 +213,7 @@ InitErgmTerm.desp<-function(nw, arglist, cache.sp=TRUE, ...) {
   linfo <- .sp.handle_layers(nw, a, type, TRUE)
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste(conam,d,sep="")), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0)
-  else list(name=dname, coef.names=paste(conam,d,sep=""), inputs=c(if(!cache.sp) -1, typecode,d), minval=0, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+  else InitErgm_abort("Use desp() instead.")
 }
 
 
@@ -235,7 +235,7 @@ InitErgmTerm.desp<-function(nw, arglist, cache.sp=TRUE, ...) {
 #always used (since it is directedness-safe), and the user's input is
 #overridden.  UTP cannot be chosen otherwise, since it won't work.
 #
-InitErgmTerm.dgwesp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
@@ -292,7 +292,7 @@ InitErgmTerm.dgwesp<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwesp.fixed.",decay,sep="")
 
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order,decay,typecode,maxesp),auxiliaries=linfo$auxiliaries)
-    else list(name=dname, coef.names=coef.names, inputs=c(if(!cache.sp) -1, decay,typecode,maxesp), auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+    else InitErgm_abort("Use dgwesp() instead.")
   }
 }
 
@@ -315,7 +315,7 @@ InitErgmTerm.dgwesp<-function(nw, arglist, cache.sp=TRUE, ...) {
 #routine is used (since it is safe for undirected graphs), irrespective of
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
-InitErgmTerm.ddsp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula,list","logical"),
@@ -358,13 +358,13 @@ InitErgmTerm.ddsp<-function(nw, arglist, cache.sp=TRUE, ...) {
   }
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else list(name=dname, coef.names=paste(conam,d,sep=""), inputs=c(if(!cache.sp) -1, typecode,d), minval=0, emptynwstats=emptynwstats, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+  else InitErgm_abort("Use ddsp() instead.")
 }
 
 
 
 ################################################################################
-InitErgmTerm.dgwdsp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   # the following line was commented out in <InitErgm.gwdsp>:
   #    ergm.checkdirected("gwdsp", is.directed(nw), requirement=FALSE)
   # so, I've not passed 'directed=FALSE' to <check.ErgmTerm>  
@@ -430,7 +430,7 @@ InitErgmTerm.dgwdsp<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwdsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else list(name=dname, coef.names=coef.names, inputs=c(if(!cache.sp) -1, decay,typecode,maxesp), auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+    else InitErgm_abort("Use dgwdspL() instead.")
   }
 }
 
@@ -452,7 +452,7 @@ InitErgmTerm.dgwdsp<-function(nw, arglist, cache.sp=TRUE, ...) {
 #routine is used (since it is safe for undirected graphs), irrespective of
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
-InitErgmTerm.dnsp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula","formula,list","logical"),
@@ -493,12 +493,12 @@ InitErgmTerm.dnsp<-function(nw, arglist, cache.sp=TRUE, ...) {
     emptynwstats <- NULL
   }
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else list(name=dname, coef.names=paste(conam,d,sep=""), inputs=c(if(!cache.sp) -1, typecode,d), minval=0, emptynwstats=emptynwstats, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+  else InitErgm_abort("Use dnspL() instead.")
 }
 
 
 ################################################################################
-InitErgmTerm.dgwnsp<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   # the following line was commented out in <InitErgm.gwnsp>:
   #    ergm.checkdirected("gwnsp", is.directed(nw), requirement=FALSE)
   # so, I've not passed 'directed=FALSE' to <check.ErgmTerm>  
@@ -564,6 +564,6 @@ InitErgmTerm.dgwnsp<-function(nw, arglist, cache.sp=TRUE, ...) {
       coef.names <- paste("gwnsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=paste0(linfo$coef.names_prefix,coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else list(name=dname, coef.names=coef.names, inputs=c(if(!cache.sp) -1, decay,typecode,maxesp), auxiliaries=if(cache.sp) .spcache.aux(type) else NULL)
+    else InitErgm_abort("Use dgwnspL() instead.")
   }
 }

@@ -4,13 +4,13 @@ These files are exported by ergm via R's LinkingTo: API, and allow
 other R packages to extend ergm's functionality. To make use of them,
 add the following dependencies to your package's DESCRIPTION file:
 
-Depends: ergm
-LinkingTo: ergm
+Depends: ergm.multi
+LinkingTo: ergm.multi
 
 and place a one-line C file (e.g., include_stubs.c) containing the
 following one line in the src/ directory of your package:
 
-#include "ergm_stubs.c"
+#include "ergm.multi_stubs.c"
 
 You will then be able to #include any of the exported header files,
 use the macros, and call any functions they define.

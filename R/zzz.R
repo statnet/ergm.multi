@@ -7,6 +7,9 @@
 #
 #  Copyright 2003-2017 Statnet Commons
 #######################################################################
+#' @import ergm
+#' @import network
+
 .onAttach <- function(lib, pkg){
   #' @importFrom statnet.common statnetStartupMessage
   sm <- statnetStartupMessage("ergm", c("statnet","ergm.count","tergm"), TRUE)
@@ -70,6 +73,7 @@
   ergm_proposal_table("c", c("Unif","DiscUnif","StdNormal","Poisson","Binomial"), ".dyads",  -3, "random", "DistRLE")
 }
 
+#' @useDynLib ergm.multi
 .onUnload <- function(libpath){
-  library.dynam.unload("ergm",libpath)
+  library.dynam.unload("ergm.multi",libpath)
 }

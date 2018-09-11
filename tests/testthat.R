@@ -1,4 +1,4 @@
 library(testthat)
-library(ergm)
+library(ergm.multi)
 
-test_check("ergm")
+test_check("ergm.multi")

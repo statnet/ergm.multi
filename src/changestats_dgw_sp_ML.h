@@ -5,7 +5,6 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 #include "ergm_changestat_multilayer.h"
-#include "changestats_dgw_sp.h"
 
 static inline int ergm_Check2Path(unsigned int e11, unsigned int e12, unsigned int e21, unsigned int e22, unsigned int any_order){
   if(any_order) return((e11&&e22) || (e12&&e21));
@@ -60,6 +59,13 @@ static inline void espITP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Netw
 /* static inline void espRTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs); */
 static inline void espOSP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs);
 static inline void espISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs);
+
+#define ESPUTP 0
+#define ESPOTP 1
+#define ESPITP 2
+#define ESPRTP 3
+#define ESPOSP 4
+#define ESPISP 5
 
 /*Changescore functions*/
 C_CHANGESTAT_FN(c_desp_ML);
