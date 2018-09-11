@@ -26,20 +26,20 @@ ISP <- function(m1, m2){
   dediag(t(m1)%*%m2+t(m2)%*%m1-t(m1*m2)%*%(m1*m2))
 }
 
-esp <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
+espL <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- UTP(Ls.path1, Ls.path2, ...)
   L.base[L.base==0] <- NA # I.e., those with base=0 don't count at all.
   esp <- dediag(L.base*TP, NA)[upper.tri(TP)]
   tabulate(match(esp, x),length(x))
 }
 
-dsp <- function(x, Ls.path1, Ls.path2=Ls.path1, ...){
+dspL <- function(x, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- UTP(Ls.path1, Ls.path2, ...)
   dsp <- dediag(TP, NA)[upper.tri(TP)]
   tabulate(match(dsp, x),length(x))
 }
 
-nsp <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
+nspL <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- UTP(Ls.path1, Ls.path2, ...)
   L.base[L.base==1] <- NA # I.e., those with base=1 don't count at all.
   nsp <- dediag((1-L.base)*TP, NA)[upper.tri(TP)]
@@ -47,20 +47,20 @@ nsp <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
 }
 
 
-desp <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
+despL <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- type(Ls.path1, Ls.path2, ...)
   L.base[L.base==0] <- NA # I.e., those with base=0 don't count at all.
   esp <- dediag(L.base*TP, NA)
   tabulate(match(esp, x),length(x))
 }
 
-ddsp <- function(x, type, Ls.path1, Ls.path2=Ls.path1, ...){
+ddspL <- function(x, type, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- type(Ls.path1, Ls.path2, ...)
   dsp <- dediag(TP, NA)
   tabulate(match(dsp, x),length(x))
 }
 
-dnsp <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
+dnspL <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- type(Ls.path1, Ls.path2, ...)
   L.base[L.base==1] <- NA # I.e., those with base=1 don't count at all.
   nsp <- dediag((1-L.base)*TP, NA)
