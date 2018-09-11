@@ -97,13 +97,13 @@ stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 
 data(florentine)
 (layer <- summary(Layer(m=flomarriage, b=flobusiness)~ddspL(0:10,Ls.path=c(~b,~b))))
-(logic <- summary(flobusiness~dspL(0:10)))
+(logic <- summary(flobusiness~dsp(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 (layer <- summary(Layer(m=flomarriage, b=flobusiness)~despL(0:10,Ls.path=c(~b,~b),L.base=~b)))
-(logic <- summary(flobusiness~espL(0:10)))
+(logic <- summary(flobusiness~esp(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 (layer <- summary(Layer(m=flomarriage, b=flobusiness)~dnspL(0:10,Ls.path=c(~b,~b),L.base=~b)))
-(logic <- summary(flobusiness~nspL(0:10)))
+(logic <- summary(flobusiness~nsp(0:10)))
 stopifnot(isTRUE(all.equal(layer, logic, check.attributes=FALSE)))
 
 # MLE
