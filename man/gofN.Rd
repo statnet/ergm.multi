@@ -3,6 +3,7 @@
 \name{gofN}
 \alias{gofN}
 \alias{plot.gofN}
+\alias{summary.gofN}
 \title{Linear model diagnostics for multinetwork linear models}
 \usage{
 gofN(object, GOF, subset = TRUE, control = control.gofN.ergm(), ...)
@@ -10,6 +11,8 @@ gofN(object, GOF, subset = TRUE, control = control.gofN.ergm(), ...)
 \method{plot}{gofN}(x, against = NULL, which = 1:2, col = 1,
   pch = 1, cex = 1, ..., ask = length(which) > 1 &&
   dev.interactive(TRUE))
+
+\method{summary}{gofN}(object, ...)
 }
 \arguments{
 \item{object}{an \code{\link{ergm}} object.}
@@ -21,14 +24,19 @@ statistics whose goodness of fit to test.}
 
 \item{control}{See \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}.}
 
-\item{\dots}{additional arguments to \code{\link[=simulate.ergm]{simulate.ergm()}} and
-\code{\link[=summary.ergm_model]{summary.ergm_model()}}.}
+\item{\dots}{additional arguments to functions (\code{\link[=simulate.ergm]{simulate.ergm()}}
+and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor, \code{\link[=plot]{plot()}},
+\code{\link[=qqnorm]{qqnorm()}}, and \code{\link[=qqline]{qqline()}} for the plotting method).}
+
+\item{x}{a \code{\link{gofN}} object.}
 
 \item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values.}
 
 \item{which}{which to plot (\code{1} for residuals plot, \code{2} for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and \code{3} for normal quantile-quantile plot).}
 
 \item{col, pch, cex}{vector of values (wrapped in \code{\link[=I]{I()}}), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.}
+
+\item{ask}{whether the user should be prompted between the plots.}
 }
 \value{
 An object of class \code{gofN}: a named list containing a list
@@ -62,6 +70,8 @@ Linear model diagnostics for multinetwork linear models
 \section{Methods (by generic)}{
 \itemize{
 \item \code{plot}: A plotting method, making residual and scale-location plots.
+
+\item \code{summary}: A simple summary function.
 }}
 
 \examples{
@@ -69,6 +79,7 @@ data(samplk)
 monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
 fit <- ergm(monks~N(~edges))
 fit.gof <- gofN(fit, GOF=~edges)
+summary(fit.gof)
 plot(fit.gof)
 
 samplk1[1,]<-NA
@@ -76,6 +87,7 @@ samplk2[,2]<-NA
 monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
 fit <- ergm(monks~N(~edges))
 fit.gof <- gofN(fit, GOF=~edges)
+summary(fit.gof)
 plot(fit.gof)
 
 # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
