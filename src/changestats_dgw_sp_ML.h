@@ -74,6 +74,13 @@ static inline unsigned int ergm_LayerLogic2Path(Vertex tail1, Vertex head1, Vert
     subroutine;								\
   }
 
+#define ESPUTP 0
+#define ESPOTP 1
+#define ESPITP 2
+#define ESPRTP 3
+#define ESPOSP 4
+#define ESPISP 5
+
 /* /\*DSP calculation functions*\/ */
 /* static inline void dspUTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs); */
 /* static inline void dspOTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs); */
