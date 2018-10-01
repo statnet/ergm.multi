@@ -1,3 +1,4 @@
+library(testthat)
 context("test-term-dgwesp-ml.R")
 
 # "Correct" transitivity calculators
@@ -70,8 +71,6 @@ dnspL <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
 library(ergm)
 library(purrr)
 n <- 5
-nw1 <- nw2 <- nw3 <- network.initialize(n,dir=TRUE)
-lnw <- Layer(nw1,nw2,nw3)
 
 #### Some code useful for debugging.
 
@@ -116,7 +115,16 @@ lnw <- Layer(nw1,nw2,nw3)
 
 ctrl <- control.simulate.formula(MCMC.burnin=1, MCMC.interval=1)
 
-test_that("Multilayer dgw*sp statistics for homogeneously directed networks", {
+for(cache.sp in c(FALSE,TRUE)){
+  options(ergm.term=list(cache.sp=cache.sp))
+  sptxt <- if(cache.sp) "with shared partner caching" else "without shared partner caching"
+
+
+### Directed.
+nw1 <- nw2 <- nw3 <- network.initialize(n,dir=TRUE)
+lnw <- Layer(nw1,nw2,nw3)
+
+test_that(paste("Multilayer dgw*sp statistics for homogeneously directed networks",sptxt), {
   sim <- suppressWarnings(simulate(lnw~
                     # desp distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -311,7 +319,7 @@ nw1 <- nw3 <- network.initialize(n,dir=TRUE)
 nw2 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
-test_that("Multilayer dgw*sp statistics for heterogeneously directed networks 1", {
+test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed networks 1",sptxt), {
   sim <- suppressWarnings(simulate(lnw~
                     # desp distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -507,7 +515,7 @@ test_that("Multilayer dgw*sp statistics for heterogeneously directed networks 1"
 nw1 <- nw2 <- nw3 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
-test_that("Multilayer dgw*sp statistics for undirected networks", {
+test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
   sim <- suppressWarnings(simulate(lnw~
                     # desp distinct layers
                     despL(0:n,L.base=~`1`,Ls.path=c(~`2`,~`3`))+
@@ -575,3 +583,4 @@ test_that("Multilayer dgw*sp statistics for undirected networks", {
 
   expect_equivalent(attr(sim,"stats"), stats)
 })
+}
