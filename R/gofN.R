@@ -13,7 +13,8 @@
 #'
 #' @param object an [`ergm`] object.
 #' @param GOF a one-sided [`ergm`] formula specifying network
-#'   statistics whose goodness of fit to test.
+#'   statistics whose goodness of fit to test, or [`NULL`]; if `NULL`,
+#'   uses the original model.
 #' @param subset argument for the [`N`][ergm-terms] term.
 #' @param \dots additional arguments to functions ([simulate.ergm()]
 #'   and [summary.ergm_model()] for the constructor, [plot()],
@@ -48,16 +49,22 @@
 #' @examples
 #' data(samplk)
 #' monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
-#' fit <- ergm(monks~N(~edges))
-#' fit.gof <- gofN(fit, GOF=~edges)
+#' fit <- ergm(monks~N(~edges+nodematch("group")))
+#' fit.gof <- gofN(fit) # GOF = original model
+#' summary(fit.gof)
+#' plot(fit.gof)
+#' fit.gof <- gofN(fit, GOF=~triangles)
 #' summary(fit.gof)
 #' plot(fit.gof)
 #'
 #' samplk1[1,]<-NA
 #' samplk2[,2]<-NA
 #' monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
-#' fit <- ergm(monks~N(~edges))
-#' fit.gof <- gofN(fit, GOF=~edges)
+#' fit <- ergm(monks~N(~edges+nodematch("group")))
+#' fit.gof <- gofN(fit) # GOF = original model
+#' summary(fit.gof)
+#' plot(fit.gof)
+#' fit.gof <- gofN(fit, GOF=~triangles)
 #' summary(fit.gof)
 #' plot(fit.gof)
 #' 
@@ -67,7 +74,7 @@
 #' }
 #' 
 #' @export
-gofN <- function(object, GOF, subset=TRUE, control=control.gofN.ergm(), ...){
+gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...){
   check.control.class(c("gofN.ergm"), "gofN")
   if(control$obs.twostage && control$nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by obs.twostage control parameter must divide the nsim control parameter evenly.")
   
@@ -93,9 +100,9 @@ gofN <- function(object, GOF, subset=TRUE, control=control.gofN.ergm(), ...){
   for(attempt in seq_len(control$retry_bad_nets + 1)){
     if(attempt!=1) message(sum(remain), " networks (", paste(which(remain),collapse=", "), ") have bad simulations; rerunning.")
     message("Constructing GOF model.")
+    NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
     if(any(NVL(prev.remain,FALSE)!=remain))
-      pernet.m <- ergm_model(~N(GOF, subset=remain), nw=nw, response = object$response, ...,
-                             term.options= .update.list(as.list(object$control$term.options), list(N.compact_stats=FALSE)))
+      pernet.m <- ergm_model(~ByNetDStats(GOF, subset=remain), nw=nw, response = object$response, ...)
     prev.remain <- remain
     
     nstats <- nparam(pernet.m, canonical=TRUE)/sum(remain)
@@ -168,27 +175,28 @@ gofN <- function(object, GOF, subset=TRUE, control=control.gofN.ergm(), ...){
     }
 
     # Calculate variances for each network and statistic.
-    dv <- apply(statarray, 2:3, var) - if(control$obs.twostage) apply(statarray, 2:3, .mean_var, control$obs.twostage) else apply(statarray.obs, 2:3, var)
+    v <- apply(statarray, 2:3, var)
+    vo <- if(control$obs.twostage) apply(statarray, 2:3, .mean_var, control$obs.twostage) else apply(statarray.obs, 2:3, var)
     # If any statistic for the network has negative variance estimate, rerun it.
-    remain[remain] <- apply(dv<=0, 2, any)
+    remain[remain] <- apply(v>0 & v-vo<=0, 2, any)
     if(!any(remain)) break;
   }
   if(any(remain))
     stop(sum(remain), " networks (", paste(which(remain),collapse=", "), ") have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
-  message("Summarising.")
+  message("Summarizing.")
   o <- setNames(lapply(seq_along(cn), function(i){
     s <- stats[,i,]
     so <- stats.obs[,i,]
     #' @importFrom tibble lst
-    l <-
-      lst(
-        observed = colMeans(so),
-        fitted = colMeans(s),
-        var = apply(s,2,var),
-        var.obs = if(control$obs.twostage) apply(s, 2, .mean_var, control$obs.twostage) else apply(so, 2, var),
-        pearson = (observed-fitted)/sqrt(var-var.obs)
-      )
+    v <- apply(s,2,var)
+    l <- list()
+    l$var <- ifelse(v>0, v, NA)
+    l$var.obs <- ifelse(v>0, if(control$obs.twostage) apply(s, 2, .mean_var, control$obs.twostage) else apply(so, 2, var), NA)
+    l$observed <- ifelse(v>0, colMeans(so), NA)
+    l$fitted <- ifelse(v>0, colMeans(s), NA)
+    l$pearson <- ifelse(v>0, (l$observed-l$fitted)/sqrt(l$var-l$var.obs), NA)
+    l
   }), cn)
 
   structure(o, nw=nw, subset=subset, control=control, class="gofN")
@@ -268,8 +276,8 @@ summary.gofN <- function(object, by=NULL, ...){
     list(`Observed/Imputed values` = object %>% map("observed") %>% as_tibble %>% summary,
          `Fitted values` = object %>% map("fitted") %>% as_tibble %>% summary,
          `Pearson residuals`  = object %>% map("pearson") %>% as_tibble %>% summary,
-         `Variance of Pearson residuals` = object %>% map("pearson") %>% map(var),
-         `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% map(sd))
+         `Variance of Pearson residuals` = object %>% map("pearson") %>% map(var,na.rm=TRUE),
+         `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% map(sd,na.rm=TRUE))
   }else{
     if(is(by,"formula"))
       nattrs <- get_multinet_nattr_tibble(attr(object,"nw"))[attr(object,"subset"),]
@@ -284,8 +292,8 @@ summary.gofN <- function(object, by=NULL, ...){
     list(`Observed/Imputed values` = object %>% map("observed") %>% as_tibble %>% split(byval) %>% map(summary),
          `Fitted values` = object %>% map("fitted") %>% as_tibble %>% split(byval) %>% map(summary),
          `Pearson residuals`  = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(summary),
-         `Variance of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(var),
-         `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(~apply(.,2,sd)))
+         `Variance of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(var,na.rm=TRUE),
+         `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(~apply(.,2,sd,na.rm=TRUE)))
   }
 }
 
