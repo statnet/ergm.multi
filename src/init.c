@@ -10,6 +10,8 @@
 /* This is a dummy list, since ergm.multi is a library package.
 */
 
+#include <R.h>
+#include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
@@ -19,8 +21,16 @@ static const R_CMethodDef CEntries[] = {
     {NULL, NULL, 0}
 };
 
+/* .Call calls */
+extern SEXP mean_var_wrapper(SEXP, SEXP);
+
+static const R_CallMethodDef CallEntries[] = {
+    {"mean_var_wrapper",   (DL_FUNC) &mean_var_wrapper,   2},
+    {NULL, NULL, 0}
+};
+
 void R_init_ergm(DllInfo *dll)
 {
-    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, TRUE);
 }

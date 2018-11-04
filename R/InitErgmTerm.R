@@ -312,13 +312,15 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
     minval = 0, maxval=network.size(nw), conflicts.constraints="degreedist")
 }
 
+#=======================InitErgmTerm functions:  G============================#
+
 ################################################################################
-InitErgmTerm.gwb1degreeL<-function(nw, arglist,  ...) {
+InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE, bipartite=TRUE,                     
   # default for 'fixed' should be made 'FALSE' when the function can handle it!                    
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
                       vartypes = c("numeric", "logical", "character","numeric", "character,numeric,logical", "formula,list"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
+                      defaultvalues = list(NULL, FALSE, NULL, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; fixed<-a$fixed; attrname<-a$attrname
   cutoff<-a$cutoff
@@ -369,12 +371,12 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist,  ...) {
 
 
 ################################################################################
-InitErgmTerm.gwb2degreeL<-function(nw, arglist,  ...) {
+InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE, bipartite=TRUE,
   # default for 'fixed' should be made 'FALSE' when the function can handle it!                    
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
                       vartypes = c("numeric", "logical", "character", "numeric", "character,numeric,logical", "formula,list"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
+                      defaultvalues = list(NULL, FALSE, NULL, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; fixed<-a$fixed; attrname<-a$attrname
   cutoff<-a$cutoff
@@ -421,11 +423,11 @@ InitErgmTerm.gwb2degreeL<-function(nw, arglist,  ...) {
 }
 
 ################################################################################
-InitErgmTerm.gwdegreeL<-function(nw, arglist, ...) {
+InitErgmTerm.gwdegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
                       vartypes = c("numeric", "logical", "character", "numeric", "character,numeric,logical", "formula,list"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
+                      defaultvalues = list(NULL, FALSE, NULL, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; attrname<-a$attrname; fixed<-a$fixed  
   cutoff<-a$cutoff
@@ -471,11 +473,11 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist, ...) {
 }
 
 ################################################################################
-InitErgmTerm.gwidegreeL<-function(nw, arglist,  ...) {
+InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
                       vartypes = c("numeric", "logical", "character","numeric", "character,numeric,logical", "formula,list"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
+                      defaultvalues = list(NULL, FALSE, NULL, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; attrname<-a$attrname; fixed<-a$fixed  
   cutoff<-a$cutoff
@@ -522,11 +524,11 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist,  ...) {
 }
 
 ################################################################################
-InitErgmTerm.gwodegreeL<-function(nw, arglist,  ...) {
+InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
                       vartypes = c("numeric", "logical", "character","numeric", "character,numeric,logical", "formula,list"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
+                      defaultvalues = list(NULL, FALSE, NULL, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; attrname<-a$attrname; fixed<-a$fixed  
   cutoff<-a$cutoff
