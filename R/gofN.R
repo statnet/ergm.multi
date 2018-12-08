@@ -200,6 +200,20 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   structure(o, nw=nw, subset=subset, control=control, class="gofN")
 }
 
+#' @describeIn gofN Extract a subset of statistics for which goodness-of-fit had been computed.
+#' @param drop whether the indexing operator should drop attributes and return simply a list.
+#' @export
+`[.gofN` <- function(x, i, ..., drop = FALSE){
+  y <- NextMethod("[")
+
+  if(drop) y
+  else{
+    mostattributes(y) <- attributes(x)
+    names(y) <- names(x)[i]
+    y
+  }
+}
+
 #' @describeIn gofN A plotting method, making residual and scale-location plots.
 #'
 #' @param x a [`gofN`] object.
@@ -252,7 +266,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     }
     
     if(2L %in% which){
-      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = paste("Scale-location plot for", sQuote(name)), xlab=againstname, ylab=expression(sqrt("|Pearson residual|")), type="n")
+      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = paste("Scale-location plot for", sQuote(name)), xlab=againstname, ylab=expression(sqrt(abs("Pearson residual"))), type="n")
       panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex, ...)
       abline(h=0, lty=3, col="gray")
     }
@@ -290,7 +304,7 @@ summary.gofN <- function(object, by=NULL, ...){
     list(`Observed/Imputed values` = object %>% map("observed") %>% as_tibble %>% split(byval) %>% map(summary),
          `Fitted values` = object %>% map("fitted") %>% as_tibble %>% split(byval) %>% map(summary),
          `Pearson residuals`  = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(summary),
-         `Variance of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(var,na.rm=TRUE),
+         `Variance of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(~apply(.,2,var,na.rm=TRUE)),
          `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% as_tibble %>% split(byval) %>% map(~apply(.,2,sd,na.rm=TRUE)))
   }
 }

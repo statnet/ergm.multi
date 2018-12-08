@@ -1,6 +1,6 @@
 Package: ergm.multi
-Version: 4.0-4694
-Date: 2018-11-04
+Version: 4.0-4721
+Date: 2018-12-08
 Title: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 Authors@R: c(
            person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
@@ -24,6 +24,6 @@ Description: A set of extensions for the 'ergm' package to fit multilayer/multip
 License: GPL-3 + file LICENSE
 URL: http://statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
