@@ -20,7 +20,6 @@ r_github_packages:
 - statnet/statnet.common-private
 - statnet/network-private
 - statnet/ergm-private@dev
-- statnet/statnet.common-private
 addons:
   apt:
     packages:
