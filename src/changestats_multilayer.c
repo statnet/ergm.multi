@@ -197,9 +197,9 @@ C_CHANGESTAT_FN(c_layerCMB){
 
 
 /*****************
- changestat: d_ldegree_ML_sum
+ changestat: d_degreeL_ML_sum
 *****************/
-C_CHANGESTAT_FN(c_ldegree_ML_sum) { 
+C_CHANGESTAT_FN(c_degreeL_ML_sum) { 
   double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
@@ -241,9 +241,9 @@ C_CHANGESTAT_FN(c_ldegree_ML_sum) {
 }
 
 /*****************
- changestat: d_ldegree_by_attr_ML_sum
+ changestat: d_degreeL_by_attr_ML_sum
 *****************/
-C_CHANGESTAT_FN(c_ldegree_by_attr_ML_sum) { 
+C_CHANGESTAT_FN(c_degreeL_by_attr_ML_sum) { 
   /* The inputparams are assumed to be set up as follows:
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
@@ -293,9 +293,9 @@ C_CHANGESTAT_FN(c_ldegree_by_attr_ML_sum) {
 }
 
 /*****************
- changestat: d_ldegree_ML_sum
+ changestat: d_degreeL_ML_sum
 *****************/
-C_CHANGESTAT_FN(c_gwldegree_ML_sum) { 
+C_CHANGESTAT_FN(c_gwdegreeL_ML_sum) { 
   double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
@@ -338,9 +338,9 @@ C_CHANGESTAT_FN(c_gwldegree_ML_sum) {
 }
 
 /*****************
- changestat: d_ldegree_by_attr_ML_sum
+ changestat: d_degreeL_by_attr_ML_sum
 *****************/
-C_CHANGESTAT_FN(c_gwldegree_by_attr_ML_sum) { 
+C_CHANGESTAT_FN(c_gwdegreeL_by_attr_ML_sum) { 
   /* The inputparams are assumed to be set up as follows:
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.

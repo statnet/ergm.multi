@@ -594,7 +594,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
     passthrough.curved.ergm_model(m, function(x) paste0(.lspec_coef.names(list(a$Ls)),":",x)))
 }
 
-InitErgmTerm.lCMB <- function(nw, arglist, response=NULL, ...){
+InitErgmTerm.CMBL <- function(nw, arglist, response=NULL, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
                       vartypes = c("formula,list"),
@@ -608,11 +608,11 @@ InitErgmTerm.lCMB <- function(nw, arglist, response=NULL, ...){
 
   inputs <- c(nltrms)
 
-  list(name="layerCMB", coef.names = paste0('lCMB(',.despace(deparse(Ls)),')'), inputs=inputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="layerCMB", coef.names = paste0('CMBL(',.despace(deparse(Ls)),')'), inputs=inputs, dependence=TRUE, auxiliaries = auxiliaries)
 }
 
 ################################################################################
-InitErgmTerm.ldegree<-function(nw, arglist, ...) {
+InitErgmTerm.degreeL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("d", "by", "Ls", "dir"),
                       vartypes = c("numeric", "character", "formula,list", "character"),
@@ -664,13 +664,13 @@ InitErgmTerm.ldegree<-function(nw, arglist, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
 
-  if(is.null(a$Ls) || is.null(a$dir)) stop("A layer and direction specification is required for the ldegree term.")
+  if(is.null(a$Ls) || is.null(a$dir)) stop("A layer and direction specification is required for the degreeL term.")
   
   c(.process_layers_degree(nw, a, name=name,coef.names=coef.names, inputs=inputs, emptynwstats=emptynwstats), minval = 0)
 }
 
 ################################################################################
-InitErgmTerm.gwldegree<-function(nw, arglist,  ...) {
+InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls", "dir"),
                       vartypes = c("numeric", "logical", "character","numeric", "character,numeric,logical", "formula,list", "character"),
@@ -679,42 +679,42 @@ InitErgmTerm.gwldegree<-function(nw, arglist,  ...) {
   decay<-a$decay; attrname<-a$attrname; fixed<-a$fixed  
   cutoff<-a$cutoff
 
-  if(is.null(a$Ls) || is.null(a$dir)) stop("A layer and direction specification is required for the gwldegree term.")
+  if(is.null(a$Ls) || is.null(a$dir)) stop("A layer and direction specification is required for the gwdegreeL term.")
 
   # d <- 1:(network.size(nw)-1)
    maxesp <- min(cutoff,network.size(nw)-1)
   d <- 1:maxesp
   if (!is.null(attrname) && !fixed ) {
-    stop("The gwldegree term cannot yet handle a nonfixed decay ",
+    stop("The gwdegreeL term cannot yet handle a nonfixed decay ",
             "term with an attribute. Use fixed=TRUE.", call.=FALSE)
     
   }
   if(!fixed){ # This is a curved exponential family model
-    if(!is.null(a$decay)) warning("In term 'gwldegree': decay parameter 'decay' passed with 'fixed=FALSE'. 'decay' will be ignored. To specify an initial value for 'decay', use the 'init' control parameter.", call.=FALSE)
+    if(!is.null(a$decay)) warning("In term 'gwdegreeL': decay parameter 'decay' passed with 'fixed=FALSE'. 'decay' will be ignored. To specify an initial value for 'decay', use the 'init' control parameter.", call.=FALSE)
     ld<-length(d)
     if(ld==0){return(NULL)}
-    c(.process_layers_degree(nw, a, name="odegree", coef.names=paste("gwldegree#",d,sep=""), inputs=c(d)),
-      list(params=list(gwldegree=NULL,gwldegree.decay=decay), conflicts.constraints="degreedist"), GWDECAY)
+    c(.process_layers_degree(nw, a, name="odegree", coef.names=paste("gwdegreeL#",d,sep=""), inputs=c(d)),
+      list(params=list(gwdegreeL=NULL,gwdegreeL.decay=decay), conflicts.constraints="degreedist"), GWDECAY)
   } else {
-    if(is.null(a$decay)) stop("Term 'gwldegree' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
+    if(is.null(a$decay)) stop("Term 'gwdegreeL' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
 
     if(!is.null(attrname)) {
-      nodecov <- get.node.attr(nw, attrname, "gwldegree")
+      nodecov <- get.node.attr(nw, attrname, "gwdegreeL")
       u<-NVL(a$levels, sort(unique(nodecov)))
       if(any(is.na(nodecov))){u<-c(u,NA)}
       nodecov <- match(nodecov,u,nomatch=length(u)+1) # Recode to numeric
       if (length(u)==1)
-        stop ("Attribute given to gwldegree() has only one value", call.=FALSE)
+        stop ("Attribute given to gwdegreeL() has only one value", call.=FALSE)
       # Combine degree and u into 2xk matrix, where k=length(d)*length(u)
       lu <- length(u)
       du <- rbind(rep(d,lu), rep(1:lu, rep(length(d), lu)))
       if(nrow(du)==0) {return(NULL)}
       #  No covariates here, so "ParamsBeforeCov" unnecessary
-      name <- "gwldegree_by_attr"
+      name <- "gwdegreeL_by_attr"
       coef.names <- paste("gwodeg", decay, ".", attrname, u, sep="")
       inputs <- c(decay, nodecov)
     }else{
-      name <- "gwldegree"
+      name <- "gwdegreeL"
       coef.names <- paste("gwodeg.fixed.",decay,sep="")
       inputs <- c(decay)
     }

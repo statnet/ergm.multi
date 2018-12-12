@@ -21,11 +21,11 @@
 \alias{gwb2degreeL}
 \alias{gwdegreeL}
 \alias{gwidegreeL}
-\alias{gwldegree}
+\alias{gwdegreeL}
 \alias{gwodegreeL}
 \alias{idegreeL}
-\alias{ldegree}
-\alias{lCMB}
+\alias{degreeL}
+\alias{CMBL}
 \alias{mutualL}
 \alias{twostarL}
 \docType{methods}
@@ -428,7 +428,7 @@
   }
 
 
-  \item{\code{gwldegreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls, dir)}  (binary)  (directed) (curved)}{\emph{Geometrically weighted
+  \item{\code{gwdegreeLL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls, dir)}  (binary)  (directed) (curved)}{\emph{Geometrically weighted
     layer-combination-degree distribution:} This term adds one network statistic to the model
     equal to the weighted layer-cumulative degree distribution with decay parameter
     \code{decay} parameter, which should be non-negative. (this parameter was called \code{alpha} prior to \code{ergm 3.7}). The value supplied for
@@ -492,7 +492,7 @@
     combined.
   }
 
-  \item{\code{ldegree(d, by=NULL, Ls, dir)}  (binary)  (directed)  (categorical nodal attribute) (frequently-used)}{\emph{Layer-combinaton-degree:} The \code{d} argument
+  \item{\code{degreeL(d, by=NULL, Ls, dir)}  (binary)  (directed)  (categorical nodal attribute) (frequently-used)}{\emph{Layer-combinaton-degree:} The \code{d} argument
     is a vector of distinct integers. This term adds one network statistic to
     the model for each element in \code{d}; the \eqn{i}th such statistic equals
     the number of nodes in the network whose total degree across all
@@ -505,7 +505,7 @@
     see \code{degree}.
   }
 
-    \item{\code{lCMB(Ls=~.)} (binary) (directed) (undirected) (layer-aware)}{\emph{Conway--Maxwell-Binomial dependence among layers}:
+    \item{\code{CMBL(Ls=~.)} (binary) (directed) (undirected) (layer-aware)}{\emph{Conway--Maxwell-Binomial dependence among layers}:
 
       Models marginal dependence layers within each dyad by imposing
       a Conway--Maxwell-Binomial (CMB) distribution on the number of
