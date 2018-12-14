@@ -75,3 +75,22 @@ InitErgmConstraint.blockdiag<-function(lhs.nw, attrname=NULL, ...){
        },
        dependence = FALSE)
 }
+
+
+InitErgmConstraint.upper_tri<-function(lhs.nw, attrname=NULL, ...){
+  if(length(list(...)))
+    stop(paste("Upper-triangular constraint takes one argument at this time."), call.=FALSE)
+  if(!is.directed(lhs.nw)) stop("Upper-triangular constraint can be used only with directed networks.")
+  n <- network.size(lhs.nw)
+  list(attrname=attrname,
+       free_dyads = {
+         restrict <- if(is.null(attrname)) rep(TRUE, n) else as.logical(lhs.nw %v% attrname)
+         # The pattern is TRUE,...,TRUE,FALSE,...,FALSE for those
+         # columns i where restrict[i]==TRUE, and it's just
+         # TRUE,...,TRUE,TRUE,...,TRUE where restrict[i]==FALSE.
+         d <- do.call(c, lapply(seq_len(n), function(i) rep(c(rle(TRUE),rle(!restrict[i])), c(i-1, n-i+1),scale="run")))
+         rlebdm(compact.rle(d), n)
+       },
+       dependence = FALSE
+       )
+}
