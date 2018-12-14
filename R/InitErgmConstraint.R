@@ -37,6 +37,7 @@ InitErgmConstraint.blockdiag<-function(lhs.nw, attrname=NULL, ...){
   list(attrname=attrname,
        free_dyads = {
          n <- network.size(lhs.nw)
+         storage.mode(n) <- "integer"
          a <- lhs.nw %v% attrname
          if(NVL(lhs.nw%n%"bipartite",0)){
            bip <- lhs.nw %n% "bipartite"
@@ -82,6 +83,7 @@ InitErgmConstraint.upper_tri<-function(lhs.nw, attrname=NULL, ...){
     stop(paste("Upper-triangular constraint takes one argument at this time."), call.=FALSE)
   if(!is.directed(lhs.nw)) stop("Upper-triangular constraint can be used only with directed networks.")
   n <- network.size(lhs.nw)
+  storage.mode(n) <- "integer"
   list(attrname=attrname,
        free_dyads = {
          restrict <- if(is.null(attrname)) rep(TRUE, n) else as.logical(lhs.nw %v% attrname)
