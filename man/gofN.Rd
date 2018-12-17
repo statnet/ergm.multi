@@ -14,7 +14,7 @@ gofN(object, GOF = NULL, subset = TRUE,
 
 \method{plot}{gofN}(x, against = NULL, which = 1:2, col = 1,
   pch = 1, cex = 1, ..., ask = length(which) > 1 &&
-  dev.interactive(TRUE))
+  dev.interactive(TRUE), id.n = 3)
 
 \method{summary}{gofN}(object, by = NULL, ...)
 }
@@ -44,6 +44,8 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 \item{col, pch, cex}{vector of values (wrapped in \code{\link[=I]{I()}}), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.}
 
 \item{ask}{whether the user should be prompted between the plots.}
+
+\item{id.n}{Number of extreme points to label explicitly.}
 
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }

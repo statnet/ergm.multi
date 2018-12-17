@@ -221,12 +221,13 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
 #' @param col,pch,cex vector of values (wrapped in [I()]), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.
 #' @param which which to plot (`1` for residuals plot, `2` for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and `3` for normal quantile-quantile plot).
 #' @param ask whether the user should be prompted between the plots.
+#' @param id.n Number of extreme points to label explicitly.
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage
 #' @importFrom graphics abline panel.smooth plot
 #' @importFrom methods is
 #' @export
-plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE)){
+plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3){
   if(ask){
     prev.ask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(prev.ask))
@@ -255,19 +256,26 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
                 a)
     assign(gpar, a)
   }
-  
+
   for(name in names(x)){
     summ <- x[[name]]
     
+    nn <- sum(!is.na(summ$pearson))
+    ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
+    ei <- rank(-abs(summ$pearson), ties.method="min")<=id.n
+    ei <- ei & abs(summ$pearson)>ez
+
     if(1L %in% which){
       plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = paste("Residuals vs. Fitted for", sQuote(name)), xlab=againstname, ylab="Pearson residual",type="n")
-      panel.smooth(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex, ...)
+      panel.smooth(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
+      text(NVL(againstval,summ$fitted)[ei], summ$pearson[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
       abline(h=0, lty=3, col="gray")
     }
     
     if(2L %in% which){
       plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = paste("Scale-location plot for", sQuote(name)), xlab=againstname, ylab=expression(sqrt(abs("Pearson residual"))), type="n")
-      panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex, ...)
+      panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch==ifelse(ei, NA, pch), cex=cex, ...)
+      text(NVL(againstval,summ$fitted)[ei], sqrt(abs(summ$pearson))[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
       abline(h=0, lty=3, col="gray")
     }
 
