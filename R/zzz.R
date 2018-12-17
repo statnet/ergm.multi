@@ -15,7 +15,7 @@
 
 .onAttach <- function(lib, pkg){
   #' @importFrom statnet.common statnetStartupMessage
-  sm <- statnetStartupMessage("ergm", c("statnet","ergm.count","tergm"), TRUE)
+  sm <- statnetStartupMessage("ergm.multi", c("statnet"), FALSE)
   if(!is.null(sm)){
     packageStartupMessage(sm)
   }
