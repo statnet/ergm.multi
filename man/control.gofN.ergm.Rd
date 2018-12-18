@@ -6,20 +6,21 @@
 \title{Auxiliary for Controlling Multinetwork ERGM Linear Goodness-of-Fit Evaluation}
 \usage{
 control.gofN.ergm(nsim = 100, obs.twostage = nsim/2,
-  retry_bad_nets = 0, MCMC.burnin = NULL, MCMC.interval = NULL,
-  MCMC.prop.weights = NULL, MCMC.prop.args = NULL,
-  MCMC.init.maxedges = NULL, MCMC.packagenames = NULL,
-  MCMC.runtime.traceplot = FALSE, network.output = "network",
-  seed = NULL, parallel = 0, parallel.type = NULL,
-  parallel.version.check = TRUE, parallel.inherit.MT = FALSE)
-
-control.gofN(nsim = 100, obs.twostage = nsim/2, retry_bad_nets = 0,
-  MCMC.burnin = NULL, MCMC.interval = NULL, MCMC.prop.weights = NULL,
+  retry_bad_nets = 0, save_stats = FALSE, MCMC.burnin = NULL,
+  MCMC.interval = NULL, MCMC.prop.weights = NULL,
   MCMC.prop.args = NULL, MCMC.init.maxedges = NULL,
   MCMC.packagenames = NULL, MCMC.runtime.traceplot = FALSE,
   network.output = "network", seed = NULL, parallel = 0,
   parallel.type = NULL, parallel.version.check = TRUE,
   parallel.inherit.MT = FALSE)
+
+control.gofN(nsim = 100, obs.twostage = nsim/2, retry_bad_nets = 0,
+  save_stats = FALSE, MCMC.burnin = NULL, MCMC.interval = NULL,
+  MCMC.prop.weights = NULL, MCMC.prop.args = NULL,
+  MCMC.init.maxedges = NULL, MCMC.packagenames = NULL,
+  MCMC.runtime.traceplot = FALSE, network.output = "network",
+  seed = NULL, parallel = 0, parallel.type = NULL,
+  parallel.version.check = TRUE, parallel.inherit.MT = FALSE)
 }
 \arguments{
 \item{nsim}{Number of networks to be randomly drawn using Markov chain Monte
@@ -54,6 +55,9 @@ number of times to retry simulating networks for which the
 estimated constrained variance is higher than unconstrained. Note
 that setting it \code{>0} is likely to bias estimates: the simulation
 should instead be rerun with a larger \code{nsim}.}
+
+\item{save_stats}{If \code{TRUE}, save the simulated network statistics;
+defaults to \code{FALSE} to save memory and disk space.}
 
 \item{MCMC.burnin}{Number of proposals before any MCMC sampling is done. It
 typically is set to a fairly large number.}

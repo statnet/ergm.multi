@@ -35,6 +35,8 @@
 #' \item{var.obs}{Conditional variance under imputation statistic.}
 #' 
 #' \item{pearson}{The Pearson residual computed from the above.}
+#'
+#' \item{stats,stats.obs}{If `save_stats` control parameter is `TRUE`, the simulated statistics.}
 #' 
 #' In addition, the following [`attr`]-style attributes are included:
 #'
@@ -194,6 +196,10 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     l$observed <- ifelse(v>0, colMeans(so), NA)
     l$fitted <- ifelse(v>0, colMeans(s), NA)
     l$pearson <- ifelse(v>0, (l$observed-l$fitted)/sqrt(l$var-l$var.obs), NA)
+    if(control$save_stats){
+      l$stats <- s
+      l$stats.obs <- so
+    }
     l
   }), cn)
 
@@ -350,6 +356,10 @@ summary.gofN <- function(object, by=NULL, ...){
 #'   estimated constrained variance is higher than unconstrained. Note
 #'   that setting it `>0` is likely to bias estimates: the simulation
 #'   should instead be rerun with a larger `nsim`.
+#'
+#' @param save_stats If `TRUE`, save the simulated network statistics;
+#'   defaults to `FALSE` to save memory and disk space.
+#'
 #' @param nsim Number of networks to be randomly drawn using Markov chain Monte
 #' Carlo.  This sample of networks provides the basis for comparing the model
 #' to the observed network.
@@ -388,6 +398,7 @@ summary.gofN <- function(object, by=NULL, ...){
 control.gofN.ergm<-function(nsim=100,
                             obs.twostage=nsim/2,
                             retry_bad_nets=0,
+                            save_stats=FALSE,
                        MCMC.burnin=NULL,
                        MCMC.interval=NULL,
                        MCMC.prop.weights=NULL,

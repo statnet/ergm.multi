@@ -1,5 +1,5 @@
 Package: ergm.multi
-Version: 4.0-3884
+Version: 4.0-3885
 Date: 2018-12-18
 Title: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 Authors@R: c(

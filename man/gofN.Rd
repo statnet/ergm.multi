@@ -67,6 +67,8 @@ of their imputations under the model.}
 
 \item{pearson}{The Pearson residual computed from the above.}
 
+\item{stats,stats.obs}{If \code{save_stats} control parameter is \code{TRUE}, the simulated statistics.}
+
 In addition, the following \code{\link{attr}}-style attributes are included:
 
 \item{nw}{The observed multinetwork object.}
