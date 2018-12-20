@@ -162,7 +162,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
         }
       message("Simulating constrained sample.")
       sim.obs <- do.call(simulate, .update.list(sim.obs_settings,
-                                                list(nsim=if(control$obs.twostage) control$obs.twostage else control$nsim,
+                                                list(nsim=control$nsim,
                                                      monitor=pernet.m)))
       sim.obs <- sim.obs[,ncol(sim.obs)-sum(remain)*nstats+seq_len(sum(remain)*nstats),drop=FALSE]
     }else{
@@ -174,7 +174,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     
     statarray <- array(c(sim), c(control$nsim, nstats, sum(remain)))
     dimnames(statarray) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
-    statarray.obs <- array(c(sim.obs), c(if(control$obs.twostage) control$obs.twostage else control$nsim, nstats, sum(remain)))
+    statarray.obs <- array(c(sim.obs), c(control$nsim, nstats, sum(remain)))
     dimnames(statarray.obs) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
 
     if(is.null(stats)){
