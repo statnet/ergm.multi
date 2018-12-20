@@ -87,15 +87,27 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
 
   stats <- stats.obs <- NULL
 
+  cl <- ergm.getCluster(control)
+  nthreads <- nthreads(control) # Fix this, so as not to become confused inside a clusterCall().
+
   message("Constructing simulation model(s).")
-  sim_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
-  
   if(!is.null(object$constrained.obs)){
+
+    # First, make sure that the sample size is a multiple of the number of threads.
+    if(control$obs.twostage && control$obs.twostage%%nthreads!=0){
+      obs.twostage.new <- ceiling(control$obs.twostage/nthreads)*nthreads
+      message(sQuote("control$obs.twostage"), " must be a multiple of number of parallel threads; increasing it to ", obs.twostage.new, ".")
+      control$nsim <- round(obs.twostage.new/control$obs.twostage*control$nsim)
+      control$obs.twostage <- obs.twostage.new
+    }
+
     sim.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
+  sim_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+
   prev.remain <- NULL
-  cl <- ergm.getCluster(control)
+
   for(attempt in seq_len(control$retry_bad_nets + 1)){
     if(attempt!=1) message(sum(remain), " networks (", paste(which(remain),collapse=", "), ") have bad simulations; rerunning.")
     message("Constructing GOF model.")
@@ -119,7 +131,6 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     # TODO: Make this adaptive: start with a small simulation,
     # increase on fail; or perhaps use a pilot sample.
     if(!is.null(object$constrained.obs)){
-      nthreads <- nthreads() # Fix this, so as not to become confused inside a clusterCall().
       sim <-
         if(control$obs.twostage){
           message("Simulating imputed networks.", appendLF=FALSE)
@@ -147,7 +158,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
           #' @importFrom parallel clusterCall
           sim <- if(!is.null(cl)) unlist(clusterCall(cl, genseries),recursive=FALSE) else genseries()
           message("")
-          do.call(rbind, sim)[seq_len(control$obs.twostage),,drop=FALSE]
+          do.call(rbind, sim)
         }
       message("Simulating constrained sample.")
       sim.obs <- do.call(simulate, .update.list(sim.obs_settings,
