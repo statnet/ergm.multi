@@ -282,8 +282,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
-    ei <- rank(-abs(summ$pearson), ties.method="min")<=id.n
-    ei <- ei & abs(summ$pearson)>ez
+    ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
 
     if(1L %in% which){
       plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = paste("Residuals vs. Fitted for", sQuote(name)), xlab=againstname, ylab="Pearson residual",type="n")
@@ -294,7 +293,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     
     if(2L %in% which){
       plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = paste("Scale-location plot for", sQuote(name)), xlab=againstname, ylab=expression(sqrt(abs("Pearson residual"))), type="n")
-      panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch==ifelse(ei, NA, pch), cex=cex, ...)
+      panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
       if(any(ei)) text(NVL(againstval,summ$fitted)[ei], sqrt(abs(summ$pearson))[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
       abline(h=0, lty=3, col="gray")
     }
