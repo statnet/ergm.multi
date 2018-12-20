@@ -1,5 +1,5 @@
 .mean_var <- function(x, ng){
-  .Call("mean_var_wrapper", x, length(x)/ng, PACKAGE="ergm")
+  .Call("mean_var_wrapper", x, length(x)/ng, PACKAGE="ergm.multi")
 }
 
 .update.list <- function(l, v){
