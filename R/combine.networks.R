@@ -33,10 +33,6 @@
 #'   look like dyadic covariate ([`ergm::edgecov`]) matrices into a
 #'   block-diagonal matrix.
 #'
-#' @param standardized whether the passed networks can be assumed to
-#'   have been run throgh [ergm::standardize.network()]: their
-#'   internal representation fulfills certain constraints.
-#'
 #' @param keep.unshared.attr whether to keep those network, vertex,
 #'   and edge attributes not shared by all networks in the list; if
 #'   \code{TRUE}, positions corresponding to networks lacking the
@@ -103,10 +99,10 @@
 #' head(get.vertex.attribute(f1, ".NetworkID"))
 #' head(get.vertex.attribute(f1, ".NetworkName"))
 #' @export
-combine_networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE, subnet.cache=FALSE){
+combine_networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE, subnet.cache=FALSE){
   out <-
-    if(any(sapply(nwl, is.bipartite))) .combine_networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
-    else .combine_networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
+    if(any(sapply(nwl, is.bipartite))) .combine_networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, keep.unshared.attr=keep.unshared.attr)
+    else .combine_networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, keep.unshared.attr=keep.unshared.attr)
 
   if(subnet.cache){
     snc <- NVL(out %n% ".subnetcache", list()) # TODO: Check that this line is necessary, since combined networks aren't supposed to have a subnet cache even if the constituent networks do.
@@ -119,12 +115,11 @@ combine_networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
 }
 
 
-.combine_networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
+.combine_networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE){
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
   if(keep.unshared.attr && detect.edgecov) stop("Detection of edge covariates is not compatible with retaining unshared attributes.")
   attrset <- if(keep.unshared.attr) union else intersect
   
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
@@ -222,13 +217,12 @@ combine_networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
 }
 
 
-.combine_networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
+.combine_networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE){
   if(!all(sapply(nwl, is.bipartite))) stop("This function operates only on bipartite networks.")
   if(any(sapply(nwl, is.directed))) stop("Bipartite directed networks are not supported at this time.")
   if(keep.unshared.attr && detect.edgecov) stop("Detection of edge covariates is not compatible with retaining unshared attributes.")
   attrset <- if(keep.unshared.attr) union else intersect
 
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   es <- sapply(nwl, "%n%", "bipartite")
   eblks <- c(0, cumsum(es))
@@ -443,7 +437,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
   uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints"))
 }
 
-  #' Calculate a vector that maps the global LHS network Vertex indices within-layer Vertex and a Vertex to layer lookup table.
+#' Calculate a vector that maps the global LHS network Vertex indices within-layer Vertex and a Vertex to layer lookup table.
 #' @noRd
 .block_vertexmap <- function(nw, by=".NetworkID", same_dim=FALSE){
   a <- .peek_vattrv(nw, by)
