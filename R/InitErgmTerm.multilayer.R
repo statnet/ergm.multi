@@ -187,7 +187,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #'   1. Several networks as (optionally named) arguments.
 #'
-#'   1. A single network, a chararacter vector, and an optional
+#'   1. A single network, a character vector, and an optional
 #'      logical vector. Then, the layers are values of the named edge
 #'      attributes. If the network is directed, the logical vector
 #'      specifies which of the layers should be treated as undirected.
