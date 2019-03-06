@@ -438,3 +438,76 @@ control.gofN.ergm<-function(nsim=100,
 #' @rdname control.gofN.ergm
 #' @export control.gofN
 control.gofN <- control.gofN.ergm
+
+#' Fit a linear model to the residuals in a gofN object.
+#'
+#' This non-method runs a properly weighted linear model on the raw
+#' residuals of a [`gofN`] simulation for a multi-network ERGM fit.
+#'
+#' @param formula an [`lm`]-style formula. See Details for
+#'   interpretation.
+#'
+#' @param data a [`gofN`] object.
+#'
+#' @param ... additional arguments to [lm()], excluding `weights`.
+#'
+#' @details The `formula`'s RHS is evaluated in an environment
+#'   comprising the network statistics used in the [gofN()] call
+#'   (which refer to the raw residuals for the corresponding
+#'   statistic) and the network attributes.
+#'
+#'   The LHS is handled in a nonstandard manner, designed to make it
+#'   easier to reference the usually lengthy network statistics:
+#'   first, it is evaluated in the formula's environment. If the
+#'   evaluation is successful and the result is numeric, these numbers
+#'   are used as indices of the statistics in the [`gofN`] object to
+#'   use on the RHS. If it is a character vector, it is treated as
+#'   names of these statistics.
+#'
+#' @return A list of [`lm`] objects, one for each element of the
+#'   vector on the LHS.
+#'
+#' @seealso [gofN()] and related methods.
+#'
+#' @examples
+#' data(samplk)
+#' # Add time indices:
+#' samplk1 %n% "t" <- 1
+#' samplk2 %n% "t" <- 2
+#' samplk3 %n% "t" <- 3
+#'
+#' monks <- Networks(samplk1, samplk2, samplk3)
+#'
+#' fit <- ergm(monks~N(~edges+nodematch("group")))
+#' fit.gof <- gofN(fit) # GOF = original model
+#'
+#' # Is there a time effect we should incorporate?
+#' fit.gof.lm <- lm.gofN((1:2)~t, data=fit.gof)
+#'
+#' lapply(fit.gof.lm, summary)
+#'
+#' @importFrom statnet.common ERRVL eval_lhs.formula
+#' @export lm.gofN
+lm.gofN <- function(formula, data, ...){
+  if(!is(data, "gofN")) stop("lm.gofN() requires a gofN object as the data= argument.")
+  if("weights" %in% names(list(...))) stop("lm.gofN() does not accept a weights= argument at this time.")
+
+  nattrs <- get_multinet_nattr_tibble(attr(data,"nw"))[attr(data,"subset"),]
+  residuals <- data %>% map(~.$observed-.$fitted) %>% do.call(cbind, .)
+
+  data.all <- cbind(residuals, nattrs)
+
+  ws <- data %>% map(~.$var-.$var.obs) %>% map(`^`, -1)
+
+  lhsl <- ERRVL(try({
+    lhsl <- eval_lhs.formula(formula)
+    if(is.numeric(lhsl)) lhsl <- names(data)[lhsl]
+    as.character(lhsl)
+  },silent=TRUE), as.character(formula[[2]]))
+
+  lapply(lhsl, function(lhs, ...){
+    formula[[2]] <- as.name(lhs)
+    data.all$.weights <- ws[[lhs]]
+    lm(formula, data=data.all, weights=.weights, ...)
+  }, ...) %>% set_names(lhsl)
+}

@@ -12,7 +12,7 @@ Layer(...)
 \item An (optionally named) list of identically-dimensioned
 networks.
 \item Several networks as (optionally named) arguments.
-\item A single network, a chararacter vector, and an optional
+\item A single network, a character vector, and an optional
 logical vector. Then, the layers are values of the named edge
 attributes. If the network is directed, the logical vector
 specifies which of the layers should be treated as undirected.
