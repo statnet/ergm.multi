@@ -263,15 +263,15 @@ Layer <- function(...){
   if(!all_identical(lapply(obs.constraintsl, .unenv))) stop("Layers have differing observation processes. This is not supported at this time.")
   
   nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints"), subnet.cache=TRUE)
-  nw %n% "constraints" <-
-      if(NVL(nwl[[1]]%n%"constraints",~.)==~.)
+  nw %ergmlhs% "constraints" <-
+      if(NVL(nwl[[1]] %ergmlhs% "constraints",~.)==~.)
         ~blockdiag(".LayerID")
       else
-        append_rhs.formula(nwl[[1]]%n%"constraints", list(call("blockdiag",".LayerID")), TRUE)
+        append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
   
-  if(any(symm)) nw %n% "constraints" <- append_rhs.formula(nw%n%"constraints", list(call("upper_tri",".undirected")), TRUE)
+  if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
 
-  if("obs.constraints" %in% list.network.attributes(nwl[[1]])) nw %n% "obs.constraints" <- nwl[[1]]%n%"obs.constraints"
+  if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]] %ergmlhs% "obs.constraints"
 
   nw
 }
