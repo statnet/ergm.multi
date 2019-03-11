@@ -262,7 +262,10 @@ Layer <- function(...){
   obs.constraintsl <- lapply(nwl, get.network.attribute, "obs.constraints")
   if(!all_identical(lapply(obs.constraintsl, .unenv))) stop("Layers have differing observation processes. This is not supported at this time.")
   
-  nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints"), subnet.cache=TRUE)
+  nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+
+  nw %n% "ergm" <- .combine_ergmlhs(nwl)
+
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",~.)==~.)
         ~blockdiag(".LayerID")
