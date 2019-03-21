@@ -115,10 +115,6 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     if(any(NVL(prev.remain,FALSE)!=remain))
       pernet.m <- ergm_model(~ByNetDStats(GOF, subset=remain), nw=nw, response = object$response, ...)
     prev.remain <- remain
-    # Subset of GOF statistics (as opposed to those used to drive the simulation):
-    gof.stats <- c(rep(FALSE, nparam(sim_settings$object, canonical=TRUE)), # sim_settings$object is the ergm_model.
-                   rep(TRUE, nparam(pernet.m, canonical=TRUE)))
-
     nstats <- nparam(pernet.m, canonical=TRUE)/sum(remain)
 
     # TODO: Simulations can be rerun only on the networks in the subset.
@@ -128,7 +124,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     if(!control$obs.twostage){
       message("Simulating unconstrained sample.")
       sim <- do.call(simulate, .update.list(sim_settings, list(monitor=pernet.m)))
-      sim <- sim[,gof.stats,drop=FALSE]
+      sim <- sim[,attr(sim, "monitored"),drop=FALSE]
     }
 
     # TODO: Make this adaptive: start with a small simulation,
@@ -153,7 +149,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
                                       control=.update.list(sim.obs_settings$control,
                                                          list(parallel=0))))
               sim[[i]] <- do.call(simulate, args)
-              sim[[i]] <- sim[[i]][,gof.stats,drop=FALSE]
+              sim[[i]] <- sim[[i]][,attr(sim[[i]], "monitored"),drop=FALSE]
               message(".", appendLF=FALSE)
             }
             sim
@@ -167,7 +163,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
       sim.obs <- do.call(simulate, .update.list(sim.obs_settings,
                                                 list(nsim=control$nsim,
                                                      monitor=pernet.m)))
-      sim.obs <- sim.obs[,gof.stats,drop=FALSE]
+      sim.obs <- sim.obs[,attr(sim.obs,"monitored"),drop=FALSE]
     }else{
       sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
     }
