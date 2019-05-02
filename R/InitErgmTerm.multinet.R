@@ -73,13 +73,16 @@ InitErgmTerm..subnets <- function(nw, arglist, response=NULL, ...){
 
 get_multinet_nattr_tibble <- function(nw){
   ## TODO: It should be possible to do this without splitting the network.
-  nwl <- if(is.network(nw)) .split_constr_network(nw, ".NetworkID", ".NetworkName")
-         else nw
-  nn <- length(nwl)
-  
-  nattrs <- Reduce(union, lapply(nwl, list.network.attributes))
-  nattrs <- as.tibble(lapply(nattrs, function(nattr) sapply(lapply(nwl, get.network.attribute, nattr), NVL, NA)) %>% set_names(nattrs))
-  nattrs
+  al <-
+    if(is(nw, "combined_networks") && !is.null(nw %n% ".subnetattr")) (nw %n% ".subnetattr")[[".NetworkID"]]
+    else{
+      nwl <- if(is.network(nw)) .split_constr_network(nw, ".NetworkID", ".NetworkName") else nw
+      nattrs <- Reduce(union, lapply(nwl, list.network.attributes))
+      lapply(nattrs, function(nattr) lapply(nwl, get.network.attribute, nattr)) %>% set_names(nattrs)
+    }
+
+  al <- lapply(al, sapply, NVL, NA)
+  as.tibble(al)
 }
 
 get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, weights=1){
@@ -133,7 +136,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
   nwnames <- names(nwl)
   nn <- length(nwl)
-  nattrs <- get_multinet_nattr_tibble(nwl)
+  nattrs <- get_multinet_nattr_tibble(nw)
 
   lmi <- get_lminfo(nattrs, lm=a$lm, subset=a$subset, contrasts=a$contrasts, offset=a$offset, weights=a$weights)
 
