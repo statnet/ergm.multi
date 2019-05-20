@@ -225,7 +225,8 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   if(drop) y
   else{
     mostattributes(y) <- attributes(x)
-    names(y) <- names(x)[i]
+    # This is necessary because i might be a character index.
+    names(y) <- setNames(nm=names(x))[i]
     y
   }
 }
