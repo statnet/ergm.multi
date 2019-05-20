@@ -14,7 +14,8 @@ gofN(object, GOF = NULL, subset = TRUE,
 
 \method{plot}{gofN}(x, against = NULL, which = 1:2, col = 1,
   pch = 1, cex = 1, ..., ask = length(which) > 1 &&
-  dev.interactive(TRUE), id.n = 3, main = "{type} for {sQuote(name)}")
+  dev.interactive(TRUE), id.n = 3, main = "{type} for {sQuote(name)}",
+  xlab = NULL)
 
 \method{summary}{gofN}(object, by = NULL, ...)
 }
@@ -48,6 +49,8 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 \item{id.n}{Number of extreme points to label explicitly.}
 
 \item{main}{A template for the plots' titles; these use \code{\link[=glue]{glue()}}'s templating, with \code{{type}} replaced with the type of plot and \code{{name}} replaced with the statistic.}
+
+\item{xlab}{Horizontal axis label; defaults to a character representation of \code{against}.}
 
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }
