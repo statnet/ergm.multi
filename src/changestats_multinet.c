@@ -111,7 +111,7 @@ U_CHANGESTAT_FN(u_MultiNet){
   Model *m = ms[i-1];
   if(m){ // NULL if network has weights 0.
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    UPDATE_STORAGE(st, sh, sn->onwp[i], m, NULL);
+    UPDATE_STORAGE(st, sh, sn->onwp[i], m, NULL, edgeflag);
   }
 }
 
@@ -164,7 +164,7 @@ U_CHANGESTAT_FN(u_MultiNets){
   unsigned int i = MN_SID_TAIL(sn, tail);
   if(pos[i-1]!=pos[i]){
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    UPDATE_STORAGE(st, sh, sn->onwp[i], ms[i-1], NULL);
+    UPDATE_STORAGE(st, sh, sn->onwp[i], ms[i-1], NULL, edgeflag);
   }
 }
 
@@ -206,7 +206,7 @@ C_CHANGESTAT_FN(c_ByNetDStats){
 
 U_CHANGESTAT_FN(u_ByNetDStats){
   GET_STORAGE(Model, m);
-  UPDATE_STORAGE(tail, head, nwp, m, NULL);
+  UPDATE_STORAGE(tail, head, nwp, m, NULL, edgeflag);
 }
 
 F_CHANGESTAT_FN(f_ByNetDStats){

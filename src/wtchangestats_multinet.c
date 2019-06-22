@@ -111,7 +111,7 @@ WtU_CHANGESTAT_FN(u_wtMultiNet){
   WtModel *m = ms[i-1];
   if(m){ // NULL if network has weights 0.
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], m, NULL);
+    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], m, NULL, edgeweight);
   }
 }
 
@@ -164,7 +164,7 @@ WtU_CHANGESTAT_FN(u_wtMultiNets){
   unsigned int i = MN_SID_TAIL(sn, tail);
   if(pos[i-1]!=pos[i]){
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], ms[i-1], NULL);
+    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], ms[i-1], NULL, edgeweight);
   }
 }
 

@@ -146,14 +146,15 @@ U_CHANGESTAT_FN(u_OnLayer){
     unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, 1, at, ah);
     int i;
     for(i=0; i<nt; i++){
-      UPDATE_STORAGE(at[i], ah[i], ll->onwp, ms[ml], NULL);
+      Rboolean edgeflag = IS_OUTEDGE(at[i], ah[i], ll->onwp);
+      if(ms[ml]->n_u) UPDATE_STORAGE(at[i], ah[i], ll->onwp, ms[ml], NULL, edgeflag);
       // We need to make a provisional toggle here, since
       // UPDATE_STORAGE expects one toggle at a time. Note that
       // ll->onwp is "owned" by the .layer.net auxiliary, so this may
       // cause a race condition for multithreaded term evaluation. The
       // "correct" solution might involve duplicating the network,
       // though some locking mechanism might also work.
-      if(i+1 < nt) ToggleEdge(at[i], ah[i], ll->onwp);
+      if(i+1 < nt) ToggleKnownEdge(at[i], ah[i], ll->onwp, edgeflag);
     }
     // Reverse the provisional toggle.
     i--; while(--i>=0) ToggleEdge(at[i], ah[i], ll->onwp);
