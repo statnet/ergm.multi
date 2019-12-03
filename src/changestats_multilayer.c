@@ -112,8 +112,7 @@ I_CHANGESTAT_FN(i_OnLayer){
   for(unsigned int ml=0; ml<nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     double *inputs = INPUT_ATTRIB+nml+1; // Rewind to the start of model spec.
-    ms[ml] = unpack_Model_as_double(&inputs);
-    InitStats(ll->onwp, ms[ml]);
+    ms[ml] = unpack_Model_as_double(&inputs, ll->onwp);
   }
 }
 

@@ -77,8 +77,7 @@ I_CHANGESTAT_FN(i_MultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = unpack_Model_as_double(&inputs);
-      InitStats(sn->onwp[i], ms[i-1]);
+      ms[i-1] = unpack_Model_as_double(&inputs, sn->onwp[i]);
     }else ms[i-1] = NULL;
   }
 }
@@ -136,8 +135,7 @@ I_CHANGESTAT_FN(i_MultiNets){
 
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = unpack_Model_as_double(&inputs);
-      InitStats(sn->onwp[i], ms[i-1]);
+      ms[i-1] = unpack_Model_as_double(&inputs, sn->onwp[i]);
     }
   }
 }
@@ -188,8 +186,7 @@ I_CHANGESTAT_FN(i_ByNetDStats){
   unsigned int ns = sn->ns;
   inputs+=ns+1; // Skip over subsets.
 
-  Model *m = STORAGE = unpack_Model_as_double(&inputs);
-  InitStats(nwp, m);
+  STORAGE = unpack_Model_as_double(&inputs, nwp);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){

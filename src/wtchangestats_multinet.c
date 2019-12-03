@@ -77,8 +77,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = unpack_WtModel_as_double(&inputs);
-      WtInitStats(sn->onwp[i], ms[i-1]);
+      ms[i-1] = unpack_WtModel_as_double(&inputs, sn->onwp[i]);
     }else ms[i-1] = NULL;
   }
 }
@@ -136,8 +135,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
 
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = unpack_WtModel_as_double(&inputs);
-      WtInitStats(sn->onwp[i], ms[i-1]);
+      ms[i-1] = unpack_WtModel_as_double(&inputs, sn->onwp[i]);
     }
   }
 }
