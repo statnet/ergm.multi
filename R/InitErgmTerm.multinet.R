@@ -152,7 +152,6 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     f <- nonsimp_update.formula(f, nw1~.)
     m <- ergm_model(f, nw1, response=response,...)
     list(model = m,
-         inputs = to_ergm_Cdouble(m),
          gs = summary(m))
   })
 
@@ -202,7 +201,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
       offset.all[subset] <- offset[,1]
     }else offset.all <- NULL
     
-    inputs <- c(ncol(xm)+!is.null(offset.all), t(cbind(xm.all,offset.all)), ms %>% map("inputs") %>% unlist())
+    inputs <- c(ncol(xm)+!is.null(offset.all), t(cbind(xm.all,offset.all)))
 
     if(is.null(offset.all)){
       # This can be represented as a fully linear term.
@@ -229,7 +228,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
       reduce(`+`) %>%
       c()
     
-    list(name="MultiNet", coef.names = coef.names, inputs=inputs, dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
+    list(name="MultiNet", coef.names = coef.names, inputs=inputs, submodels=map(ms,"model"), dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
         
   }else{
     Xl <- xm %>%
@@ -245,7 +244,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     
     ol <- offset %>% split(., row(.)) # Rows of offset as a list.
     
-    inputs <- c(c(0,cumsum(nstats.all)), ms %>% map("inputs") %>% unlist())
+    inputs <- c(0,cumsum(nstats.all))
     
     etamap <- function(x, n, ...){
       Xl %>%
@@ -272,7 +271,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     coef.names <- paste0('N#',rep(seq_len(nm), nstats),':',unlist(lapply(lapply(ms, `[[`, "model"), param_names, canonical=TRUE)))
     # Empty network statistics.
     gs <- unlist(lapply(ms, `[[`, "gs"))   
-    list(name="MultiNets", coef.names = coef.names, inputs=inputs, dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
+    list(name="MultiNets", coef.names = coef.names, inputs=inputs, submodels=map(ms,"model"), dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
   }
 }
 
@@ -297,6 +296,6 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
   m <- ergm_model(f, nw, response=response,...)
 
   coef.names <- paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE)),':',param_names(m, canonical=TRUE))
-  inputs <- c(cumsum(c(-1,subset))*nparam(m, canonical=TRUE), to_ergm_Cdouble(m))
-  list(name="ByNetDStats", coef.names = coef.names, inputs=inputs, dependence=is.dyad.independent(m), auxiliaries=auxiliaries)
+  inputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)
+  list(name="ByNetDStats", coef.names = coef.names, inputs=inputs, submodel=m, dependence=is.dyad.independent(m), auxiliaries=auxiliaries)
 }

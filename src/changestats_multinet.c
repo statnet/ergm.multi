@@ -1,6 +1,7 @@
 #include "ergm_changestat_multinet.h"
 #include "ergm_changestat.h"
-#include "ergm_changestat_operator.h"
+#include "ergm_model.h"
+#include "ergm_storage.h"
 
 
 I_CHANGESTAT_FN(i__subnets){
@@ -67,6 +68,8 @@ I_CHANGESTAT_FN(i_MultiNet){
   
   ALLOC_STORAGE(ns, Model*, ms);
 
+  SEXP submodels = getListElement(mtp->R, "submodels");
+  unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     unsigned int used=FALSE;
     for(unsigned int j=0; j<nwts; j++){
@@ -77,7 +80,7 @@ I_CHANGESTAT_FN(i_MultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = unpack_Model_as_double(&inputs, sn->onwp[i]);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), sn->onwp[i], FALSE);
     }else ms[i-1] = NULL;
   }
 }
@@ -133,9 +136,11 @@ I_CHANGESTAT_FN(i_MultiNets){
   inputs+=ns+1;
   ALLOC_STORAGE(ns, Model*, ms);
 
+  SEXP submodels = getListElement(mtp->R, "submodels");
+  unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = unpack_Model_as_double(&inputs, sn->onwp[i]);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), sn->onwp[i], FALSE);
     }
   }
 }
@@ -186,7 +191,7 @@ I_CHANGESTAT_FN(i_ByNetDStats){
   unsigned int ns = sn->ns;
   inputs+=ns+1; // Skip over subsets.
 
-  STORAGE = unpack_Model_as_double(&inputs, nwp);
+  STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), nwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){

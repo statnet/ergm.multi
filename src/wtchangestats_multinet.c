@@ -1,6 +1,7 @@
 #include "ergm_wtchangestat_multinet.h"
 #include "ergm_wtchangestat.h"
-#include "ergm_wtchangestat_operator.h"
+#include "ergm_wtmodel.h"
+#include "ergm_storage.h"
 
 
 WtI_CHANGESTAT_FN(i__wtsubnets){
@@ -67,6 +68,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
   
   ALLOC_STORAGE(ns, WtModel*, ms);
 
+  SEXP submodels = getListElement(mtp->R, "submodels");
   for(unsigned int i=1; i<=sn->ns; i++){
     unsigned int used=FALSE;
     for(unsigned int j=0; j<nwts; j++){
@@ -77,7 +79,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = unpack_WtModel_as_double(&inputs, sn->onwp[i]);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, i-1), sn->onwp[i], FALSE);
     }else ms[i-1] = NULL;
   }
 }
@@ -133,9 +135,10 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
   inputs+=ns+1;
   ALLOC_STORAGE(ns, WtModel*, ms);
 
+  SEXP submodels = getListElement(mtp->R, "submodels");
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = unpack_WtModel_as_double(&inputs, sn->onwp[i]);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, i-1), sn->onwp[i], FALSE);
     }
   }
 }

@@ -586,14 +586,11 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
 
   dependence <- !is.dyad.independent(m) || !is.dyad.independent(nonsimp_update.formula(auxiliaries, nw~., from.new="nw"))
 
-  
-  inputs <- to_ergm_Cdouble(m)
-  
-  inputs <- c(nltrms, w, inputs)
+  inputs <- c(nltrms, w)
 
   gs <- summary(m) * nltrms
   
-  c(list(name="OnLayer", coef.names = paste0(.lspec_coef.names(list(a$Ls)),":",m$coef.names), inputs=inputs, dependence=dependence, emptynwstats = gs, auxiliaries = auxiliaries),
+  c(list(name="OnLayer", coef.names = paste0(.lspec_coef.names(list(a$Ls)),":",m$coef.names), inputs=inputs, submodel=m, dependence=dependence, emptynwstats = gs, auxiliaries = auxiliaries),
     passthrough.curved.ergm_model(m, function(x) paste0(.lspec_coef.names(list(a$Ls)),":",x)))
 }
 

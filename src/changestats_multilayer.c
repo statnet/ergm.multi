@@ -1,7 +1,7 @@
 #include "ergm_changestat_multilayer.h"
 #include "ergm_changestat.h"
-#include "ergm_changestat_operator.h"
-
+#include "ergm_model.h"
+#include "ergm_storage.h"
 
 I_CHANGESTAT_FN(i__layer_net){
   double *inputs = INPUT_PARAM;
@@ -111,8 +111,7 @@ I_CHANGESTAT_FN(i_OnLayer){
 
   for(unsigned int ml=0; ml<nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
-    double *inputs = INPUT_ATTRIB+nml+1; // Rewind to the start of model spec.
-    ms[ml] = unpack_Model_as_double(&inputs, ll->onwp);
+    ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), ll->onwp, FALSE);
   }
 }
 
