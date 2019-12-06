@@ -6,7 +6,7 @@
 
 I_CHANGESTAT_FN(i__subnets){
   double *inputs = INPUT_PARAM;
-  ALLOC_AUX_STORAGE(1, StoreSubnets, sn); inputs++;
+  ALLOC_AUX_STORAGE(1, StoreSubnets, sn);
   sn->ns = *(inputs++);
   sn->inwp = nwp;
   sn->onwp = Calloc(sn->ns, Network *);
@@ -54,14 +54,13 @@ F_CHANGESTAT_FN(f__subnets){
 I_CHANGESTAT_FN(i_MultiNet){
   /*
     inputs expects:
-    1: position of the subnets auxiliary
     1: number of weights per network (nwts)
     nwts*ns: matrix of weights, in network-major order
     ?*ns: submodel specifications for nm submodels
   */
   
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   unsigned int ns = sn->ns;
   unsigned int nwts = *(inputs++);
   double *wts = inputs; inputs+=ns*nwts;
@@ -87,7 +86,7 @@ I_CHANGESTAT_FN(i_MultiNet){
 
 C_CHANGESTAT_FN(c_MultiNet){
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
   unsigned int nwts = *(inputs++);
   double *wts = inputs;
@@ -130,7 +129,7 @@ F_CHANGESTAT_FN(f_MultiNet){
 
 I_CHANGESTAT_FN(i_MultiNets){
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   unsigned int ns = sn->ns;
   double *pos = inputs;
   inputs+=ns+1;
@@ -147,7 +146,7 @@ I_CHANGESTAT_FN(i_MultiNets){
 
 C_CHANGESTAT_FN(c_MultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
   unsigned int i = MN_SID_TAIL(sn, tail);
@@ -161,7 +160,7 @@ C_CHANGESTAT_FN(c_MultiNets){
 
 U_CHANGESTAT_FN(u_MultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
   unsigned int i = MN_SID_TAIL(sn, tail);
@@ -173,7 +172,7 @@ U_CHANGESTAT_FN(u_MultiNets){
 
 F_CHANGESTAT_FN(f_MultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
   for(unsigned int i=1; i<=sn->ns; i++){
@@ -187,7 +186,7 @@ F_CHANGESTAT_FN(f_MultiNets){
 
 I_CHANGESTAT_FN(i_ByNetDStats){
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   unsigned int ns = sn->ns;
   inputs+=ns+1; // Skip over subsets.
 
@@ -196,7 +195,7 @@ I_CHANGESTAT_FN(i_ByNetDStats){
 
 C_CHANGESTAT_FN(c_ByNetDStats){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model, m);
 
   unsigned int i = MN_SID_TAIL(sn, tail);

@@ -26,18 +26,6 @@
 #define MN_NEXT_INEDGE_NUM(sn) (sn->onwp->next_inedge)
 #define MN_NEXT_OUTEDGE_NUM(sn) (sn->onwp->next_outedge)
 
-/* Vector of change statistics to be modified by the function*/
-#define CHANGE_STAT (mtp->dstats)
-/* Number of change statistics required by the current term */
-#define N_CHANGE_STATS (mtp->nstats)
-
-/* Vector of values passed via "inputs" from R */
-#define INPUT_PARAM (mtp->inputparams)
-#define N_INPUT_PARAMS (mtp->ninputparams) /* Number of inputs passed */
-
 /* Set all changestats to zero at start of function: takes arbitrary arguments, for backwards compatibility. */
 #define ZERO_ALL_CHANGESTATS(...) memset(CHANGE_STAT, 0, N_CHANGE_STATS*sizeof(double))
-
-/* Not often used */
-#define INPUT_ATTRIB (mtp->attrib)
 

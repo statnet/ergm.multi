@@ -378,12 +378,12 @@ C_CHANGESTAT_FN(c_ddsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[3]>=0) ? AUX_STORAGE_NUM(3) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[4];
+  StoreDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
   
   /*Set things up*/
-  unsigned int type=(int)INPUT_PARAM[5];     /*Get the ESP type code to be used*/
-  double *dvec=INPUT_PARAM+6;           /*Get the pointer to the ESP stats list*/
+  unsigned int type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  double *dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   double *cs=CHANGE_STAT;               /*Grab the pointer to the CS vector*/
 
   /*Obtain the DSP changescores (by type)*/
@@ -416,7 +416,7 @@ Only one type may be specified per esp term.  The default, OTP, retains the orig
 */
 
 I_CHANGESTAT_FN(i_dgwdsp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[7]; // Index must be same as for maxesp below.
+  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*2, double, storage);
   double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
@@ -427,8 +427,8 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[3]>=0) ? AUX_STORAGE_NUM(3) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[4];
+  StoreDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp;
@@ -436,10 +436,10 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[5];       /*Get alpha*/
+  alpha = INPUT_PARAM[1];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[6];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[7];   /*Get the max ESP cutoff to use*/
+  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
+  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
   dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
 
@@ -908,16 +908,16 @@ C_CHANGESTAT_FN(c_desp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[4]>=0) ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[5];
+  StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
 
   int type;
   double *dvec,*cs;
   
   /*Set things up*/
   ZERO_ALL_CHANGESTATS(i);
-  type=(int)INPUT_PARAM[6];     /*Get the ESP type code to be used*/
-  dvec=INPUT_PARAM+7;           /*Get the pointer to the ESP stats list*/
+  type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   cs=CHANGE_STAT;               /*Grab the pointer to the CS vector*/
 
   /*Obtain the ESP changescores (by type)*/
@@ -949,7 +949,7 @@ Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; t
 Only one type may be specified per esp term.  The default, OTP, retains the original behavior of esp/gwesp.  In the case of undirected graphs, OTP should be used (the others assume a directed network memory structure, and are not safe in the undirected case).
 */
 I_CHANGESTAT_FN(i_dgwesp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[8]; // Index must be same as for maxesp below.
+  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*2, double, storage);
   double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
@@ -961,8 +961,8 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[4]>=0) ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[5];
+  StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp;
@@ -970,10 +970,10 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[6];       /*Get alpha*/
+  alpha = INPUT_PARAM[1];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[7];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[8];   /*Get the max ESP cutoff to use*/
+  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
+  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
   dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
 
@@ -1028,15 +1028,15 @@ C_CHANGESTAT_FN(c_dnsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[4]>=0) ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[5];
+  StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int i,type;
   double *dvec,*cs_esp, *cs_dsp;
   
   /*Set things up*/
-  type=(int)INPUT_PARAM[6];     /*Get the ESP type code to be used*/
-  dvec=INPUT_PARAM+7;           /*Get the pointer to the ESP stats list*/
+  type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   cs_esp=storage;               /*Grab memory for the DSP changescores*/
   cs_dsp=storage+N_CHANGE_STATS;/*Grab memory for the DSP changescores*/
 
@@ -1090,7 +1090,7 @@ Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; t
 Only one type may be specified per esp term.  The default, OTP, retains the original behavior of esp/gwesp.  In the case of undirected graphs, OTP should be used (the others assume a directed network memory structure, and are not safe in the undirected case).
 */
 I_CHANGESTAT_FN(i_dgwnsp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[8]; // Index must be same as for maxesp below.
+  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*3, double, storage);
   double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
@@ -1102,8 +1102,8 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
-  StoreDyadMapUInt *spcache = (INPUT_PARAM[4]>=0) ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[5];
+  StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
+  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp;
@@ -1111,10 +1111,10 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[6];       /*Get alpha*/
+  alpha = INPUT_PARAM[1];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[7];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[8];   /*Get the max ESP cutoff to use*/
+  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
+  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
   cs_esp=storage;     /*Grab memory for the ESP changescores*/
   dvec=storage+maxesp;   /*Grab memory for the ESP vals*/
   cs_dsp=storage+maxesp+maxesp;     /*Grab memory for the ESP changescores*/

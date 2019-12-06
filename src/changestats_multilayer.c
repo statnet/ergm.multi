@@ -5,7 +5,7 @@
 
 I_CHANGESTAT_FN(i__layer_net){
   double *inputs = INPUT_PARAM;
-  ALLOC_AUX_STORAGE(1, StoreLayerLogic, ll); inputs++;
+  ALLOC_AUX_STORAGE(1, StoreLayerLogic, ll);
   ll->nl = *(inputs++);
   ll->inwp = nwp;
 
@@ -14,7 +14,6 @@ I_CHANGESTAT_FN(i__layer_net){
   inputs += N_NODES;
   ll->lmap = inputs - 1;
   inputs += N_NODES;
-
   Vertex lnnodes, lbip;
   if(BIPARTITE){
     lbip = lnnodes = *(inputs++);
@@ -105,7 +104,7 @@ F_CHANGESTAT_FN(f__layer_net){
 
 I_CHANGESTAT_FN(i_OnLayer){
   
-  unsigned int nml = *INPUT_ATTRIB; // Number of layers *in the term*. Already shifted past the auxiliaries.
+  unsigned int nml = *INPUT_PARAM; // Number of layers *in the term*.
 
   ALLOC_STORAGE(nml, Model*, ms);
 
@@ -117,8 +116,8 @@ I_CHANGESTAT_FN(i_OnLayer){
 
 C_CHANGESTAT_FN(c_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_ATTRIB;
-  double *w = INPUT_ATTRIB+1;
+  unsigned int nml = *INPUT_PARAM;
+  double *w = INPUT_PARAM+1;
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
@@ -135,7 +134,7 @@ C_CHANGESTAT_FN(c_OnLayer){
 
 U_CHANGESTAT_FN(u_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_ATTRIB;
+  unsigned int nml = *INPUT_PARAM;
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
@@ -161,7 +160,7 @@ U_CHANGESTAT_FN(u_OnLayer){
 
 F_CHANGESTAT_FN(f_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_ATTRIB;
+  unsigned int nml = *INPUT_PARAM;
   for(unsigned int ml=0; ml<nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     ModelDestroy(ll->onwp, ms[ml]);
@@ -171,7 +170,7 @@ F_CHANGESTAT_FN(f_OnLayer){
 /* layerCMB: Conway-Maxwell-Binomial for the sum of layer combinations */
 
 C_CHANGESTAT_FN(c_layerCMB){
-  unsigned int nml = *INPUT_ATTRIB;
+  unsigned int nml = *INPUT_PARAM;
 
   // FIXME: Cache current values, perhaps via a valued auxiliary?
 
@@ -199,7 +198,7 @@ C_CHANGESTAT_FN(c_layerCMB){
  changestat: d_degreeL_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_degreeL_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
   inputs += nml;
@@ -247,7 +246,7 @@ C_CHANGESTAT_FN(c_degreeL_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
   inputs += nml;
@@ -295,7 +294,7 @@ C_CHANGESTAT_FN(c_degreeL_by_attr_ML_sum) {
  changestat: d_degreeL_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_gwdegreeL_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
   inputs += nml;
@@ -344,7 +343,7 @@ C_CHANGESTAT_FN(c_gwdegreeL_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *dirs = inputs;
   inputs += nml;
@@ -399,7 +398,7 @@ C_CHANGESTAT_FN(c_gwdegreeL_by_attr_ML_sum) {
  changestat: c_twopathL
 *****************/
 C_CHANGESTAT_FN(c_twostarL) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int typeID = inputs[0];
   unsigned int distinct = inputs[1];
   
@@ -508,7 +507,7 @@ C_CHANGESTAT_FN(c_twostarL) {
  changestat: d_b1degree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_b1degree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *degs = inputs;
 
@@ -539,7 +538,7 @@ C_CHANGESTAT_FN(c_b1degree_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
 
   /* *** don't forget tail -> head */    
@@ -568,7 +567,7 @@ C_CHANGESTAT_FN(c_b1degree_by_attr_ML_sum) {
  changestat: d_b2degree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_b2degree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *degs = inputs;
 
@@ -599,7 +598,7 @@ C_CHANGESTAT_FN(c_b2degree_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
 
   /* *** don't forget tail -> head */    
@@ -628,7 +627,7 @@ C_CHANGESTAT_FN(c_b2degree_by_attr_ML_sum) {
  changestat: d_degree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_degree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *degs = inputs;
 
@@ -661,7 +660,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
 
   /* *** don't forget tail -> head */    
@@ -694,7 +693,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_ML_sum) {
  changestat: d_gwb1degree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_gwb1degree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double oneexpd = 1.0-exp(-decay);
@@ -725,7 +724,7 @@ C_CHANGESTAT_FN(c_gwb1degree_by_attr_ML_sum) {
     The next sequence of values is the nodal attributes, coded as integers
          from 1 through N_CHANGE_STATS
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
@@ -752,7 +751,7 @@ C_CHANGESTAT_FN(c_gwb1degree_by_attr_ML_sum) {
  changestat: d_gwdegree_ML
 *****************/
 C_CHANGESTAT_FN(c_gwdegree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double oneexpd = 1.0-exp(-decay);
@@ -786,7 +785,7 @@ C_CHANGESTAT_FN(c_gwdegree_by_attr_ML_sum) {
     The next sequence of values is the nodal attributes, coded as integers
          from 1 through N_CHANGE_STATS
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
@@ -817,7 +816,7 @@ C_CHANGESTAT_FN(c_gwdegree_by_attr_ML_sum) {
  changestat: d_gwb2degree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_gwb2degree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double oneexpd = 1.0-exp(-decay);
@@ -848,7 +847,7 @@ C_CHANGESTAT_FN(c_gwb2degree_by_attr_ML_sum) {
     The next sequence of values is the nodal attributes, coded as integers
          from 1 through N_CHANGE_STATS
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
@@ -875,7 +874,7 @@ C_CHANGESTAT_FN(c_gwb2degree_by_attr_ML_sum) {
  changestat: d_gwidegree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_gwidegree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double oneexpd = 1.0-exp(-decay);
@@ -906,7 +905,7 @@ C_CHANGESTAT_FN(c_gwidegree_by_attr_ML_sum) {
     The next sequence of values is the nodal attributes, coded as integers
          from 1 through N_CHANGE_STATS
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
@@ -933,7 +932,7 @@ C_CHANGESTAT_FN(c_gwidegree_by_attr_ML_sum) {
  changestat: d_gwodegree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_gwodegree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double oneexpd = 1.0-exp(-decay);
@@ -963,7 +962,7 @@ C_CHANGESTAT_FN(c_gwodegree_by_attr_ML_sum) {
     The next sequence of values is the nodal attributes, coded as integers
          from 1 through N_CHANGE_STATS
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
@@ -990,7 +989,7 @@ C_CHANGESTAT_FN(c_gwodegree_by_attr_ML_sum) {
  changestat: d_idegree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_idegree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *degs = inputs;
 
@@ -1021,7 +1020,7 @@ C_CHANGESTAT_FN(c_idegree_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
 
   /* *** don't forget tail -> head */    
@@ -1059,8 +1058,8 @@ C_CHANGESTAT_FN(c_mutual_ML){
   double matchval;
   int j, ninputs, noattr;
 
-  ninputs = N_INPUT_PARAMS - N_NODES - 2;
-  noattr = (N_INPUT_PARAMS == 2);
+  ninputs = N_INPUT_PARAMS - N_NODES;
+  noattr = !N_INPUT_PARAMS;
 
   /* *** don't forget tail -> head */
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
@@ -1078,13 +1077,13 @@ C_CHANGESTAT_FN(c_mutual_ML){
       if (noattr) { /* "plain vanilla" mutual, without node attributes */
         CHANGE_STAT[0] += change;
       } else { /* Only consider mutuals where node attributes match */
-        matchval = INPUT_PARAM[tail+ninputs-1+2];
-        if (matchval == INPUT_PARAM[head+ninputs-1+2]) { /* We have a match! */
+        matchval = INPUT_PARAM[tail+ninputs-1];
+        if (matchval == INPUT_PARAM[head+ninputs-1]) { /* We have a match! */
           if (ninputs==0) {/* diff=F in network statistic specification */
             CHANGE_STAT[0] += change;
           } else { /* diff=T */
             for (j=0; j<ninputs; j++) {
-              if (matchval == INPUT_PARAM[j+2]) 
+              if (matchval == INPUT_PARAM[j]) 
                 CHANGE_STAT[j] += change;
             }
           }
@@ -1102,7 +1101,7 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
 
   int j, ninputs;
 
-  ninputs = N_INPUT_PARAMS - N_NODES - 2;
+  ninputs = N_INPUT_PARAMS - N_NODES;
 
   /* *** don't forget tail -> head */
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
@@ -1118,8 +1117,8 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
 
     if (change) { /* otherwise, no change occurs */
       for (j=0; j<ninputs; j++) {
-        if (INPUT_PARAM[tail+ninputs-1+2] == INPUT_PARAM[j+2]){CHANGE_STAT[j] += change;}
-        if (INPUT_PARAM[head+ninputs-1+2] == INPUT_PARAM[j+2]){CHANGE_STAT[j] += change;}
+        if (INPUT_PARAM[tail+ninputs-1] == INPUT_PARAM[j]){CHANGE_STAT[j] += change;}
+        if (INPUT_PARAM[head+ninputs-1] == INPUT_PARAM[j]){CHANGE_STAT[j] += change;}
       }
     }
 }
@@ -1128,7 +1127,7 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
  changestat: d_odegree_ML_sum
 *****************/
 C_CHANGESTAT_FN(c_odegree_ML_sum) { 
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double *degs = inputs;
 
@@ -1159,7 +1158,7 @@ C_CHANGESTAT_FN(c_odegree_by_attr_ML_sum) {
   The first 2*nstats values are in pairs:  (degree, attrvalue)
   The values following the first 2*nstats values are the nodal attributes.
   */
-  double *inputs = INPUT_ATTRIB; // Already shifted past the auxiliaries.
+  double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
 
   /* *** don't forget tail -> head */    
