@@ -126,7 +126,7 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
   }
 
   if(length(fes)){
-    el <- as_tibble(x, attrnames=list.edge.attributes(x), na.rm=FALSE)
+    el <- as_tibble(x, attrnames=list.edge.attributes(x), na.rm=FALSE, store.eid=TRUE)
     keep <- !el$na
     for(e in fes){
       keep <- keep & evl(e, el, x)
@@ -142,7 +142,7 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
   }
 
   for(i in seq_along(oes)){
-    el <- as_tibble(x, attrname=list.edge.attributes(x), na.rm=FALSE)
+    el <- as_tibble(x, attrname=list.edge.attributes(x), na.rm=FALSE, store.eid=TRUE)
     
     e <- oes[[i]]
     nm <- names(oes)[[i]]
