@@ -79,7 +79,7 @@ I_CHANGESTAT_FN(i_MultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), sn->onwp[i], FALSE);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), NULL, sn->onwp[i], FALSE);
     }else ms[i-1] = NULL;
   }
 }
@@ -139,7 +139,7 @@ I_CHANGESTAT_FN(i_MultiNets){
   unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), sn->onwp[i], FALSE);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos++), NULL, sn->onwp[i], FALSE);
     }
   }
 }
@@ -190,7 +190,7 @@ I_CHANGESTAT_FN(i_ByNetDStats){
   unsigned int ns = sn->ns;
   inputs+=ns+1; // Skip over subsets.
 
-  STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), nwp, FALSE);
+  STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), NULL, nwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){

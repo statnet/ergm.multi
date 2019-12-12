@@ -6,7 +6,7 @@
 
 WtI_CHANGESTAT_FN(i__wtsubnets){
   double *inputs = INPUT_PARAM;
-  ALLOC_AUX_STORAGE(1, StoreWtSubnets, sn); inputs++;
+  ALLOC_AUX_STORAGE(1, StoreWtSubnets, sn);
   sn->ns = *(inputs++);
   sn->inwp = nwp;
   sn->onwp = Calloc(sn->ns, WtNetwork *);
@@ -61,7 +61,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
   */
   
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreWtSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   unsigned int ns = sn->ns;
   unsigned int nwts = *(inputs++);
   double *wts = inputs; inputs+=ns*nwts;
@@ -69,6 +69,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
   ALLOC_STORAGE(ns, WtModel*, ms);
 
   SEXP submodels = getListElement(mtp->R, "submodels");
+  unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     unsigned int used=FALSE;
     for(unsigned int j=0; j<nwts; j++){
@@ -79,14 +80,14 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, i-1), sn->onwp[i], FALSE);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos++), NULL, sn->onwp[i], FALSE);
     }else ms[i-1] = NULL;
   }
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNet){
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreWtSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
   unsigned int nwts = *(inputs++);
   double *wts = inputs;
@@ -129,23 +130,24 @@ WtF_CHANGESTAT_FN(f_wtMultiNet){
 
 WtI_CHANGESTAT_FN(i_wtMultiNets){
   double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreWtSubnets, sn); inputs++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   unsigned int ns = sn->ns;
   double *pos = inputs;
   inputs+=ns+1;
   ALLOC_STORAGE(ns, WtModel*, ms);
 
   SEXP submodels = getListElement(mtp->R, "submodels");
+  unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, i-1), sn->onwp[i], FALSE);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos++), NULL, sn->onwp[i], FALSE);
     }
   }
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreWtSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
   unsigned int i = MN_SID_TAIL(sn, tail);
@@ -159,7 +161,7 @@ WtC_CHANGESTAT_FN(c_wtMultiNets){
 
 WtU_CHANGESTAT_FN(u_wtMultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreWtSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
   unsigned int i = MN_SID_TAIL(sn, tail);
@@ -171,7 +173,7 @@ WtU_CHANGESTAT_FN(u_wtMultiNets){
 
 WtF_CHANGESTAT_FN(f_wtMultiNets){
   double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreWtSubnets, sn); pos++;
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
   for(unsigned int i=1; i<=sn->ns; i++){

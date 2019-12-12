@@ -118,6 +118,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     nstats <- nparam(pernet.m, canonical=TRUE)/sum(remain)
 
     # TODO: Simulations can be rerun only on the networks in the subset.
+    # TODO: Run with ergm_state rather than ergm_model.
     
     # The two-stage sample, taken marginally, *is* an unconstrained
     # sample.
@@ -142,7 +143,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
                                    basis=sim.net,
                                    control=.update.list(sim_settings$control,
                                                       list(parallel=0,MCMC.burnin=if(i==1)sim_settings$control$MCMC.burnin else sim_settings$control$MCMC.interval)),
-                                   output="pending_update_network", nsim=1))
+                                   output="ergm_state", nsim=1))
               sim.net <- do.call(simulate, args)
               args <- .update.list(sim.obs_settings,
                                  list(basis=sim.net, monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
