@@ -65,11 +65,13 @@ static inline unsigned int ergm_LayerLogic2Path(Vertex tail1, Vertex head1, Vert
 #define CALC_with_dirs(subroutine)					\
   if(l1fc || l2fc || l3fc){						\
     int l1c = l1fc, l2c = l2fc, l3c = l3fc;				\
+    (void) l3c;                                                         \
     Vertex t = t0, h = h0;						\
     subroutine;								\
   }									\
   if(l1rc || l2rc || l3rc){						\
     int l1c = l1rc, l2c = l2rc, l3c = l3rc;				\
+    (void) l3c;                                                         \
     Vertex t = h0, h = t0;						\
     subroutine;								\
   }
