@@ -32,8 +32,8 @@
 typedef struct {
   unsigned int ns;
   WtNetwork *inwp, **onwp;
-  double *sid;
-  double *smap;
+  Vertex *sid;
+  Vertex *smap;
 } StoreWtSubnets;
 
 #define WtMN_IO_TAIL(sn, t) ((Vertex) ((sn)->smap[t]))

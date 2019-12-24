@@ -5,27 +5,27 @@
 
 
 I_CHANGESTAT_FN(i__subnets){
-  double *inputs = INPUT_PARAM;
+  int *iinputs = IINPUT_PARAM;
   ALLOC_AUX_STORAGE(1, StoreSubnets, sn);
-  sn->ns = *(inputs++);
+  sn->ns = *(iinputs++);
   sn->inwp = nwp;
   sn->onwp = Calloc(sn->ns, Network *);
   sn->onwp--; // The -- is because Network IDs count from 1.
 
   /* Set up the layer information. */
-  sn->sid = inputs - 1; // The -1 is because Vertex IDs count from 1.
-  inputs += N_NODES;
-  sn->smap = inputs - 1;
-  inputs += N_NODES;
+  sn->sid = (Vertex *) iinputs - 1; // The -1 is because Vertex IDs count from 1.
+  iinputs += N_NODES;
+  sn->smap = (Vertex *) iinputs - 1;
+  iinputs += N_NODES;
 
   for(unsigned int i=1; i<=sn->ns; i++){
     Vertex lnnodes, lbip;
     if(BIPARTITE){
-      lbip = lnnodes = *(inputs++);
-      lnnodes += *(inputs++);
+      lbip = lnnodes = *(iinputs++);
+      lnnodes += *(iinputs++);
     }else{
       lbip = 0;
-      lnnodes = *(inputs++);
+      lnnodes = *(iinputs++);
     }
 
     sn->onwp[i] = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);
@@ -53,17 +53,16 @@ F_CHANGESTAT_FN(f__subnets){
 
 I_CHANGESTAT_FN(i_MultiNet){
   /*
+    iinputs expects:
+    1: number of weights (nwts)
     inputs expects:
-    1: number of weights per network (nwts)
     nwts*ns: matrix of weights, in network-major order
-    ?*ns: submodel specifications for nm submodels
   */
   
-  double *inputs = INPUT_PARAM; 
   GET_AUX_STORAGE(StoreSubnets, sn);
   unsigned int ns = sn->ns;
-  unsigned int nwts = *(inputs++);
-  double *wts = inputs; inputs+=ns*nwts;
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
   
   ALLOC_STORAGE(ns, Model*, ms);
 
@@ -85,11 +84,10 @@ I_CHANGESTAT_FN(i_MultiNet){
 }
 
 C_CHANGESTAT_FN(c_MultiNet){
-  double *inputs = INPUT_PARAM; 
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
-  unsigned int nwts = *(inputs++);
-  double *wts = inputs;
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
 
   unsigned int i = MN_SID_TAIL(sn, tail);
   Model *m = ms[i-1];
@@ -128,11 +126,10 @@ F_CHANGESTAT_FN(f_MultiNet){
 // MultiNets: Concatenate the networks' statistics; network statistic counts may be heterogeneous.
 
 I_CHANGESTAT_FN(i_MultiNets){
-  double *inputs = INPUT_PARAM; 
+  int *iinputs = IINPUT_PARAM; 
   GET_AUX_STORAGE(StoreSubnets, sn);
   unsigned int ns = sn->ns;
-  double *pos = inputs;
-  inputs+=ns+1;
+  unsigned int *pos = (unsigned int *) iinputs;
   ALLOC_STORAGE(ns, Model*, ms);
 
   SEXP submodels = getListElement(mtp->R, "submodels");
@@ -145,7 +142,7 @@ I_CHANGESTAT_FN(i_MultiNets){
 }
 
 C_CHANGESTAT_FN(c_MultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
@@ -159,7 +156,7 @@ C_CHANGESTAT_FN(c_MultiNets){
 }
 
 U_CHANGESTAT_FN(u_MultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
@@ -171,7 +168,7 @@ U_CHANGESTAT_FN(u_MultiNets){
 }
 
 F_CHANGESTAT_FN(f_MultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
 
@@ -185,16 +182,11 @@ F_CHANGESTAT_FN(f_MultiNets){
 // ByNetDStats
 
 I_CHANGESTAT_FN(i_ByNetDStats){
-  double *inputs = INPUT_PARAM; 
-  GET_AUX_STORAGE(StoreSubnets, sn);
-  unsigned int ns = sn->ns;
-  inputs+=ns+1; // Skip over subsets.
-
   STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), NULL, nwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model, m);
 

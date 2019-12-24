@@ -32,8 +32,8 @@
 typedef struct {
   unsigned int ns;
   Network *inwp, **onwp;
-  double *sid;
-  double *smap;
+  Vertex *sid;
+  Vertex *smap;
 } StoreSubnets;
 
 #define MN_IO_TAIL(sn, t) ((Vertex) ((sn)->smap[t]))

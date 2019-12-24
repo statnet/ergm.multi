@@ -5,27 +5,27 @@
 
 
 WtI_CHANGESTAT_FN(i__wtsubnets){
-  double *inputs = INPUT_PARAM;
+  int *iinputs = IINPUT_PARAM;
   ALLOC_AUX_STORAGE(1, StoreWtSubnets, sn);
-  sn->ns = *(inputs++);
+  sn->ns = *(iinputs++);
   sn->inwp = nwp;
   sn->onwp = Calloc(sn->ns, WtNetwork *);
   sn->onwp--; // The -- is because WtNetwork IDs count from 1.
 
   /* Set up the layer information. */
-  sn->sid = inputs - 1; // The -1 is because Vertex IDs count from 1.
-  inputs += N_NODES;
-  sn->smap = inputs - 1;
-  inputs += N_NODES;
+  sn->sid = (Vertex *) iinputs - 1; // The -1 is because Vertex IDs count from 1.
+  iinputs += N_NODES;
+  sn->smap = (Vertex *) iinputs - 1;
+  iinputs += N_NODES;
 
   for(unsigned int i=1; i<=sn->ns; i++){
     Vertex lnnodes, lbip;
     if(BIPARTITE){
-      lbip = lnnodes = *(inputs++);
-      lnnodes += *(inputs++);
+      lbip = lnnodes = *(iinputs++);
+      lnnodes += *(iinputs++);
     }else{
       lbip = 0;
-      lnnodes = *(inputs++);
+      lnnodes = *(iinputs++);
     }
 
     sn->onwp[i] = WtNetworkInitialize(NULL, NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);
@@ -53,18 +53,16 @@ WtF_CHANGESTAT_FN(f__wtsubnets){
 
 WtI_CHANGESTAT_FN(i_wtMultiNet){
   /*
+    iinputs expects:
+    1: number of weights (nwts)
     inputs expects:
-    1: position of the subnets auxiliary
-    1: number of weights per network (nwts)
     nwts*ns: matrix of weights, in network-major order
-    ?*ns: submodel specifications for nm submodels
   */
   
-  double *inputs = INPUT_PARAM; 
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   unsigned int ns = sn->ns;
-  unsigned int nwts = *(inputs++);
-  double *wts = inputs; inputs+=ns*nwts;
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
   
   ALLOC_STORAGE(ns, WtModel*, ms);
 
@@ -86,11 +84,10 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNet){
-  double *inputs = INPUT_PARAM; 
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
-  unsigned int nwts = *(inputs++);
-  double *wts = inputs;
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
 
   unsigned int i = MN_SID_TAIL(sn, tail);
   WtModel *m = ms[i-1];
@@ -129,11 +126,10 @@ WtF_CHANGESTAT_FN(f_wtMultiNet){
 // MultiNets: Concatenate the networks' statistics; network statistic counts may be heterogeneous.
 
 WtI_CHANGESTAT_FN(i_wtMultiNets){
-  double *inputs = INPUT_PARAM; 
+  int *iinputs = IINPUT_PARAM; 
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   unsigned int ns = sn->ns;
-  double *pos = inputs;
-  inputs+=ns+1;
+  unsigned int *pos = (unsigned int *) iinputs;
   ALLOC_STORAGE(ns, WtModel*, ms);
 
   SEXP submodels = getListElement(mtp->R, "submodels");
@@ -146,7 +142,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
@@ -160,7 +156,7 @@ WtC_CHANGESTAT_FN(c_wtMultiNets){
 }
 
 WtU_CHANGESTAT_FN(u_wtMultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
@@ -172,7 +168,7 @@ WtU_CHANGESTAT_FN(u_wtMultiNets){
 }
 
 WtF_CHANGESTAT_FN(f_wtMultiNets){
-  double *pos = INPUT_PARAM; // Starting positions of subnetworks' statistics.
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
 
