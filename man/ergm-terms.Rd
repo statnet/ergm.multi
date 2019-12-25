@@ -162,11 +162,9 @@
     with \code{subset}, which controls which networks are affected by
     the term.
 
-    \code{offset} (which can also be specified in \code{lm} as well)
-    can be a constant, a vector of length equal to the number of
-    networks, or a matrix whose number of rows is the number of networks
-    and whose number of columns is the number of free parameters of the
-    ERGM.
+    Care should be taken to avoid multicollinearity when using this operator. When \code{lm} is given a model with intercept and a categorical predictor (including a \code{\link{logical}} one), it will use the first level (or \code{FALSE}) as the baseline, but if the model is without intercept, it will use all levels of the first categorical predictor. This is typically what is wanted in a linear regression, but for the \code{N} operator, this can be problematic if the \dQuote{intercept} effect is added by a different term. A workaround is to convert the categorical predictor to dummy variables before putting it into the \code{lm} formula.
+
+    \code{offset} (which can be specified in \code{lm} as well) can be a constant, a vector of length equal to the number of networks, or a matrix whose number of rows is the number of networks and whose number of columns is the number of free parameters of the ERGM.
 
     Note that although \code{weights} is an argument in the term, it is
     reserved for future use; attempting to change it will cause an
