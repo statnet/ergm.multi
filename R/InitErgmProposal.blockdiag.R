@@ -125,8 +125,7 @@ ergm_block_diag_samp_info <- function(nw, a){
     w <- cumsum(tmp$lengths1*tmp$lengths2) # cumulative block weights ~ # dyads in the block
     w <- w/max(w)
     # Note that this automagically takes care of singleton blocks by giving them weight 0.
-    out <- list(nblk=length(w),  b1pos=eb, b2pos=ab, cumwt=w)
-    attr(out, "ndyads") <- sum(tmp$lengths1*tmp$lengths2)
+    out <- list(nblk=length(w),  b1pos=as.integer(eb), b2pos=as.integer(ab), cumwt=as.double(w), ndyads=sum(as.double(tmp$lengths1*tmp$lengths2)))
   }else{
     ## rle() returns contigous runs of values.
     a <- rle(a)
@@ -136,28 +135,14 @@ ergm_block_diag_samp_info <- function(nw, a){
     w <- cumsum(a$lengths*(a$lengths-1)) # cumulative block weights ~ # dyads in the block
     w <- w/max(w)
     # Note that this automagically takes care of singleton blocks by giving them weight 0.
-    out <- list(nblk=length(w),  pos=b, cumwt=w)
-    attr(out, "ndyads") <- sum(a$lengths*(a$lengths-1)/(if(is.directed(nw)) 1 else 2))
+    out <- list(nblk=as.integer(length(w)),  pos=as.integer(b), cumwt=as.double(w), ndyads=sum(as.double(a$lengths*(a$lengths-1)/(if(is.directed(nw)) 1 else 2))))
   }
   structure(out, class="ergm_block_diag_samp_info")
 }
 
-#' @describeIn ergm_block_diag_samp_info A method to serialise it into
-#'   a [`numeric`] vector.
-#' 
-#' @param ndyads where to prepend the number of togglable dyads to the
-#'   block information.
-#' @param x an `ergm_block_diag_samp_info` object.
-#' @param ... additional arguments, currently unused.
-#'
-#' @export
-to_ergm_Cdouble.ergm_block_diag_samp_info <- function(x, ndyads, ...){
-  c(if(ndyads) attr(x,"ndyads"), unlist(x))
-}
-
 InitErgmProposal.blockdiag <- function(arguments, nw){
   BDI <- ergm_block_diag_samp_info(nw, .get.blockdiag.attr(nw, arguments$constraints))
-  list(name = "blockdiag", inputs=to_ergm_Cdouble(BDI, ndyads=FALSE))
+  list(name = "blockdiag", BDI=BDI)
 }
 
 InitErgmProposal.blockdiagTNT <- function(arguments, nw){
@@ -168,7 +153,7 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
 
   BDI <- ergm_block_diag_samp_info(nw, a)
   
-  list(name = "blockdiagTNT", inputs=to_ergm_Cdouble(BDI, ndyads=TRUE))
+  list(name = "blockdiagTNT", BDI=BDI)
 }
 
 ## Helper function, since the following two have the same body except for the MH_ function.

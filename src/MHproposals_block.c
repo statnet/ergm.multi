@@ -20,8 +20,7 @@
 *********************/
 MH_I_FN(Mi_blockdiag){
   ALLOC_STORAGE(1, MH_BlockDiagSampInfo, b);
-  double *inputs = MH_INPUTS; // Need an throw-away variable since unpacker updates the position. 
-  *b = unpack_BlockDiagSampInfo(&inputs, BIPARTITE, DIRECTED);
+  *b = unpack_BlockDiagSampInfo(getListElement(MHp->R,"BDI"), BIPARTITE, DIRECTED);
   MHp->ntoggles=1;
 }
 
@@ -40,8 +39,7 @@ MH_P_FN(Mp_blockdiag){
 ***********************/
 MH_I_FN(Mi_blockdiagTNT){
   ALLOC_STORAGE(1, MH_BlockDiagSampInfo, b);
-  double *inputs = MH_INPUTS+1; // Need an throw-away variable since unpacker updates the position. 
-  *b = unpack_BlockDiagSampInfo(&inputs, BIPARTITE, DIRECTED);
+  *b = unpack_BlockDiagSampInfo(getListElement(MHp->R,"BDI"), BIPARTITE, DIRECTED);
   MHp->ntoggles=1;
 }
 
@@ -50,7 +48,7 @@ MH_P_FN(Mp_blockdiagTNT){
 
   const double comp=0.5, odds = comp/(1.0-comp);
   
-  Dyad ndyads = MH_INPUTS[0];
+  Dyad ndyads = b->ndyads;
   Edge nedges=EDGECOUNT(nwp);
   
   double logratio=0; 

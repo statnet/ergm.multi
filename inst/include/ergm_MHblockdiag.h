@@ -53,45 +53,42 @@
 #define _ERGM_MHBLOCKDIAG_H_
 
 #include "ergm_MHproposal.h"
+#include "ergm_Rutil.h"
 
 typedef struct {
-  double *epos; // starts and ends of blocks (b1)
-  double *apos; // starts and ends of blocks (b2) == b1 if unipartite
+  Vertex *epos; // starts and ends of blocks (b1)
+  Vertex *apos; // starts and ends of blocks (b2) == b1 if unipartite
   double *cwt; // cumulative selection probabilities
   Dyad ndyads; // number of dyads
   Vertex n; // number of blocks
-  unsigned int directed_flag; // directed flag
+  Rboolean directed_flag; // directed flag
 } MH_BlockDiagSampInfo;
 
 /**
 Unpack input from R into block diagonal sampling information
 
-Unpack a double *input vector containing block diagonal sampling
-information into a `MH_BlockDiagSampInfo` structure and advance the
-pointer to the end of the block diagonal informatio nsegment.
+Unpack a SEXP containing block diagonal sampling
+information into a `MH_BlockDiagSampInfo` structure.
 
-@param inputs a pointer to a pointer to a vector of inputs; will be
-  updated by the procedure
+@param BDI a SEXP containing a list constructed by ergm_block_diag_sample_info (or equivalent). See R/InitErgmProposal.blockdiag.R for details.
 @param bipartite the number of b1 vertices, or 0 if unipartite
 @param directed_flag whether the network is directed
 */
-static inline MH_BlockDiagSampInfo unpack_BlockDiagSampInfo(double **inputs, Vertex bipartite, unsigned int directed_flag){
-  double *x = *inputs;
-  Vertex n = (x++)[0]; // number of blocks
-
-  MH_BlockDiagSampInfo out = {
-    .directed_flag=directed_flag,
-    .n=n};
-
-  out.epos=x; x+=n+1;
+static inline MH_BlockDiagSampInfo unpack_BlockDiagSampInfo(SEXP BDI, Vertex bipartite, Rboolean directed_flag){
+  MH_BlockDiagSampInfo out =
+    {
+     .directed_flag = directed_flag,
+     .ndyads = asInteger(getListElement(BDI,"ndyads")),
+     .n = asInteger(getListElement(BDI,"nblk"))
+    };
 
   if(bipartite){
-    out.apos=x; x+=n+1;
-  }else out.apos=out.epos;
+    out.epos = (Vertex *) INTEGER(getListElement(BDI,"b1pos"));
+    out.apos = (Vertex *) INTEGER(getListElement(BDI,"b2pos"));
+  }else out.apos = out.epos = (Vertex *) INTEGER(getListElement(BDI,"pos"));
   
-  out.cwt=x; x+=n;
+  out.cwt= REAL(getListElement(BDI,"cumwt"));
 
-  *inputs=x;
   return out;
 }
 
