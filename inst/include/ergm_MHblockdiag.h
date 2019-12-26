@@ -95,6 +95,20 @@ static inline MH_BlockDiagSampInfo unpack_BlockDiagSampInfo(double **inputs, Ver
   return out;
 }
 
+/* A macro implementing bisection search agnostic to type of list and
+   key. Argument result must be predeclared and will be
+   overwritten. */
+#define _bisect_search(list, len, key, result)      \
+  {                                                 \
+    unsigned int __u=(len);                         \
+    (result) = 1;                                   \
+    while((result)<__u){                            \
+      unsigned int __m = (result) + (__u-result)/2; \
+      if(key > (list)[__m]) (result) = __m+1;       \
+      else __u = __m;                               \
+    }                                               \
+  }
+
 /**
 Generate a random dyad that belongs a block
 
@@ -103,11 +117,12 @@ Generate a random dyad that belongs a block
 @param b block information
 */
 static inline void GetRandDyadBlockDiag(Vertex *tail, Vertex *head, const MH_BlockDiagSampInfo *b){
-  Vertex blk = 1, t, h;
   double r = unif_rand();
-  // FIXME: Change to a binary search to change from O(b->n) to O(log(b->n)).
-  while(r>b->cwt[blk-1]) blk++;
-  t = b->epos[blk-1]+1 + unif_rand() * (b->epos[blk]-b->epos[blk-1]);
+
+  Vertex blk;
+  _bisect_search(b->cwt-1, b->n, r, blk);
+
+  Vertex t = b->epos[blk-1]+1 + unif_rand() * (b->epos[blk]-b->epos[blk-1]), h;
   while ((h = b->apos[blk-1]+1 + unif_rand() * (b->apos[blk]-b->apos[blk-1])) == t);
   if (!b->directed_flag && t > h) {
     *tail = h;
@@ -128,12 +143,14 @@ Obtain index of the block to which the given dyad belongs
 @returns index of the block (from 1) or 0 if not in a block
 */
 static inline Vertex GetBlockID(Vertex tail, Vertex head, const MH_BlockDiagSampInfo *b){
-  Vertex tblk = 1;
-  while(tail>b->epos[tblk]) tblk++; 
-  Vertex hblk = 1;
-  while(head>b->epos[hblk]) hblk++;
+  Vertex tblk;
+  _bisect_search(b->epos, b->n, tail, tblk);
+  Vertex hblk;
+  _bisect_search(b->apos, b->n, head, hblk);
   if(tblk==hblk) return tblk;
   else return 0;
 }
+
+#undef _bisect_search
 
 #endif
