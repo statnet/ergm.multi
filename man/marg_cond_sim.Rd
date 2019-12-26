@@ -4,8 +4,14 @@
 \alias{marg_cond_sim}
 \title{An experimental function for calculating gofN()-style Pearson residuals for arbitrary statistics.}
 \usage{
-marg_cond_sim(object, nsim = 1, obs.twostage = nsim/2, GOF = NULL,
-  control = control.simulate.ergm(), ...)
+marg_cond_sim(
+  object,
+  nsim = 1,
+  obs.twostage = nsim/2,
+  GOF = NULL,
+  control = control.simulate.ergm(),
+  ...
+)
 }
 \description{
 It should probably be moved to \code{ergm}, perhaps integrated into the \code{simulate} methods.

@@ -28,9 +28,9 @@ from other edge attributes.
 }
 \details{
 Attribute specification arguments have the form
-\code{<newattrname> = <expr>}, where \code{<newattrname>} specifies the
+\verb{<newattrname> = <expr>}, where \verb{<newattrname>} specifies the
 name of the new edge attribute (or attribute to be overwritten)
-and \code{<expr>} can be one of the following:
+and \verb{<expr>} can be one of the following:
 \describe{
 
 \item{a function}{The function will be passed two arguments, the

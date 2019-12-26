@@ -2,13 +2,10 @@
 % Please edit documentation in R/InitErgmProposal.blockdiag.R
 \name{ergm_block_diag_samp_info}
 \alias{ergm_block_diag_samp_info}
-\alias{to_ergm_Cdouble.ergm_block_diag_samp_info}
 \title{Compute and serialize information needed by the block-diagonal
 Metropolis-Hastings samplers.}
 \usage{
 ergm_block_diag_samp_info(nw, a)
-
-\method{to_ergm_Cdouble}{ergm_block_diag_samp_info}(x, ndyads, ...)
 }
 \arguments{
 \item{nw}{the network of interest.}
@@ -16,13 +13,6 @@ ergm_block_diag_samp_info(nw, a)
 \item{a}{either a vector (of any mode) whose \eqn{i}th element
 identifies the block to which vertex \eqn{i} belongs. Blocks must
 be continguous.}
-
-\item{x}{an \code{ergm_block_diag_samp_info} object.}
-
-\item{ndyads}{where to prepend the number of togglable dyads to the
-block information.}
-
-\item{...}{additional arguments, currently unused.}
 }
 \value{
 An object of nonce class \code{ergm_block_diag_samp_info} with
@@ -52,10 +42,4 @@ Given a nodal attribute vector specifying the blocks
 returns a list containing information needed to efficiently
 sample dyads in those blocks.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{to_ergm_Cdouble}: A method to serialise it into
-a \code{\link{numeric}} vector.
-}}
-
 \keyword{internal}

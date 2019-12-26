@@ -4,10 +4,17 @@
 \alias{combine_networks}
 \title{A single block-diagonal network created by combining multiple networks}
 \usage{
-combine_networks(nwl, ignore.nattr = c("mnext"), ignore.vattr = c(),
-  ignore.eattr = c(), blockID.vattr = ".NetworkID",
-  blockName.vattr = NULL, detect.edgecov = FALSE,
-  keep.unshared.attr = FALSE, subnet.cache = FALSE)
+combine_networks(
+  nwl,
+  ignore.nattr = c("mnext"),
+  ignore.vattr = c(),
+  ignore.eattr = c(),
+  blockID.vattr = ".NetworkID",
+  blockName.vattr = NULL,
+  detect.edgecov = FALSE,
+  keep.unshared.attr = FALSE,
+  subnet.cache = FALSE
+)
 }
 \arguments{
 \item{nwl}{a list of \code{\link[network:network]{network::network}}s to be combined; they

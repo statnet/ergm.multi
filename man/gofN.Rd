@@ -7,15 +7,23 @@
 \alias{summary.gofN}
 \title{Linear model diagnostics for multinetwork linear models}
 \usage{
-gofN(object, GOF = NULL, subset = TRUE,
-  control = control.gofN.ergm(), ...)
+gofN(object, GOF = NULL, subset = TRUE, control = control.gofN.ergm(), ...)
 
 \method{[}{gofN}(x, i, ..., drop = FALSE)
 
-\method{plot}{gofN}(x, against = NULL, which = 1:2, col = 1,
-  pch = 1, cex = 1, ..., ask = length(which) > 1 &&
-  dev.interactive(TRUE), id.n = 3, main = "{type} for {sQuote(name)}",
-  xlab = NULL)
+\method{plot}{gofN}(
+  x,
+  against = NULL,
+  which = 1:2,
+  col = 1,
+  pch = 1,
+  cex = 1,
+  ...,
+  ask = length(which) > 1 && dev.interactive(TRUE),
+  id.n = 3,
+  main = "{type} for {sQuote(name)}",
+  xlab = NULL
+)
 
 \method{summary}{gofN}(object, by = NULL, ...)
 }
