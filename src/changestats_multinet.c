@@ -32,13 +32,13 @@ I_CHANGESTAT_FN(i__subnets){
   }
   
   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, {
-      ToggleEdge(MN_IO_TAIL(sn, t), MN_IO_HEAD(sn, h), sn->onwp[MN_SID_TAIL(sn, t)]);
+      ToggleKnownEdge(MN_IO_TAIL(sn, t), MN_IO_HEAD(sn, h), sn->onwp[MN_SID_TAIL(sn, t)], FALSE);
     });
 }
 
 U_CHANGESTAT_FN(u__subnets){ 
   GET_AUX_STORAGE(StoreSubnets, sn);
-  ToggleEdge(MN_IO_TAIL(sn, tail), MN_IO_HEAD(sn, head),sn->onwp[MN_SID_TAIL(sn, tail)]);
+  ToggleKnownEdge(MN_IO_TAIL(sn, tail), MN_IO_HEAD(sn, head),sn->onwp[MN_SID_TAIL(sn, tail)], edgeflag);
 }
 
 F_CHANGESTAT_FN(f__subnets){
@@ -93,7 +93,7 @@ C_CHANGESTAT_FN(c_MultiNet){
   Model *m = ms[i-1];
   if(m){ // NULL if network has weights 0.
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    ChangeStats(1, &st, &sh, sn->onwp[i], m);
+    ChangeStats1(st, sh, sn->onwp[i], m, edgeflag);
 
     wts += (i-1)*nwts; // Position of that network's weight vector.
     for(unsigned int j=0; j<m->n_stats; j++)
@@ -150,7 +150,7 @@ C_CHANGESTAT_FN(c_MultiNets){
   Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
   if(pos[i-1]!=pos[i]){
     Model *m = ms[i-1];
-    ChangeStats(1, &st, &sh, sn->onwp[i], m);
+    ChangeStats1(st, sh, sn->onwp[i], m, edgeflag);
     memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
   }
 }
@@ -207,4 +207,3 @@ F_CHANGESTAT_FN(f_ByNetDStats){
   ModelDestroy(nwp, m);
   STORAGE = NULL;
 }
-

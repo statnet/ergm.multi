@@ -93,7 +93,7 @@ WtC_CHANGESTAT_FN(c_wtMultiNet){
   WtModel *m = ms[i-1];
   if(m){ // NULL if network has weights 0.
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    WtChangeStats(1, &st, &sh, &weight, sn->onwp[i], m);
+    WtChangeStats1(st, sh, weight, sn->onwp[i], m, edgeweight);
 
     wts += (i-1)*nwts; // Position of that network's weight vector.
     for(unsigned int j=0; j<m->n_stats; j++)
@@ -150,7 +150,7 @@ WtC_CHANGESTAT_FN(c_wtMultiNets){
   Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
   if(pos[i-1]!=pos[i]){
     WtModel *m = ms[i-1];
-    WtChangeStats(1, &st, &sh, &weight, sn->onwp[i], m);
+    WtChangeStats1(st, sh, weight, sn->onwp[i], m, edgeweight);
     memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
   }
 }
