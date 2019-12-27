@@ -110,7 +110,7 @@ I_CHANGESTAT_FN(i_OnLayer){
 
   for(unsigned int ml=0; ml<nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
-    ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), NULL, ll->onwp, FALSE);
+    ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, ll->onwp, FALSE);
   }
 }
 

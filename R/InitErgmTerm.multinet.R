@@ -150,17 +150,15 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     
   ms <- lapply(nwl[subset], function(nw1){
     f <- nonsimp_update.formula(f, nw1~.)
-    m <- ergm_model(f, nw1, response=response,...)
-    list(model = m,
-         gs = summary(m))
+    ergm_model(f, nw1, response=response,...)
   })
 
-  nparams <- ms %>% map("model") %>% map_int(nparam, canonical=FALSE)
-  nstats <-  ms %>% map("model") %>% map_int(nparam, canonical=TRUE)
-  
+  nparams <- ms %>% map_int(nparam, canonical=FALSE)
+  nstats <-  ms %>% map_int(nparam, canonical=TRUE)
+
   # Check for MANOVA style matrix.
   if(!all_identical(nparams)) ergm_Init_abort("N() operator only supports models with the same numbers of parameters for every network. This may change in the future.")
-  if(!all_identical(ms %>% map("model") %>% map(param_names, canonical=FALSE))) ergm_Init_warn("Subnetwork models have different parameter names but the same parameter vector lengths; this may indicate specification problems.")
+  if(!all_identical(ms %>% map(param_names, canonical=FALSE))) ergm_Init_warn("Subnetwork models have different parameter names but the same parameter vector lengths; this may indicate specification problems.")
   nparam <- nparams[1]
 
   # Extract offsets and weights.
@@ -172,15 +170,19 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   params <- rep(list(NULL), nparam*ncol(xm))
   parnames <- colnames(xm)
   parnames <- ifelse(parnames=="(Intercept)", "1", parnames)
-  names(params) <- paste0('N(',NVL3(a$label,paste0(.,","),""),rep(parnames, nparam),'):',rep(param_names(ms[[1]]$model, canonical=FALSE), each=ncol(xm)))
-  if(with(ms[[1]]$model$etamap,
+  names(params) <- paste0('N(',NVL3(a$label,paste0(.,","),""),rep(parnames, nparam),'):',rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)))
+  if(with(ms[[1]]$etamap,
           any(mintheta[!offsettheta]!=-Inf) || any(maxtheta[!offsettheta]!=+Inf))){
     warning("Submodel specified to N() operator with a linear model formula has parameter constraints. They will be ignored.")
   }
   
   nstats.all <- integer(nn)
   nstats.all[subset] <- nstats # So networks not in subset get 0 stats.
- 
+
+  # Get the extended state and empty network stats wrapping. Note that
+  # naming, curved models, etc., are handled "in-house" (for now).
+  wms <- lapply(ms, wrap.ergm_model, nw, response)
+  
   ## An important special case is when all models are linear and have
   ## the same number of stats. lm-offset does not work with this
   ## approach at this time, either *unless* all terms are offset by
@@ -189,9 +191,10 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   ## be used.
   # TODO: A more refined detection than is.curved(), since currently
   # all operators show up as curved.
+  # TODO: Check that multivariate offset is still not allowed in R.
   if(N.compact_stats &&
      all_identical(nstats) &&
-     !any(ms%>%map("model")%>%map_lgl(is.curved)) &&
+     !any(ms%>%map_lgl(is.curved)) &&
      all(apply(offset,1,all_identical))){
     xm.all <- matrix(0, nn, ncol(xm))
     xm.all[subset,] <- xm
@@ -223,13 +226,33 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
       coef.names <- names(params) %>% matrix(ncol=nparam) %>% rbind(paste0("offset",seq_len(nparam))) %>% c()
     }
     
-    gs <- lst(X = cbind(xm,offset.all[subset]) %>% split(., row(.)),
-              Y = ms %>% map("gs")) %>%
-      pmap(outer) %>%
-      reduce(`+`) %>%
-      c()
-    
-    list(name="MultiNet", coef.names = coef.names, inputs=inputs, iinputs=iinputs, submodels=map(ms,"model"), dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
+    gss <- map(wms, "emptynwstats")
+    gs <-
+      if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
+        NULL
+      }else if(!any(map_lgl(gss, is.function))){ # All numeric or NULL
+        gs0 <- map_lgl(gs, is.null)
+        lst(X = (cbind(xm,offset.all[subset]) %>% split(., row(.)))[!gs0],
+            Y = gss[!gs0]) %>%
+          pmap(outer) %>%
+          reduce(`+`) %>%
+          c()
+    }else{ # Some functions: the hard case.
+      function(ext.state){
+        gss <- mapply(function(gs, ext.st){
+          if(is.function(gs)) gs(ext.state=ext.st)
+          else gs
+        }, gs=gss, ext.st=ext.state, SIMPLIFY=FALSE)
+        gs0 <- map_lgl(gs, is.null)
+        lst(X = (cbind(xm,offset.all[subset]) %>% split(., row(.)))[!gs0],
+            Y = gss[!gs0]) %>%
+          pmap(outer) %>%
+          reduce(`+`) %>%
+          c()
+      }
+    }
+
+    list(name="MultiNet", coef.names = coef.names, inputs=inputs, iinputs=iinputs, submodels=ms, dependence=any(map_lgl(wms, "dependence")), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
         
   }else{
     Xl <- xm %>%
@@ -252,7 +275,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
         map(`%*%`, c(x)) %>% # Evaluate X%*%c(x), where X is the predictor matrix and x is "theta".
         map(c) %>% # Output of the previous step is a matrix; convert to vector.
         map2(ol, `+`) %>% # Add on offset.
-        map2(ms %>% map(c("model","etamap")), # Obtain the etamap.
+        map2(ms %>% map("etamap"), # Obtain the etamap.
              ergm.eta) %>% # Evaluate eta.
         #      map2(weights, `*`) %>% # Weight.
         unlist()
@@ -262,17 +285,34 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
         map(`%*%`, c(x)) %>% # Evaluate X%*%c(x), where X is the predictor matrix and x is "theta".
         map(c) %>% # Output of the previous step is a matrix; convert to vector.
         map2(ol, `+`) %>% # Add on offset.
-        map2(ms %>% map(c("model","etamap")), # Obtain the etamap.
+        map2(ms %>% map("etamap"), # Obtain the etamap.
              ergm.etagrad) %>% # Evaluate eta gradient.
         map2(Xl, ., crossprod) %>%
         #      map2(weights, `*`) %>% # Weight.
         do.call(cbind,.)
     }
 
-    coef.names <- paste0('N#',rep(seq_len(nm), nstats),':',unlist(lapply(lapply(ms, `[[`, "model"), param_names, canonical=TRUE)))
+    coef.names <- paste0('N#',rep(seq_len(nm), nstats),':',unlist(lapply(ms, param_names, canonical=TRUE)))
+
     # Empty network statistics.
+    gss <- map(wms, "emptynwstats")
+    gs <-
+      if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
+        NULL
+      }else if(!any(map_lgl(gss, is.function))){ # All numeric or NULL
+        unlist(mapply(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats, SIMPLIFY=FALSE))
+    }else{ # Some functions: the hard case.
+      function(ext.state){
+        gss <- mapply(function(gs, ext.st){
+          if(is.function(gs)) gs(ext.state=ext.st)
+          else gs
+        }, gs=gss, ext.st=ext.state, SIMPLIFY=FALSE)
+        unlist(mapply(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats, SIMPLIFY=FALSE))
+      }
+    }
+
     gs <- unlist(lapply(ms, `[[`, "gs"))   
-    list(name="MultiNets", coef.names = coef.names, iinputs=iinputs, submodels=map(ms,"model"), dependence=!all(sapply(lapply(ms, `[[`, "model"), is.dyad.independent)), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
+    list(name="MultiNets", coef.names = coef.names, iinputs=iinputs, submodels=ms, dependence=any(map_lgl(wms, "dependence")), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
   }
 }
 
@@ -298,5 +338,6 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
 
   coef.names <- paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE)),':',param_names(m, canonical=TRUE))
   iinputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)
-  list(name="ByNetDStats", coef.names = coef.names, iinputs=iinputs, submodel=m, dependence=is.dyad.independent(m), auxiliaries=auxiliaries)
+  wm <- wrap.ergm_model(m, nw, response=response, NULL) # Only need a few things from wrap.
+  list(name="ByNetDStats", coef.names = coef.names, iinputs=iinputs, submodel=m, auxiliaries=auxiliaries, dependence=wm$dependence, ext.encode=wm$ext.encode)
 }
