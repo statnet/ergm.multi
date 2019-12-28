@@ -46,33 +46,25 @@ MH_I_FN(Mi_blockdiagTNT){
 MH_P_FN(Mp_blockdiagTNT){
   GET_STORAGE(MH_BlockDiagSampInfo, b);
 
-  const double comp=0.5, odds = comp/(1.0-comp);
-  
-  Dyad ndyads = b->ndyads;
+  const double P = 0.5, Q = 1-P;
+  double DP = P*b->ndyads, DO = DP/Q;
+
   Edge nedges=EDGECOUNT(nwp);
   
   double logratio=0; 
 
   BD_LOOP({
-      if (unif_rand() < comp && nedges > 0) { /* Select a tie at random */
+      if (unif_rand() < P && nedges > 0) { /* Select a tie at random */
 	// Note that, by construction, this tie will be within a block.
 	GetRandEdge(Mtail, Mhead, nwp);
-	/* Thanks to Robert Goudie for pointing out an error in the previous 
-	   version of this sampler when proposing to go from nedges==0 to nedges==1 
-	   or vice versa.  Note that this happens extremely rarely unless the 
-	   network is small or the parameter values lead to extremely sparse 
-	   networks.  */
-	logratio = log((nedges==1 ? 1.0/(comp*ndyads + (1.0-comp)) :
-			 nedges / (odds*ndyads + nedges)));
+	logratio = TNT_LR_E(nedges, Q, DP, DO);
       }else{ /* Select a dyad at random within a block */
 	GetRandDyadBlockDiag(Mtail, Mhead, b);
 	
 	if(IS_OUTEDGE(Mtail[0],Mhead[0])!=0){
-	  logratio = log((nedges==1 ? 1.0/(comp*ndyads + (1.0-comp)) :
-				nedges / (odds*ndyads + nedges)));
+          logratio = TNT_LR_DE(nedges, Q, DP, DO);
 	}else{
-	  logratio = log((nedges==0 ? comp*ndyads + (1.0-comp) :
-				1.0 + (odds*ndyads)/(nedges + 1)));
+          logratio = TNT_LR_DN(nedges, Q, DP, DO);
 	}
       }
     });
