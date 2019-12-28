@@ -589,9 +589,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
   wm <- wrap.ergm_model(m, nw1, response, function(x) paste0(.lspec_coef.names(list(a$Ls)),":",x))
   gs <- wm$emptynwstats
-  wm$emptynwstats <-
-    if(is.function(gs)) function(...) gs(...)*nltrms
-    else if(is.numeric(gs)) gs*nltrms
+  wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
   wm$dependence <- wm$dependence || !is.dyad.independent(nonsimp_update.formula(auxiliaries, nw~., from.new="nw"))
 
   c(list(name="OnLayer", inputs=inputs, submodel=m, auxiliaries = auxiliaries),

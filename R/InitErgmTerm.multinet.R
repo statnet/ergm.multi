@@ -230,26 +230,13 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     gs <-
       if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
         NULL
-      }else if(!any(map_lgl(gss, is.function))){ # All numeric or NULL
+      }else{ # All numeric or NULL
         gs0 <- map_lgl(gs, is.null)
         lst(X = (cbind(xm,offset.all[subset]) %>% split(., row(.)))[!gs0],
             Y = gss[!gs0]) %>%
           pmap(outer) %>%
           reduce(`+`) %>%
           c()
-    }else{ # Some functions: the hard case.
-      function(ext.state){
-        gss <- mapply(function(gs, ext.st){
-          if(is.function(gs)) gs(ext.state=ext.st)
-          else gs
-        }, gs=gss, ext.st=ext.state, SIMPLIFY=FALSE)
-        gs0 <- map_lgl(gs, is.null)
-        lst(X = (cbind(xm,offset.all[subset]) %>% split(., row(.)))[!gs0],
-            Y = gss[!gs0]) %>%
-          pmap(outer) %>%
-          reduce(`+`) %>%
-          c()
-      }
     }
 
     list(name="MultiNet", coef.names = coef.names, inputs=inputs, iinputs=iinputs, submodels=ms, dependence=any(map_lgl(wms, "dependence")), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
@@ -299,19 +286,10 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
     gs <-
       if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
         NULL
-      }else if(!any(map_lgl(gss, is.function))){ # All numeric or NULL
-        unlist(mapply(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats, SIMPLIFY=FALSE))
-    }else{ # Some functions: the hard case.
-      function(ext.state){
-        gss <- mapply(function(gs, ext.st){
-          if(is.function(gs)) gs(ext.state=ext.st)
-          else gs
-        }, gs=gss, ext.st=ext.state, SIMPLIFY=FALSE)
+      }else{ # All numeric or NULL
         unlist(mapply(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats, SIMPLIFY=FALSE))
       }
-    }
 
-    gs <- unlist(lapply(ms, `[[`, "gs"))   
     list(name="MultiNets", coef.names = coef.names, iinputs=iinputs, submodels=ms, dependence=any(map_lgl(wms, "dependence")), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)
   }
 }
