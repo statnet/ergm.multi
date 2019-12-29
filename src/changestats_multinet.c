@@ -198,7 +198,7 @@ C_CHANGESTAT_FN(c_ByNetDStats){
 
   unsigned int i = MN_SID_TAIL(sn, tail);
   if(pos[i-1]!=pos[i]){
-    ChangeStats(1, &tail, &head, nwp, m);
+    ChangeStats1(tail, head, nwp, m, edgeflag);
     memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
   }
 }
