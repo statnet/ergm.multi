@@ -1,4 +1,5 @@
 #include "ergm_changestat_multinet.h"
+#include "ergm_changestat_operator.h"
 #include "ergm_changestat.h"
 #include "ergm_model.h"
 #include "ergm_storage.h"
@@ -82,6 +83,7 @@ I_CHANGESTAT_FN(i_MultiNet){
       submodpos++;
     }else ms[i-1] = NULL;
   }
+  DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
 }
 
 C_CHANGESTAT_FN(c_MultiNet){
@@ -141,6 +143,7 @@ I_CHANGESTAT_FN(i_MultiNets){
       submodpos++;
     }
   }
+  DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
 }
 
 C_CHANGESTAT_FN(c_MultiNets){
@@ -184,7 +187,8 @@ F_CHANGESTAT_FN(f_MultiNets){
 // ByNetDStats
 
 I_CHANGESTAT_FN(i_ByNetDStats){
-  STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  Model *m = STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){

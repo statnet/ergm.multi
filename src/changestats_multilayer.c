@@ -1,4 +1,5 @@
 #include "ergm_changestat_multilayer.h"
+#include "ergm_changestat_operator.h"
 #include "ergm_changestat.h"
 #include "ergm_model.h"
 #include "ergm_storage.h"
@@ -112,6 +113,7 @@ I_CHANGESTAT_FN(i_OnLayer){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, ll->onwp, FALSE);
   }
+  DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, nml);
 }
 
 C_CHANGESTAT_FN(c_OnLayer){

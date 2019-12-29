@@ -1,4 +1,5 @@
 #include "ergm_wtchangestat_multinet.h"
+#include "ergm_wtchangestat_operator.h"
 #include "ergm_wtchangestat.h"
 #include "ergm_wtmodel.h"
 #include "ergm_storage.h"
@@ -82,6 +83,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
       submodpos++;
     }else ms[i-1] = NULL;
   }
+  WtDELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNet){
@@ -141,6 +143,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
       submodpos++;
     }
   }
+  WtDELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNets){
