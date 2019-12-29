@@ -165,7 +165,7 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   el <- as.edgelist(is.na(nw))
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
   
-  c(list(inputs=to_ergm_Cdouble(el)), list(...))
+  c(list(iinputs=to_ergm_Cdouble(el)), list(...))
 }
 
 
