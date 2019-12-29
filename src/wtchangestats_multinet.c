@@ -79,7 +79,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos), isNULL(mtp->ext_state) ? NULL : VECTOR_ELT(mtp->ext_state, submodpos), sn->onwp[i], FALSE);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos), NULL, sn->onwp[i], FALSE);
       submodpos++;
     }else ms[i-1] = NULL;
   }
@@ -159,7 +159,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
   unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos), isNULL(mtp->ext_state) ? NULL : VECTOR_ELT(mtp->ext_state, submodpos), sn->onwp[i], FALSE);
+      ms[i-1] = WtModelInitialize(VECTOR_ELT(submodels, submodpos), NULL, sn->onwp[i], FALSE);
       submodpos++;
     }
   }

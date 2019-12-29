@@ -79,7 +79,7 @@ I_CHANGESTAT_FN(i_MultiNet){
     }
     wts += nwts; // OK to clobber it here.
     if(used){
-      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos), isNULL(mtp->ext_state) ? NULL : VECTOR_ELT(mtp->ext_state, submodpos), sn->onwp[i], FALSE);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos), NULL, sn->onwp[i], FALSE);
       submodpos++;
     }else ms[i-1] = NULL;
   }
@@ -159,7 +159,7 @@ I_CHANGESTAT_FN(i_MultiNets){
   unsigned int submodpos = 0;
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
-      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos), isNULL(mtp->ext_state) ? NULL : VECTOR_ELT(mtp->ext_state, submodpos), sn->onwp[i], FALSE);
+      ms[i-1] = ModelInitialize(VECTOR_ELT(submodels, submodpos), NULL, sn->onwp[i], FALSE);
       submodpos++;
     }
   }
@@ -222,7 +222,7 @@ F_CHANGESTAT_FN(f_MultiNets){
 // ByNetDStats
 
 I_CHANGESTAT_FN(i_ByNetDStats){
-  Model *m = STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  Model *m = STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), NULL, nwp, FALSE);
   DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
   DELETE_IF_UNUSED_IN_SUBMODEL(z_func, m);
 }
