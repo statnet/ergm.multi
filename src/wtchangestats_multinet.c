@@ -84,6 +84,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNet){
     }else ms[i-1] = NULL;
   }
   WtDELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
+  WtDELETE_IF_UNUSED_IN_SUBMODELS(z_func, ms, sn->ns);
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNet){
@@ -102,6 +103,25 @@ WtC_CHANGESTAT_FN(c_wtMultiNet){
     for(unsigned int j=0; j<m->n_stats; j++)
       for(unsigned int k=0; k<nwts; k++)
 	CHANGE_STAT[j*nwts+k] += m->workspace[j]*wts[k];
+  }
+}
+
+WtZ_CHANGESTAT_FN(z_wtMultiNet){
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
+  GET_STORAGE(WtModel*, ms);
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
+
+  for(unsigned int i=1; i<=sn->ns; i++){
+    WtModel *m = ms[i-1];
+    if(m){ // NULL if network has weights 0.
+      WtZStats(sn->onwp[i], m);
+      
+      wts += (i-1)*nwts; // Position of that network's weight vector.
+      for(unsigned int j=0; j<m->n_stats; j++)
+        for(unsigned int k=0; k<nwts; k++)
+          CHANGE_STAT[j*nwts+k] += m->workspace[j]*wts[k];
+    }
   }
 }
 
@@ -144,6 +164,7 @@ WtI_CHANGESTAT_FN(i_wtMultiNets){
     }
   }
   WtDELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
+  WtDELETE_IF_UNUSED_IN_SUBMODELS(z_func, ms, sn->ns);
 }
 
 WtC_CHANGESTAT_FN(c_wtMultiNets){
@@ -169,6 +190,20 @@ WtU_CHANGESTAT_FN(u_wtMultiNets){
   if(pos[i-1]!=pos[i]){
     Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
     WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], ms[i-1], NULL, edgeweight);
+  }
+}
+
+WtZ_CHANGESTAT_FN(z_wtMultiNets){
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
+  GET_STORAGE(WtModel*, ms);
+
+  for(unsigned int i=1; i<=sn->ns; i++){
+    if(pos[i-1]!=pos[i]){
+      WtModel *m = ms[i-1];
+      WtZStats(sn->onwp[i], m);
+      memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
+    }
   }
 }
 

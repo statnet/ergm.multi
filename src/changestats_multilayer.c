@@ -114,6 +114,7 @@ I_CHANGESTAT_FN(i_OnLayer){
     ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, ll->onwp, FALSE);
   }
   DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, nml);
+  DELETE_IF_UNUSED_IN_SUBMODELS(z_func, ms, nml);
 }
 
 C_CHANGESTAT_FN(c_OnLayer){
@@ -157,6 +158,20 @@ U_CHANGESTAT_FN(u_OnLayer){
     }
     // Reverse the provisional toggle.
     i--; while(--i>=0) ToggleEdge(at[i], ah[i], ll->onwp);
+  }
+}
+
+Z_CHANGESTAT_FN(z_OnLayer){
+  GET_STORAGE(Model*, ms);
+  unsigned int nml = *INPUT_PARAM;
+  double *w = INPUT_PARAM+1;
+
+  // Find the affected models.
+  for(unsigned int ml=0; ml < nml; ml++){
+    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    ZStats(ll->onwp, ms[ml]);
+    for(unsigned int i=0; i<N_CHANGE_STATS; i++)
+      CHANGE_STAT[i] += ms[ml]->workspace[i] * w[ml];
   }
 }
 

@@ -84,6 +84,7 @@ I_CHANGESTAT_FN(i_MultiNet){
     }else ms[i-1] = NULL;
   }
   DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
+  DELETE_IF_UNUSED_IN_SUBMODELS(z_func, ms, sn->ns);
 }
 
 C_CHANGESTAT_FN(c_MultiNet){
@@ -126,6 +127,25 @@ F_CHANGESTAT_FN(f_MultiNet){
   }
 }
 
+Z_CHANGESTAT_FN(z_MultiNet){
+  GET_AUX_STORAGE(StoreSubnets, sn);
+  GET_STORAGE(Model*, ms);
+  unsigned int nwts = *IINPUT_PARAM;
+  double *wts = INPUT_PARAM;
+
+  for(unsigned int i=1; i<=sn->ns; i++){
+    Model *m = ms[i-1];
+    if(m){ // NULL if network has weights 0.
+      ZStats(sn->onwp[i], m);
+
+      wts += (i-1)*nwts; // Position of that network's weight vector.
+      for(unsigned int j=0; j<m->n_stats; j++)
+        for(unsigned int k=0; k<nwts; k++)
+          CHANGE_STAT[j*nwts+k] += m->workspace[j]*wts[k];
+    }
+  }
+}
+
 // MultiNets: Concatenate the networks' statistics; network statistic counts may be heterogeneous.
 
 I_CHANGESTAT_FN(i_MultiNets){
@@ -144,6 +164,7 @@ I_CHANGESTAT_FN(i_MultiNets){
     }
   }
   DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, sn->ns);
+  DELETE_IF_UNUSED_IN_SUBMODELS(z_func, ms, sn->ns);
 }
 
 C_CHANGESTAT_FN(c_MultiNets){
@@ -172,6 +193,20 @@ U_CHANGESTAT_FN(u_MultiNets){
   }
 }
 
+Z_CHANGESTAT_FN(z_MultiNets){
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
+  GET_AUX_STORAGE(StoreSubnets, sn);
+  GET_STORAGE(Model*, ms);
+
+  for(unsigned int i=1; i<=sn->ns; i++){
+    if(pos[i-1]!=pos[i]){
+      Model *m = ms[i-1];
+      ZStats(sn->onwp[i], m);
+      memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
+    }
+  }
+}
+
 F_CHANGESTAT_FN(f_MultiNets){
   unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
@@ -189,6 +224,7 @@ F_CHANGESTAT_FN(f_MultiNets){
 I_CHANGESTAT_FN(i_ByNetDStats){
   Model *m = STORAGE = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
   DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+  DELETE_IF_UNUSED_IN_SUBMODEL(z_func, m);
 }
 
 C_CHANGESTAT_FN(c_ByNetDStats){
@@ -201,6 +237,18 @@ C_CHANGESTAT_FN(c_ByNetDStats){
     ChangeStats1(tail, head, nwp, m, edgeflag);
     memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
   }
+}
+
+Z_CHANGESTAT_FN(z_ByNetDStats){
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
+  GET_AUX_STORAGE(StoreSubnets, sn);
+  GET_STORAGE(Model, m);
+
+  for(unsigned int i=1; i<=sn->ns; i++)
+    if(pos[i-1]!=pos[i]){
+      ZStats(nwp, m);
+      memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
+    }
 }
 
 U_CHANGESTAT_FN(u_ByNetDStats){
