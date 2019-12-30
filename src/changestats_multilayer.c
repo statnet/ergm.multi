@@ -169,7 +169,7 @@ Z_CHANGESTAT_FN(z_OnLayer){
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
-    ZStats(ll->onwp, ms[ml]);
+    ZStats(ll->onwp, ms[ml], FALSE);
     for(unsigned int i=0; i<N_CHANGE_STATS; i++)
       CHANGE_STAT[i] += ms[ml]->workspace[i] * w[ml];
   }

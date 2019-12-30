@@ -136,7 +136,7 @@ Z_CHANGESTAT_FN(z_MultiNet){
   for(unsigned int i=1; i<=sn->ns; i++){
     Model *m = ms[i-1];
     if(m){ // NULL if network has weights 0.
-      ZStats(sn->onwp[i], m);
+      ZStats(sn->onwp[i], m, FALSE);
 
       wts += (i-1)*nwts; // Position of that network's weight vector.
       for(unsigned int j=0; j<m->n_stats; j++)
@@ -201,7 +201,7 @@ Z_CHANGESTAT_FN(z_MultiNets){
   for(unsigned int i=1; i<=sn->ns; i++){
     if(pos[i-1]!=pos[i]){
       Model *m = ms[i-1];
-      ZStats(sn->onwp[i], m);
+      ZStats(sn->onwp[i], m, FALSE);
       memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
     }
   }
@@ -246,7 +246,7 @@ Z_CHANGESTAT_FN(z_ByNetDStats){
 
   for(unsigned int i=1; i<=sn->ns; i++)
     if(pos[i-1]!=pos[i]){
-      ZStats(nwp, m);
+      ZStats(nwp, m, FALSE);
       memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
     }
 }
