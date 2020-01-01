@@ -1,7 +1,7 @@
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
 #include "changestats_dgw_sp_ML.h"
-#include "ergm_changestat_multilayer.h"
+#include "ergm.multi_changestat_multilayer.h"
 #include "ergm_dyad_hashmap.h"
 
 /* Construct and maintain a directed weighted network whose (i,j)

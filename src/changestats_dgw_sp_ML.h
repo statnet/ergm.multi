@@ -4,7 +4,7 @@
 #include "ergm_edgetree.h"
 #include "ergm_changestat.h"
 #include "ergm_storage.h"
-#include "ergm_changestat_multilayer.h"
+#include "ergm.multi_changestat_multilayer.h"
 
 static inline int ergm_Check2Path(unsigned int e11, unsigned int e12, unsigned int e21, unsigned int e22, unsigned int any_order){
   if(any_order) return((e11&&e22) || (e12&&e21));

@@ -1,4 +1,4 @@
-#include "ergm_wtchangestat_multinet.h"
+#include "ergm.multi_wtchangestat_multinet.h"
 #include "ergm_wtchangestat_operator.h"
 #include "ergm_wtchangestat.h"
 #include "ergm_wtmodel.h"

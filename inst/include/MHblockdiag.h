@@ -7,5 +7,5 @@
  *
  *  Copyright 2003-2017 Statnet Commons
  */
-#pragma message ("warning: The header file \"MHblockdiag.h\" has been deprecated in favor of \"ergm_MHblockdiag.h\" and may be removed in the future.")
-#include "ergm_MHblockdiag.h"
+#pragma message ("warning: The header file \"MHblockdiag.h\" has been deprecated in favor of \"ergm.multi_MHblockdiag.h\" and may be removed in the future.")
+#include "ergm.multi_MHblockdiag.h"

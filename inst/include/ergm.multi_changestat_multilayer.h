@@ -1,8 +1,8 @@
-#ifndef _ERGM_CHANGESTAT_MULTILAYER_H_
-#define _ERGM_CHANGESTAT_MULTILAYER_H_
+#ifndef _ERGM_MULTI_CHANGESTAT_MULTILAYER_H_
+#define _ERGM_MULTI_CHANGESTAT_MULTILAYER_H_
 
 #include "ergm_changestat.h"
-#include "ergm_changestat_multilayer_common.do_not_include_directly.h"
+#include "ergm.multi_changestat_multilayer_common.do_not_include_directly.h"
 
 /* layer-aware macros eponymous to ergm_changestat.h */
 #define ML_IS_OUTEDGE(ll, a,b) (EdgetreeSearch((a),(b),(ll)->onwp->outedges)!=0?1:0)
@@ -310,4 +310,4 @@ static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, /
 #undef ergm_BINFUN
 #undef ergm_FLOORDIV
 
-#endif // _ERGM_CHANGESTAT_MULTILAYER_H_
+#endif // _ERGM_MULTI_CHANGESTAT_MULTILAYER_H_

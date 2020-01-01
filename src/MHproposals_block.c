@@ -10,7 +10,7 @@
 #include "ergm_MHproposal.h"
 #include "ergm_edgelist.h"
 #include "ergm_changestat.h"
-#include "ergm_MHblockdiag.h"
+#include "ergm.multi_MHblockdiag.h"
 #include "ergm_MHstorage.h"
 
 /*********************

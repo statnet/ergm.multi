@@ -49,8 +49,8 @@
      1, etc.)
 */
 
-#ifndef _ERGM_MHBLOCKDIAG_H_
-#define _ERGM_MHBLOCKDIAG_H_
+#ifndef _ERGM_MULTI_MHBLOCKDIAG_H_
+#define _ERGM_MULTI_MHBLOCKDIAG_H_
 
 #include "ergm_MHproposal.h"
 #include "ergm_Rutil.h"
@@ -150,4 +150,4 @@ static inline Vertex GetBlockID(Vertex tail, Vertex head, const MH_BlockDiagSamp
 
 #undef _bisect_search
 
-#endif
+#endif // _ERGM_MULTI_MHBLOCKDIAG_H_
