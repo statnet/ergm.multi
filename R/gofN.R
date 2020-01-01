@@ -244,7 +244,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
 #' @param xlab Horizontal axis label; defaults to a character representation of `against`.
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage
-#' @importFrom graphics abline panel.smooth plot
+#' @importFrom graphics abline panel.smooth plot text
 #' @importFrom methods is
 #' @importFrom glue glue
 #' @export
