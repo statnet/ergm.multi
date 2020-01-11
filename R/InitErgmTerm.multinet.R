@@ -231,7 +231,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
       if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
         NULL
       }else{ # All numeric or NULL
-        gs0 <- map_lgl(gs, is.null)
+        gs0 <- map_lgl(gss, is.null)
         lst(X = (cbind(xm,offset.all[subset]) %>% split(., row(.)))[!gs0],
             Y = gss[!gs0]) %>%
           pmap(outer) %>%
