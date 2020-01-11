@@ -442,7 +442,24 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
   uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr"))
 }
 
-#' Calculate a vector that maps the global LHS network Vertex indices within-layer Vertex and a Vertex to layer lookup table.
+#' Calculate a vector that maps the combined (block-diagonal) LHS network Vertex indices within-layer/within-network Vertex and a Vertex to layer/network lookup table.
+#'
+#' @param nw combined network.
+#' @param by vertex attribute on which to split blocks.
+#' @param same_dim whether all blocks must have the same dimensions (usually `FALSE` for multinetwork and `TRUE` for multilayer objects).
+#'
+#' @return A list with the following elements:
+#'
+#' \item{nb}{Number of blocks.}
+#'
+#' \item{bids}{A vector equal in length to the size of the combined
+#' network containing the 1-based IDs of the block to which each
+#' vertex belongs.}
+#'
+#' \item{bmap}{A vector equal in length to the size of the combined
+#' network containing the 1-based IDs of the each
+#' vertex's within-block ID.}
+#'
 #' @noRd
 .block_vertexmap <- function(nw, by=".NetworkID", same_dim=FALSE){
   a <- .peek_vattrv(nw, by)
@@ -456,7 +473,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
     if(same_dim) if(!all_identical(el) || !all_identical(al)) stop("Layers must be networks of the same dimensions.", call.=FALSE)
 
     eoff <- rep(cumsum(c(0,el[-length(el)])), el)
-    aoff <- rep(cumsum(c(0,el[-length(al)])), al) + sum(el)
+    aoff <- rep(cumsum(c(0,al[-length(al)]))-el, al) + sum(el)
     
     o <- list(nb = length(el), bids = a, bmap = seq_len(n) - c(eoff,aoff), ns = rbind(el,al))
   }else{
