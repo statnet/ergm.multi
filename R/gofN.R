@@ -101,10 +101,10 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
 
   prev.remain <- NULL
 
@@ -115,42 +115,63 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     if(any(NVL(prev.remain,FALSE)!=remain))
       pernet.m <- ergm_model(~ByNetDStats(GOF, subset=remain), nw=nw, response = object$response, ...)
     prev.remain <- remain
-    nstats <- nparam(pernet.m, canonical=TRUE)/sum(remain)
+    nmonitored <- nparam(pernet.m, canonical=TRUE)
+    nstats <- nmonitored/sum(remain)
+
+    # Indices of monitored elements.
+    monitored <- nparam(sim.m_settings$object, canonical=TRUE) + seq_len(nmonitored)
 
     # TODO: Simulations can be rerun only on the networks in the subset.
-    # TODO: Run with ergm_state rather than ergm_model.
-    
+
     # The two-stage sample, taken marginally, *is* an unconstrained
     # sample.
     if(!control$obs.twostage){
       message("Simulating unconstrained sample.")
-      sim <- do.call(simulate, .update.list(sim_settings, list(monitor=pernet.m)))
-      sim <- sim[,attr(sim, "monitored"),drop=FALSE]
+      sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=pernet.m)))
+      sim <- sim[,monitored,drop=FALSE]
     }
 
     # TODO: Make this adaptive: start with a small simulation,
     # increase on fail; or perhaps use a pilot sample.
     if(!is.null(object$constrained.obs)){
+      # Construct a simulate.ergm_state() call list for constrained simulation.
+      args <- .update.list(sim.m.obs_settings,
+                           list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
+                                do.sim=FALSE))
+      sim.s.obs_settings <- do.call(simulate, args)
+      rm(sim.m.obs_settings, pernet.m); gc()
       sim <-
         if(control$obs.twostage){
           message("Simulating imputed networks.", appendLF=FALSE)
-          sim.net <- sim_settings$basis
+          # Construct a simulate.ergm_state() call list for unconstrained simulation.
+          args <- .update.list(sim.m_settings,
+                               list(control=.update.list(sim.m_settings$control,
+                                                         list(parallel=0)),
+                                    output="ergm_state", nsim=1, do.sim=FALSE))
+          sim.s_settings <- do.call(simulate, args)
+          state <- sim.s_settings$object
+          rm(sim.m_settings); gc()
           genseries <- function(){
             sim <- list()
             for(i in seq_len(control$obs.twostage/nthreads)){
-              args <- .update.list(sim_settings,
-                                 list(
-                                   basis=sim.net,
-                                   control=.update.list(sim_settings$control,
-                                                      list(parallel=0,MCMC.burnin=if(i==1)sim_settings$control$MCMC.burnin else sim_settings$control$MCMC.interval)),
-                                   output="ergm_state", nsim=1))
-              sim.net <- do.call(simulate, args)
-              args <- .update.list(sim.obs_settings,
-                                 list(basis=sim.net, monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
-                                      control=.update.list(sim.obs_settings$control,
-                                                         list(parallel=0))))
+              # First, simulate a realisation of the unconstrained network.
+              args <- .update.list(sim.s_settings,
+                                   list(
+                                     object = state,
+                                     control=.update.list(sim.s_settings$control,
+                                                          list(MCMC.burnin=if(i==1)sim.s_settings$control$MCMC.burnin else sim.s_settings$control$MCMC.interval)),
+                                     output="ergm_state", nsim=1))
+              state <- update(do.call(simulate, args)) # Make sure ext.state and nw0 are reconciled.
+              # Next, simulate a realisation of the constrained network conditional on the unconstrained.
+              state.obs <- sim.s.obs_settings$object
+              state.obs <- update(state.obs, el = state$el, nw0 = state$nw0)
+              if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
+              args <- .update.list(sim.s.obs_settings,
+                                   list(object = state.obs, nsim=control$nsim/control$obs.twostage,
+                                        control=.update.list(sim.s.obs_settings$control,
+                                                             list(parallel=0))))
               sim[[i]] <- do.call(simulate, args)
-              sim[[i]] <- sim[[i]][,attr(sim[[i]], "monitored"),drop=FALSE]
+              sim[[i]] <- sim[[i]][,monitored,drop=FALSE]
               message(".", appendLF=FALSE)
             }
             sim
@@ -161,10 +182,9 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
           do.call(rbind, sim)
         }
       message("Simulating constrained sample.")
-      sim.obs <- do.call(simulate, .update.list(sim.obs_settings,
-                                                list(nsim=control$nsim,
-                                                     monitor=pernet.m)))
-      sim.obs <- sim.obs[,attr(sim.obs,"monitored"),drop=FALSE]
+      sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
+                                                list(nsim=control$nsim)))
+      sim.obs <- sim.obs[,monitored,drop=FALSE]
     }else{
       sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
     }
