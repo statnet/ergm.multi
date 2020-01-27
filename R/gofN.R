@@ -134,53 +134,27 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     # TODO: Make this adaptive: start with a small simulation,
     # increase on fail; or perhaps use a pilot sample.
     if(!is.null(object$constrained.obs)){
+
       # Construct a simulate.ergm_state() call list for constrained simulation.
       args <- .update.list(sim.m.obs_settings,
                            list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
                                 do.sim=FALSE))
       sim.s.obs_settings <- do.call(simulate, args)
       rm(sim.m.obs_settings, pernet.m); gc()
-      sim <-
-        if(control$obs.twostage){
-          message("Simulating imputed networks.", appendLF=FALSE)
-          # Construct a simulate.ergm_state() call list for unconstrained simulation.
-          args <- .update.list(sim.m_settings,
-                               list(control=.update.list(sim.m_settings$control,
-                                                         list(parallel=0)),
-                                    output="ergm_state", nsim=1, do.sim=FALSE))
-          sim.s_settings <- do.call(simulate, args)
-          state <- sim.s_settings$object
-          rm(sim.m_settings); gc()
-          genseries <- function(){
-            sim <- list()
-            for(i in seq_len(control$obs.twostage/nthreads)){
-              # First, simulate a realisation of the unconstrained network.
-              args <- .update.list(sim.s_settings,
-                                   list(
-                                     object = state,
-                                     control=.update.list(sim.s_settings$control,
-                                                          list(MCMC.burnin=if(i==1)sim.s_settings$control$MCMC.burnin else sim.s_settings$control$MCMC.interval)),
-                                     output="ergm_state", nsim=1))
-              state <- update(do.call(simulate, args)) # Make sure ext.state and nw0 are reconciled.
-              # Next, simulate a realisation of the constrained network conditional on the unconstrained.
-              state.obs <- sim.s.obs_settings$object
-              state.obs <- update(state.obs, el = state$el, nw0 = state$nw0)
-              if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
-              args <- .update.list(sim.s.obs_settings,
-                                   list(object = state.obs, nsim=control$nsim/control$obs.twostage,
-                                        control=.update.list(sim.s.obs_settings$control,
-                                                             list(parallel=0))))
-              sim[[i]] <- do.call(simulate, args)
-              sim[[i]] <- sim[[i]][,monitored,drop=FALSE]
-              message(".", appendLF=FALSE)
-            }
-            sim
-          }
-          #' @importFrom parallel clusterCall
-          sim <- if(!is.null(cl)) unlist(clusterCall(cl, genseries),recursive=FALSE) else genseries()
-          message("")
-          do.call(rbind, sim)
-        }
+
+      if(control$obs.twostage){
+        message("Simulating imputed networks.", appendLF=FALSE)
+        # Construct a simulate.ergm_state() call list for unconstrained simulation.
+        args <- .update.list(sim.m_settings, list(do.sim=FALSE))
+        sim.s_settings <- do.call(simulate, args)
+        rm(sim.m_settings, args); gc()
+
+        #' @importFrom parallel clusterCall
+        sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
+               else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
+        message("")
+        sim <- do.call(rbind, sim)
+      }
       message("Simulating constrained sample.")
       sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
                                                 list(nsim=control$nsim)))
@@ -235,6 +209,35 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   }), cn)
 
   structure(o, nw=nw, subset=subset, control=control, class="gofN")
+}
+
+# Helper function for gofN.
+gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored){
+  sim <- vector("list", control$obs.twostage/nthreads)
+
+  sim.s_settings$control$parallel <- 0
+  sim.s_settings$output <- "ergm_state"
+  sim.s_settings$nsim <- 1
+
+  sim.s.obs_settings$control$parallel <- 0
+  sim.s.obs_settings$output <- "stats"
+  sim.s.obs_settings$nsim <- control$nsim/control$obs.twostage
+
+  for(i in seq_along(sim)){
+    # First, simulate a realisation of the unconstrained network.
+    state <- sim.s_settings$object <- update(do.call(simulate, sim.s_settings)) # Make sure ext.state and nw0 are reconciled.
+    if(i==1) sim.s_settings$control$MCMC.burnin <- sim.s_settings$control$MCMC.interval # After the first iteration, shorter intervals.
+
+    # Next, simulate a realisation of the constrained network conditional on the unconstrained.
+    sim.s.obs_settings$object <- update(sim.s.obs_settings$object, el = state$el, nw0 = state$nw0) # Replace network state with that of unconstrained sample.
+
+    sim[[i]] <- do.call(simulate, sim.s.obs_settings)
+    sim[[i]] <- sim[[i]][,monitored,drop=FALSE]
+
+    if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
+    message(".", appendLF=FALSE)
+  }
+  sim
 }
 
 #' @describeIn gofN Extract a subset of statistics for which goodness-of-fit had been computed.
