@@ -154,6 +154,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
                else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
         message("")
         sim <- do.call(rbind, sim)
+        gc()
       }
       message("Simulating constrained sample.")
       sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
