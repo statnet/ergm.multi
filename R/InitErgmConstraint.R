@@ -64,14 +64,14 @@ InitErgmConstraint.blockdiag<-function(lhs.nw, attrname=NULL, ...){
                                       el)
                                   ),
                           rep(rle(FALSE), (n-bip)*n, scale="run")), n)
-           o | ot
+           compress(o | ot)
          }else{
            a <- rle(a)
-           rlebdm(compact.rle(do.call(c,rep(
-                                          mapply(function(blen,bend){rep(rle(c(FALSE,TRUE,FALSE)), c(bend-blen, blen, n-bend), scale="run")},
-                                                 a$lengths, cumsum(a$lengths), SIMPLIFY=FALSE),
-                                          a$lengths)
-                                      )), n)
+           rlebdm(compress(do.call(c,rep(
+                                       mapply(function(blen,bend){rep(rle(c(FALSE,TRUE,FALSE)), c(bend-blen, blen, n-bend), scale="run")},
+                                              a$lengths, cumsum(a$lengths), SIMPLIFY=FALSE),
+                                       a$lengths)
+                                   )), n)
          }
        },
        dependence = FALSE)
@@ -91,7 +91,7 @@ InitErgmConstraint.upper_tri<-function(lhs.nw, attrname=NULL, ...){
          # columns i where restrict[i]==TRUE, and it's just
          # TRUE,...,TRUE,TRUE,...,TRUE where restrict[i]==FALSE.
          d <- do.call(c, lapply(seq_len(n), function(i) rep(c(rle(TRUE),rle(!restrict[i])), c(i-1, n-i+1),scale="run")))
-         rlebdm(compact.rle(d), n)
+         rlebdm(compress(d), n)
        },
        dependence = FALSE
        )
