@@ -43,8 +43,8 @@ Networks <- function(...){
   nw %n% "ergm" <- .combine_ergmlhs(nwl)
 
   nw %ergmlhs% "constraints" <-
-      if(NVL(nwl[[1]] %ergmlhs% "constraints",~.)==~.)
-        ~blockdiag(".NetworkID")
+      if(NVL(nwl[[1]] %ergmlhs% "constraints",trim_env(~.))==trim_env(~.))
+        trim_env(~blockdiag(".NetworkID"))
       else
         append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag",".NetworkID")), TRUE)
   if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]]%ergmlhs%"obs.constraints"
@@ -131,7 +131,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
   f <- a$formula
-  auxiliaries <- ~.subnets(".NetworkID")
+  auxiliaries <- trim_env(~.subnets(".NetworkID"))
 
   nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
   nwnames <- names(nwl)
@@ -302,7 +302,7 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
                       required = c(TRUE,FALSE))
 
   f <- a$formula
-  auxiliaries <- ~.subnets(".NetworkID")
+  auxiliaries <- trim_env(~.subnets(".NetworkID"))
   nattrs <- get_multinet_nattr_tibble(nw)
 
   lmi <- get_lminfo(nattrs, subset=a$subset)

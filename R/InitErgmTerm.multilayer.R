@@ -267,8 +267,8 @@ Layer <- function(...){
   nw %n% "ergm" <- .combine_ergmlhs(nwl)
 
   nw %ergmlhs% "constraints" <-
-      if(NVL(nwl[[1]] %ergmlhs% "constraints",~.)==~.)
-        ~blockdiag(".LayerID")
+      if(NVL(nwl[[1]] %ergmlhs% "constraints",trim_env(~.))==trim_env(~.))
+        trim_env(~blockdiag(".LayerID"))
       else
         append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
   
@@ -536,16 +536,17 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 
 .all_layers_terms <- function(n, LHS=NULL){
   if(is.null(LHS))
-    lapply(seq_len(n), function(i) as.formula(substitute(~i,list(i=as.name(i)))))
+    lapply(seq_len(n), function(i) trim_env(as.formula(substitute(~i,list(i=as.name(i))))))
   else
-    lapply(seq_len(n), function(i) as.formula(substitute(lhs~i,list(lhs=LHS, i=as.name(i)))))
+    lapply(seq_len(n), function(i) trim_env(as.formula(substitute(lhs~i,list(lhs=LHS, i=as.name(i))))))
 }
 
 .mk_.layer.net_auxform <- function(ll, nl){
   trmcalls <- .layers_expand_dot(ll, nl)
   # Get the formula as a list of term calls.
   trmcalls <- lapply(trmcalls, function(ltrm) call(".layer.net", ltrm))
-  append_rhs.formula(~.,trmcalls)[-2]
+  # TODO: Double-check that trim_env here doesn't break anything.
+  trim_env(append_rhs.formula(~.,trmcalls)[-2])
 }
 
 .layers_expand_dot <- function(ll, nl){
@@ -558,7 +559,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "Ls"),
                       vartypes = c("formula", "formula,list"),
-                      defaultvalues = list(NULL, ~.),
+                      defaultvalues = list(NULL, trim_env(~.)),
                       required = c(TRUE, FALSE))
   f <- a$formula
 
@@ -600,7 +601,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, response=NULL, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
                       vartypes = c("formula,list"),
-                      defaultvalues = list(~.),
+                      defaultvalues = list(trim_env(~.)),
                       required = c(FALSE))
 
   nwl <- .split_constr_network(nw,".LayerID",".LayerID")
