@@ -140,30 +140,31 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
                            list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
                                 do.sim=FALSE))
       sim.s.obs_settings <- do.call(simulate, args)
-      rm(sim.m.obs_settings, pernet.m); gc()
+      rm(sim.m.obs_settings, pernet.m)
 
       if(control$obs.twostage){
         message("Simulating imputed networks.", appendLF=FALSE)
         # Construct a simulate.ergm_state() call list for unconstrained simulation.
         args <- .update.list(sim.m_settings, list(do.sim=FALSE))
         sim.s_settings <- do.call(simulate, args)
-        rm(sim.m_settings, args); gc()
+        rm(sim.m_settings, args)
 
         #' @importFrom parallel clusterCall
         sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
                else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
         message("")
         sim <- do.call(rbind, sim)
-        gc()
       }
+      rm(sim.s_settings)
       message("Simulating constrained sample.")
       sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
                                                 list(nsim=control$nsim)))
+      rm(sim.s.obs_settings)
       sim.obs <- sim.obs[,monitored,drop=FALSE]
     }else{
       sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
+      rm(pernet.m)
     }
-
     message("Collating the simulations.")
     cn <- colnames(sim)[seq_len(nstats)] %>% sub(".*?:","", .)
     
@@ -235,7 +236,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
     sim[[i]] <- do.call(simulate, sim.s.obs_settings)
     sim[[i]] <- sim[[i]][,monitored,drop=FALSE]
 
-    if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
+    ## if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
     message(".", appendLF=FALSE)
   }
   sim
