@@ -27,3 +27,6 @@ VignetteBuilder: rmarkdown, knitr
 RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
+Remotes: github::statnet/statnet.common@master,
+    github::statnet/network@master,
+    github::statnet/ergm@dev
