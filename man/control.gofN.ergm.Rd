@@ -8,7 +8,6 @@
 control.gofN.ergm(
   nsim = 100,
   obs.twostage = nsim/2,
-  retry_bad_nets = 0,
   save_stats = FALSE,
   MCMC.burnin = NULL,
   MCMC.interval = NULL,
@@ -28,7 +27,6 @@ control.gofN.ergm(
 control.gofN(
   nsim = 100,
   obs.twostage = nsim/2,
-  retry_bad_nets = 0,
   save_stats = FALSE,
   MCMC.burnin = NULL,
   MCMC.interval = NULL,
@@ -71,13 +69,6 @@ sample and then averaging over the first-stage sample.
 Then, \code{obs.twostage} specifies the number of unconstrained networks
 to simulate from, which should divide the \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}'s
 \code{nsim} argument evenly.}
-
-\item{retry_bad_nets}{This parameter only has an effect if the
-network has missing data or observational process. It gives the
-number of times to retry simulating networks for which the
-estimated constrained variance is higher than unconstrained. Note
-that setting it \verb{>0} is likely to bias estimates: the simulation
-should instead be rerun with a larger \code{nsim}.}
 
 \item{save_stats}{If \code{TRUE}, save the simulated network statistics;
 defaults to \code{FALSE} to save memory and disk space.}

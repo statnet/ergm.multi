@@ -77,13 +77,12 @@
 gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...){
   check.control.class(c("gofN.ergm"), "gofN")
   if(control$obs.twostage && control$nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by obs.twostage control parameter must divide the nsim control parameter evenly.")
-  
+
   nw <- object$network
   nnets <- length(unique(.peek_vattrv(nw, ".NetworkID")))
 
   if(is.numeric(subset)) subset <- unwhich(subset, nnets)
   subset <- rep(subset, length.out=nnets)
-  remain <- subset
 
   stats <- stats.obs <- NULL
 
@@ -106,104 +105,100 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
 
   sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
 
-  prev.remain <- NULL
+  message("Constructing GOF model.")
+  NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
+  pernet.m <- ergm_model(~ByNetDStats(GOF), nw=nw, response = object$response, ...)
+  nmonitored <- nparam(pernet.m, canonical=TRUE)
+  nstats <- nmonitored/nnets
 
-  for(attempt in seq_len(control$retry_bad_nets + 1)){
-    if(attempt!=1) message(sum(remain), " networks (", paste(which(remain),collapse=", "), ") have bad simulations; rerunning.")
-    message("Constructing GOF model.")
-    NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
-    if(any(NVL(prev.remain,FALSE)!=remain))
-      pernet.m <- ergm_model(~ByNetDStats(GOF, subset=remain), nw=nw, response = object$response, ...)
-    prev.remain <- remain
-    nmonitored <- nparam(pernet.m, canonical=TRUE)
-    nstats <- nmonitored/sum(remain)
+  # Indices of monitored elements.
+  monitored <- nparam(sim.m_settings$object, canonical=TRUE) + seq_len(nmonitored)
 
-    # Indices of monitored elements.
-    monitored <- nparam(sim.m_settings$object, canonical=TRUE) + seq_len(nmonitored)
+  # TODO: Simulations can be rerun only on the networks in the subset.
 
-    # TODO: Simulations can be rerun only on the networks in the subset.
-
-    # The two-stage sample, taken marginally, *is* an unconstrained
-    # sample.
-    if(!control$obs.twostage){
-      message("Simulating unconstrained sample.")
-      sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=pernet.m)))
-      sim <- sim[,monitored,drop=FALSE]
-    }
-
-    # TODO: Make this adaptive: start with a small simulation,
-    # increase on fail; or perhaps use a pilot sample.
-    if(!is.null(object$constrained.obs)){
-
-      # Construct a simulate.ergm_state() call list for constrained simulation.
-      args <- .update.list(sim.m.obs_settings,
-                           list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
-                                do.sim=FALSE))
-      sim.s.obs_settings <- do.call(simulate, args)
-      rm(sim.m.obs_settings, pernet.m)
-
-      if(control$obs.twostage){
-        message("Simulating imputed networks.", appendLF=FALSE)
-        # Construct a simulate.ergm_state() call list for unconstrained simulation.
-        args <- .update.list(sim.m_settings, list(do.sim=FALSE))
-        sim.s_settings <- do.call(simulate, args)
-        rm(sim.m_settings, args)
-
-        #' @importFrom parallel clusterCall
-        sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
-               else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
-        message("")
-        sim <- do.call(rbind, sim)
-      }
-      rm(sim.s_settings)
-      message("Simulating constrained sample.")
-      sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
-                                                list(nsim=control$nsim)))
-      rm(sim.s.obs_settings)
-      sim.obs <- sim.obs[,monitored,drop=FALSE]
-    }else{
-      sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
-      rm(pernet.m)
-    }
-    message("Collating the simulations.")
-    cn <- colnames(sim)[seq_len(nstats)] %>% sub(".*?:","", .)
-    
-    statarray <- array(c(sim), c(control$nsim, nstats, sum(remain)))
-    dimnames(statarray) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
-    statarray.obs <- array(c(sim.obs), c(control$nsim, nstats, sum(remain)))
-    dimnames(statarray.obs) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
-
-    if(is.null(stats)){
-      stats <- statarray
-      stats.obs <- statarray.obs
-    }else{
-      stats[,,remain[subset]] <- statarray
-      stats.obs[,,remain[subset]] <- statarray.obs
-    }
-
-    # Calculate variances for each network and statistic.
-    v <- apply(statarray, 2:3, var)
-    vo <- if(control$obs.twostage) apply(statarray, 2:3, .mean_var, control$obs.twostage) else apply(statarray.obs, 2:3, var)
-    # If any statistic for the network has negative variance estimate, rerun it.
-    remain[remain] <- apply(v>0 & v-vo<=0, 2, any)
-    if(!any(remain)) break;
+  # The two-stage sample, taken marginally, *is* an unconstrained
+  # sample.
+  if(!control$obs.twostage){
+    message("Simulating unconstrained sample.")
+    sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=pernet.m)))
+    sim <- sim[,monitored,drop=FALSE]
   }
+
+  # TODO: Make this adaptive: start with a small simulation,
+  # increase on fail; or perhaps use a pilot sample.
+  if(!is.null(object$constrained.obs)){
+
+    # Construct a simulate.ergm_state() call list for constrained simulation.
+    args <- .update.list(sim.m.obs_settings,
+                         list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
+                              do.sim=FALSE))
+    sim.s.obs_settings <- do.call(simulate, args)
+    rm(sim.m.obs_settings, pernet.m)
+
+    if(control$obs.twostage){
+      message("Simulating imputed networks.", appendLF=FALSE)
+      # Construct a simulate.ergm_state() call list for unconstrained simulation.
+      args <- .update.list(sim.m_settings, list(do.sim=FALSE))
+      sim.s_settings <- do.call(simulate, args)
+      rm(sim.m_settings, args)
+
+      #' @importFrom parallel clusterCall
+      sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
+             else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
+      message("")
+      sim <- do.call(rbind, sim)
+    }
+    rm(sim.s_settings)
+    message("Simulating constrained sample.")
+    sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
+                                              list(nsim=control$nsim)))
+    rm(sim.s.obs_settings)
+    sim.obs <- sim.obs[,monitored,drop=FALSE]
+  }else{
+    sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
+    rm(pernet.m)
+  }
+  message("Collating the simulations.")
+  cn <- colnames(sim)[seq_len(nstats)] %>% sub(".*?:","", .)
+
+  if(control$save_stats){
+    stats <- array(c(sim), c(control$nsim, nstats, nnets))
+    dimnames(stats) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
+    stats.obs <- array(c(sim.obs), c(control$nsim, nstats, nnets))
+    dimnames(stats.obs) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
+  }
+
+  # Calculate variances for each network and statistic.
+  v <- apply(sim, 2, var)
+  vo <- if(control$obs.twostage) apply(sim, 2, .mean_var, control$obs.twostage) else apply(sim.obs, 2, var)
+  # If any statistic for the network has negative variance estimate, stop with an error.
+  remain <- any(v>0 & v-vo<=0)
   if(any(remain))
-    stop(sum(remain), " networks (", paste(which(remain),collapse=", "), ") have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
+    stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
+
+  m <- colMeans(sim)
+  mo <- colMeans(sim.obs)
+
+  rm(sim, sim.obs)
+
+  # Reshape into matrices:
+  v <- matrix(v, nstats, nnets, dimnames=list(Statistic=cn,Network=NULL))
+  vo <- matrix(vo, nstats, nnets, dimnames=list(Statistic=cn,Network=NULL))
+  m <- matrix(m, nstats, nnets, dimnames=list(Statistic=cn,Network=NULL))
+  mo <- matrix(mo, nstats, nnets, dimnames=list(Statistic=cn,Network=NULL))
 
   message("Summarizing.")
-  o <- setNames(lapply(seq_along(cn), function(i){
-    s <- stats[,i,]
-    so <- stats.obs[,i,]
+  o <- setNames(lapply(seq_len(nstats), function(i){
     #' @importFrom tibble lst
-    v <- apply(s,2,var)
     l <- list()
-    l$var <- ifelse(v>0, v, NA)
-    l$var.obs <- ifelse(v>0, if(control$obs.twostage) apply(s, 2, .mean_var, control$obs.twostage) else apply(so, 2, var), NA)
-    l$observed <- ifelse(v>0, colMeans(so), NA)
-    l$fitted <- ifelse(v>0, colMeans(s), NA)
-    l$pearson <- ifelse(v>0, (l$observed-l$fitted)/sqrt(l$var-l$var.obs), NA)
+    l$var <- ifelse(v[i,]>0, v[,i], NA)
+    l$var.obs <- ifelse(v[i,]>0, vo[i,], NA)
+    l$observed <- ifelse(v[i,]>0, mo[i,], NA)
+    l$fitted <- ifelse(v[i,]>0, m[i,], NA)
+    l$pearson <- ifelse(v[i,]>0, (mo[i,]-m[i,])/sqrt(v[i,]-vo[i,]), NA)
     if(control$save_stats){
+      s <- stats[,i,]
+      so <- stats.obs[,i,]
       l$stats <- s
       l$stats.obs <- so
     }
@@ -390,13 +385,6 @@ summary.gofN <- function(object, by=NULL, ...){
 #' to simulate from, which should divide the [control.gofN.ergm()]'s
 #' `nsim` argument evenly.
 #' 
-#' @param retry_bad_nets This parameter only has an effect if the
-#'   network has missing data or observational process. It gives the
-#'   number of times to retry simulating networks for which the
-#'   estimated constrained variance is higher than unconstrained. Note
-#'   that setting it `>0` is likely to bias estimates: the simulation
-#'   should instead be rerun with a larger `nsim`.
-#'
 #' @param save_stats If `TRUE`, save the simulated network statistics;
 #'   defaults to `FALSE` to save memory and disk space.
 #'
@@ -437,7 +425,6 @@ summary.gofN <- function(object, by=NULL, ...){
 #' @export control.gofN.ergm
 control.gofN.ergm<-function(nsim=100,
                             obs.twostage=nsim/2,
-                            retry_bad_nets=0,
                             save_stats=FALSE,
                        MCMC.burnin=NULL,
                        MCMC.interval=NULL,
