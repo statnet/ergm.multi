@@ -2,8 +2,38 @@
   .Call("mean_var_wrapper", x, length(x)/ng, PACKAGE="ergm.multi")
 }
 
+.col_var <- function(x){
+  .Call("vars_wrapper", x, nrow(x), PACKAGE="ergm.multi")
+}
+
 .update.list <- function(l, v){
   l[names(v)]<-v
+  l
+}
+
+# l must be a list with three elements (in this specific order):
+# * running sample size
+# * running mean
+# * running sum squared deviations
+Welford_update <- function(l, x){
+  if(is.numeric(x)){ # Either a vector or a matrix with statistics in rows.
+    xm <- rbind(x)
+    for(r in seq_len(nrow(xm))){
+      x <- xm[r,]
+      n.prev <- l[[1]]
+      l[[1]] <- n.new <- n.prev + 1
+      m.prev <- l[[2]]
+      l[[2]] <- m.new <- m.prev + (x-m.prev)/n.new
+      l[[3]] <- l[[3]] + (x-m.prev)*(x-m.new)
+    }
+  }else{ # Multielement update: both l and x are lists
+    l.n <- l[[1]]; x.n <- x[[1]]; l[[1]] <- n.new <- l.n + x.n
+    l.m <- l[[2]]; x.m <- x[[2]]
+    d <- x.m - l.m
+    # In our application, n for x and n for l are going to be similar, so we use weighted average.
+    l[[2]] <- (l.n*l.m + x.n*x.m)/n.new
+    l[[3]] <- l[[3]] + x[[3]] + d*d*l.n*x.n/n.new
+  }
   l
 }
 
@@ -18,6 +48,8 @@
 #'   and [summary.ergm_model()] for the constructor, [plot()],
 #'   [qqnorm()], and [qqline()] for the plotting method).
 #' @param control See [control.gofN.ergm()].
+#' @param save_stats If `TRUE`, save the simulated network statistics;
+#'   defaults to `FALSE` to save memory and disk space.
 #'
 #' @return An object of class `gofN`: a named list containing a list
 #'   for every statistic in the specified `GOF` formula with the
@@ -73,10 +105,11 @@
 #' fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
 #' }
 #' 
-#' @export
-gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...){
+#' @exportc
+gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), save_stats=FALSE, ...){
   check.control.class(c("gofN.ergm"), "gofN")
   if(control$obs.twostage && control$nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by obs.twostage control parameter must divide the nsim control parameter evenly.")
+  max_elts <- if(save_stats) Inf else control$array.max*1024^2/8 # A numeric is 8 bytes per element.
 
   nw <- object$network
   nnets <- length(unique(.peek_vattrv(nw, ".NetworkID")))
@@ -110,18 +143,22 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   pernet.m <- ergm_model(~ByNetDStats(GOF), nw=nw, response = object$response, ...)
   nmonitored <- nparam(pernet.m, canonical=TRUE)
   nstats <- nmonitored/nnets
+  cn <- param_names(pernet.m)[seq_len(nstats)] %>% sub(".*?:","", .)
 
   # Indices of monitored elements.
   monitored <- nparam(sim.m_settings$object, canonical=TRUE) + seq_len(nmonitored)
-
-  # TODO: Simulations can be rerun only on the networks in the subset.
 
   # The two-stage sample, taken marginally, *is* an unconstrained
   # sample.
   if(!control$obs.twostage){
     message("Simulating unconstrained sample.")
-    sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=pernet.m)))
-    sim <- sim[,monitored,drop=FALSE]
+    args <- .update.list(sim.m_settings, list(monitor=pernet.m, do.sim=FALSE))
+    sim.s_settings <- do.call(simulate, args)
+    sim <- sim_stats_piecemeal(sim.s_settings, monitored,  max_elts, save_stats=save_stats)
+    rm(sim.s_settings)
+    SST <- attr(sim, "SST")
+
+    if(!save_stats) suppressWarnings(rm(sim))
   }
 
   # TODO: Make this adaptive: start with a small simulation,
@@ -133,35 +170,49 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
                          list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
                               do.sim=FALSE))
     sim.s.obs_settings <- do.call(simulate, args)
-    rm(sim.m.obs_settings, pernet.m)
+    suppressWarnings(rm(sim.m.obs_settings, pernet.m))
 
     if(control$obs.twostage){
       message("Simulating imputed networks.", appendLF=FALSE)
       # Construct a simulate.ergm_state() call list for unconstrained simulation.
       args <- .update.list(sim.m_settings, list(do.sim=FALSE))
       sim.s_settings <- do.call(simulate, args)
-      rm(sim.m_settings, args)
+      suppressWarnings(rm(sim.m_settings, args))
 
       #' @importFrom parallel clusterCall
-      sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
-             else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
+      if(!is.null(cl)){
+        sim <- clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats)
+        SST <- lapply(sim, attr, "SST")
+        MV <- lapply(sim, attr, "MV")
+        sim <- unlist(sim, recursive=FALSE)
+      }else{
+        sim <- gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats)
+        SST <- list(attr(sim, "SST"))
+        MV <- list(attr(sim, "MV"))
+      }
       message("")
-      sim <- do.call(rbind, sim)
+      if(save_stats) sim <- do.call(rbind, sim) else rm(sim)
+      
+      SST <- Reduce(Welford_update, SST)
+      MV <- colMeans(do.call(rbind, MV))
+      message("")
     }
-    rm(sim.s_settings)
+    suppressWarnings(rm(sim.s_settings))
     message("Simulating constrained sample.")
-    sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
-                                              list(nsim=control$nsim)))
+    sim.obs <- sim_stats_piecemeal(.update.list(sim.s.obs_settings,
+                                                list(nsim=control$nsim)), monitored, max_elts, save_stats)
     rm(sim.s.obs_settings)
-    sim.obs <- sim.obs[,monitored,drop=FALSE]
+    SST.obs <- attr(sim.obs, "SST")
+    if(!save_stats) rm(sim.obs)
   }else{
-    sim.obs <- matrix(summary(pernet.m, object$network, response = object$response, ...), nrow(sim), ncol(sim), byrow=TRUE)
-    rm(pernet.m)
+    SST.obs <- list(0, summary(pernet.m, object$network, response = object$response, ...))
+    SST.obs[[3]] <- numeric(length(SST.obs[[2]]))
+    if(save_stats) sim.obs <- matrix(SST.obs[[2]], control$nsim, nparam(pernet.m, canonical=TRUE), byrow=TRUE)
+    suppressWarnings(rm(pernet.m))
   }
   message("Collating the simulations.")
-  cn <- colnames(sim)[seq_len(nstats)] %>% sub(".*?:","", .)
 
-  if(control$save_stats){
+  if(save_stats){
     stats <- array(c(sim), c(control$nsim, nstats, nnets))
     dimnames(stats) <- list(Iterations=NULL, Statistic=cn, Network=NULL)
     stats.obs <- array(c(sim.obs), c(control$nsim, nstats, nnets))
@@ -169,17 +220,17 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   }
 
   # Calculate variances for each network and statistic.
-  v <- apply(sim, 2, var)
-  vo <- if(control$obs.twostage) apply(sim, 2, .mean_var, control$obs.twostage) else apply(sim.obs, 2, var)
+  v <- SST[[3]]/(SST[[1]]-1)
+  vo <- if(control$obs.twostage) MV else SST.obs[[3]]/(SST.obs[[1]]-1)
   # If any statistic for the network has negative variance estimate, stop with an error.
   remain <- any(v>0 & v-vo<=0)
   if(any(remain))
     stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
-  m <- colMeans(sim)
-  mo <- colMeans(sim.obs)
+  m <- SST[[2]]
+  mo <- SST.obs[[2]]
 
-  rm(sim, sim.obs)
+  suppressWarnings(rm(sim, sim.obs))
 
   # Reshape into matrices:
   v <- matrix(v, nstats, nnets, dimnames=list(Statistic=cn,Network=NULL))
@@ -196,7 +247,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
     l$observed <- ifelse(v[i,]>0, mo[i,], NA)
     l$fitted <- ifelse(v[i,]>0, m[i,], NA)
     l$pearson <- ifelse(v[i,]>0, (mo[i,]-m[i,])/sqrt(v[i,]-vo[i,]), NA)
-    if(control$save_stats){
+    if(save_stats){
       s <- stats[,i,]
       so <- stats.obs[,i,]
       l$stats <- s
@@ -208,33 +259,79 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), ...
   structure(o, nw=nw, subset=subset, control=control, class="gofN")
 }
 
-# Helper function for gofN.
-gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored){
-  sim <- vector("list", control$obs.twostage/nthreads)
+# Helper functions for gofN.
+sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=FALSE){
+  nthreads <- nthreads(sim.s_settings$control)
+  # This needs to be a multiple of nthreads:
+  chunk_nsim <- ((max_elts %/% nparam(sim.s_settings$object, canonical=TRUE)) %/% nthreads)*nthreads
+  nreruns <- sim.s_settings$nsim %/% chunk_nsim
+  first_nsim <- sim.s_settings$nsim - nreruns*chunk_nsim
+
+  sim <- if(save_stats) vector("list", nreruns+1) else list()
+
+  nstats <- switch(mode(monitored), # Vector of the correct length.
+                    numeric = length(monitored),
+                    logical = sum(monitored))
+
+  # Welford's algorithm setup
+  SST <- list(0L, numeric(nstats), numeric(nstats))
+
+  sim.s_settings$control$MCMC.samplesize <- first_nsim
+  o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
+  state <- sim.s_settings$object <- o$networks
+  sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
+  if(save_stats) sim[[1L]] <- sim1
+  
+  SST <- Welford_update(SST, sim1)
+
+  for(rerun in seq_len(nreruns)){
+    sim.s_settings$control$MCMC.samplesize <- chunk_nsim
+    sim.s_settings$control$MCMC.burnin <- sim.s_settings$control$MCMC.interval
+    o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
+    state <- sim.s_settings$object <- o$networks # Make sure ext.state and nw0 are reconciled.
+    sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
+    if(save_stats) sim[[rerun+1L]] <- sim1
+
+    SST <- Welford_update(SST, sim1)
+  }
+
+  structure(sim, SST=SST, state=state)
+}
+gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats=FALSE){
+  n_cond <- control$obs.twostage/nthreads
+  sim <- if(save_stats) vector("list", n_cond) else list()
 
   sim.s_settings$control$parallel <- 0
-  sim.s_settings$output <- "ergm_state"
-  sim.s_settings$nsim <- 1
+  sim.s_settings$control$MCMC.samplesize <- 1
 
   sim.s.obs_settings$control$parallel <- 0
-  sim.s.obs_settings$output <- "stats"
-  sim.s.obs_settings$nsim <- control$nsim/control$obs.twostage
+  sim.s.obs_settings$control$MCMC.samplesize <- control$nsim/control$obs.twostage
 
-  for(i in seq_along(sim)){
+  nstats <- switch(mode(monitored), # Vector of the correct length.
+                    numeric = length(monitored),
+                    logical = sum(monitored))
+  MV <- numeric(nstats)
+  # Welford's algorithm setup
+  SST <- list(0L, numeric(nstats), numeric(nstats))
+
+  for(i in seq_len(n_cond)){
     # First, simulate a realisation of the unconstrained network.
-    state <- sim.s_settings$object <- update(do.call(simulate, sim.s_settings)) # Make sure ext.state and nw0 are reconciled.
+    o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
+    state <- sim.s_settings$object <- update(o$networks[[1]]) # Make sure ext.state and nw0 are reconciled.
     if(i==1) sim.s_settings$control$MCMC.burnin <- sim.s_settings$control$MCMC.interval # After the first iteration, shorter intervals.
 
     # Next, simulate a realisation of the constrained network conditional on the unconstrained.
     sim.s.obs_settings$object <- update(sim.s.obs_settings$object, el = state$el, nw0 = state$nw0) # Replace network state with that of unconstrained sample.
 
-    sim[[i]] <- do.call(simulate, sim.s.obs_settings)
-    sim[[i]] <- sim[[i]][,monitored,drop=FALSE]
+    sim1 <- with(sim.s.obs_settings, as.matrix(ergm_MCMC_sample(object, control, coef)$stats)[,monitored,drop=FALSE])
+    if(save_stats) sim[[i]] <- sim1
 
-    ## if(i%%64==0) gc() # R's default garbage collection does not appear to be frequent enough.
+    SST <- Welford_update(SST, sim1)
+    MV <- MV + (.col_var(sim1) - MV)/i
+
     message(".", appendLF=FALSE)
   }
-  sim
+  structure(sim, SST=SST, MV=MV)
 }
 
 #' @describeIn gofN Extract a subset of statistics for which goodness-of-fit had been computed.
@@ -384,13 +481,14 @@ summary.gofN <- function(object, by=NULL, ...){
 #' Then, `obs.twostage` specifies the number of unconstrained networks
 #' to simulate from, which should divide the [control.gofN.ergm()]'s
 #' `nsim` argument evenly.
-#' 
-#' @param save_stats If `TRUE`, save the simulated network statistics;
-#'   defaults to `FALSE` to save memory and disk space.
 #'
 #' @param nsim Number of networks to be randomly drawn using Markov chain Monte
 #' Carlo.  This sample of networks provides the basis for comparing the model
 #' to the observed network.
+#'
+#' @param array.max Try to avoid creating arrays larger in size (in
+#'   megabytes) than this. Is ignored if `save_stats` is passed.
+#'
 #' @param MCMC.burnin Number of proposals before any MCMC sampling is done. It
 #' typically is set to a fairly large number.
 #' @param MCMC.interval Number of proposals between sampled statistics.
@@ -425,7 +523,8 @@ summary.gofN <- function(object, by=NULL, ...){
 #' @export control.gofN.ergm
 control.gofN.ergm<-function(nsim=100,
                             obs.twostage=nsim/2,
-                            save_stats=FALSE,
+                            array.max=128,
+
                        MCMC.burnin=NULL,
                        MCMC.interval=NULL,
                        MCMC.prop.weights=NULL,

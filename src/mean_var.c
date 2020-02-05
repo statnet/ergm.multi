@@ -42,3 +42,22 @@ SEXP mean_var_wrapper(SEXP xe, SEXP ne){
   UNPROTECT(3);
   return oe;
 }
+
+/*
+  For x a concatenation of m vectors of length n, calculate the sample
+  variances of those vectors. (This can be used to compute column
+  variances of matrices.)
+*/
+
+SEXP vars_wrapper(SEXP xe, SEXP ne){
+  xe = PROTECT(coerceVector(xe, REALSXP));
+  ne = PROTECT(coerceVector(ne, INTSXP));
+  unsigned int n = asInteger(ne), m = length(xe)/n;
+  
+  SEXP oe = PROTECT(allocVector(REALSXP, m));
+  double *o = REAL(oe), *x=REAL(xe);
+  for(unsigned int i=0; i<m; i++, x+=n, o++)
+    *o = sumdev2(x,n)/(n-1);
+  UNPROTECT(3);
+  return oe;
+}

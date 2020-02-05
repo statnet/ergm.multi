@@ -2,7 +2,7 @@
 #'
 #' It should probably be moved to `ergm`, perhaps integrated into the `simulate` methods.
 #' @export
-marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.simulate.ergm(), ...){
+marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.simulate.ergm(), save_stats=FALSE, ...){
   check.control.class(c("simulate.ergm"), "marg_cond_sim")
   control$obs.twostage <- obs.twostage
   control$nsim <- nsim
@@ -45,6 +45,8 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
     message("Simulating unconstrained sample.")
     sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=gof.m)))
     sim <- sim[,monitored,drop=FALSE]
+    SST <- list(nrow(sim), colMeans(sim), .col_var(sim))
+    if(!save_stats) suppressWarnings(rm(sim))
   }
 
   # TODO: Make this adaptive: start with a small simulation,
@@ -56,49 +58,74 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
                          list(monitor=gof.m, nsim=control$nsim/control$obs.twostage,
                               do.sim=FALSE))
     sim.s.obs_settings <- do.call(simulate, args)
-    rm(sim.m.obs_settings, gof.m); gc()
+    suppressWarnings(rm(sim.m.obs_settings, gof.m))
 
     if(control$obs.twostage){
       message("Simulating imputed networks.", appendLF=FALSE)
       # Construct a simulate.ergm_state() call list for unconstrained simulation.
       args <- .update.list(sim.m_settings, list(do.sim=FALSE))
       sim.s_settings <- do.call(simulate, args)
-      rm(sim.m_settings, args); gc()
+      suppressWarnings(rm(sim.m_settings, args))
 
       #' @importFrom parallel clusterCall
-      sim <- if(!is.null(cl)) unlist(clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored), recursive=FALSE)
-             else gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored)
+      if(!is.null(cl)){
+        sim <- clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats)
+        SST <- lapply(sim, attr, "SST")
+        MV <- lapply(sim, attr, "MV")
+        sim <- unlist(sim, recursive=FALSE)
+      }else{
+        sim <- gen_obs_imputation_series(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats)
+        SST <- list(attr(sim, "SST"))
+        MV <- list(attr(sim, "MV"))
+      }
       message("")
-      sim <- do.call(rbind, sim)
-      gc()
+      if(save_stats) sim <- do.call(rbind, sim) else rm(sim)
+      
+      SST <- Reduce(Welford_update, SST)
+      MV <- colMeans(do.call(rbind, MV))
+      message("")
     }
+    suppressWarnings(rm(sim.s_settings))
     message("Simulating constrained sample.")
     sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
                                               list(nsim=control$nsim)))
+    suppressWarnings(rm(sim.s.obs_settings))
     sim.obs <- sim.obs[,monitored,drop=FALSE]
   }else{
     sim.obs <- summary(gof.m, object$network, response = object$response, ...)
+    suppressWarnings(rm(gof.m))
   }
-  
-  stats <- sim
-  stats.obs <- sim.obs
-  
-  # Calculate variances for each statistic.
-  v <- apply(stats, 2, var)
-  vo <- if(control$obs.twostage) apply(stats, 2, .mean_var, control$obs.twostage) else apply(stats.obs, 2, var)
-  # If any statistic for the network has negative variance estimate, rerun it.
-  if(any(v>0 & v-vo<=0)) stop("Some statistics networks have bad simulations. Rerun with higher nsim= control parameter.")
+  message("Collating the simulations.")
+
+  if(save_stats){
+    stats <- sim
+    stats.obs <- sim.obs
+  }
+
+  # Calculate variances for each network and statistic.
+  v <- SST[[3]]/(SST[[1]]-1)
+  vo <- if(control$obs.twostage) MV else .col_var(sim.obs)
+  # If any statistic for the network has negative variance estimate, stop with an error.
+  remain <- any(v>0 & v-vo<=0)
+  if(any(remain))
+    stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
+
+  m <- SST[[2]]
+  mo <- colMeans(sim.obs)
+
+  suppressWarnings(rm(sim, sim.obs))
 
   message("Summarizing.")
   l <- list()
   l$var <- ifelse(v>0, v, NA)
   l$var.obs <- ifelse(v>0, vo, NA)
-  l$observed <- ifelse(v>0, colMeans(stats.obs), NA)
-  l$fitted <- ifelse(v>0, colMeans(stats), NA)
-  l$pearson <- ifelse(v>0, (l$observed-l$fitted)/sqrt(l$var-l$var.obs), NA)
-  l$stats <- stats
-  l$stats.obs <- stats.obs
-  l
+  l$observed <- ifelse(v>0, mo, NA)
+  l$fitted <- ifelse(v>0, m, NA)
+  l$pearson <- ifelse(v>0, (mo-m)/sqrt(v-vo), NA)
+  if(save_stats){
+    l$stats <- stats
+    l$stats.obs <- stats.obs
+  }
 
   structure(l, nw=nw, control=control)
 }
