@@ -263,8 +263,8 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
 sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=FALSE){
   nthreads <- nthreads(sim.s_settings$control)
   # This needs to be a multiple of nthreads:
-  chunk_nsim <- ((max_elts %/% nparam(sim.s_settings$object, canonical=TRUE)) %/% nthreads)*nthreads
-  nreruns <- sim.s_settings$nsim %/% chunk_nsim
+  chunk_nsim <- if(is.finite(max_elts)) ((max_elts %/% nparam(sim.s_settings$object, canonical=TRUE)) %/% nthreads)*nthreads else sim.s_settings$nsim
+  nreruns <- ceiling(sim.s_settings$nsim / chunk_nsim) - 1
   first_nsim <- sim.s_settings$nsim - nreruns*chunk_nsim
 
   sim <- if(save_stats) vector("list", nreruns+1) else list()
@@ -294,6 +294,8 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
 
     SST <- Welford_update(SST, sim1)
   }
+
+  if(save_stats) sim <- do.call(rbind, sim)
 
   structure(sim, SST=SST, state=state)
 }
