@@ -223,7 +223,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   v <- SST[[3]]/(SST[[1]]-1)
   vo <- if(control$obs.twostage) MV else SST.obs[[3]]/(SST.obs[[1]]-1)
   # If any statistic for the network has negative variance estimate, stop with an error.
-  remain <- any(v>0 & v-vo<=0)
+  remain <- v>0 & v-vo<=0
   if(any(remain))
     stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
@@ -242,7 +242,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   o <- setNames(lapply(seq_len(nstats), function(i){
     #' @importFrom tibble lst
     l <- list()
-    l$var <- ifelse(v[i,]>0, v[,i], NA)
+    l$var <- ifelse(v[i,]>0, v[i,], NA)
     l$var.obs <- ifelse(v[i,]>0, vo[i,], NA)
     l$observed <- ifelse(v[i,]>0, mo[i,], NA)
     l$fitted <- ifelse(v[i,]>0, m[i,], NA)
@@ -324,6 +324,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 
     # Next, simulate a realisation of the constrained network conditional on the unconstrained.
     sim.s.obs_settings$object <- update(sim.s.obs_settings$object, el = state$el, nw0 = state$nw0) # Replace network state with that of unconstrained sample.
+    sim.s.obs_settings$object <- update(sim.s.obs_settings$object, stats = summary(sim.s.obs_settings$object)) # Find the current network statistic.
 
     sim1 <- with(sim.s.obs_settings, as.matrix(ergm_MCMC_sample(object, control, coef)$stats)[,monitored,drop=FALSE])
     if(save_stats) sim[[i]] <- sim1
