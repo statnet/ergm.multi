@@ -280,9 +280,10 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
   o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
   state <- sim.s_settings$object <- o$networks
   sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
+
   if(save_stats) sim[[1L]] <- sim1
-  
   SST <- Welford_update(SST, sim1)
+  rm(sim1)
 
   for(rerun in seq_len(nreruns)){
     sim.s_settings$control$MCMC.samplesize <- chunk_nsim
@@ -290,9 +291,10 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
     o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
     state <- sim.s_settings$object <- o$networks # Make sure ext.state and nw0 are reconciled.
     sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
-    if(save_stats) sim[[rerun+1L]] <- sim1
 
+    if(save_stats) sim[[rerun+1L]] <- sim1
     SST <- Welford_update(SST, sim1)
+    rm(sim1)
   }
 
   if(save_stats) sim <- do.call(rbind, sim)
