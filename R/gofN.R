@@ -105,7 +105,7 @@ Welford_update <- function(l, x){
 #' fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
 #' }
 #' 
-#' @exportc
+#' @export
 gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), save_stats=FALSE, ...){
   check.control.class(c("gofN.ergm"), "gofN")
   if(control$obs.twostage && control$nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by obs.twostage control parameter must divide the nsim control parameter evenly.")

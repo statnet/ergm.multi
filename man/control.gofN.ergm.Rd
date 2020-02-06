@@ -8,7 +8,7 @@
 control.gofN.ergm(
   nsim = 100,
   obs.twostage = nsim/2,
-  save_stats = FALSE,
+  array.max = 128,
   MCMC.burnin = NULL,
   MCMC.interval = NULL,
   MCMC.prop.weights = NULL,
@@ -27,7 +27,7 @@ control.gofN.ergm(
 control.gofN(
   nsim = 100,
   obs.twostage = nsim/2,
-  save_stats = FALSE,
+  array.max = 128,
   MCMC.burnin = NULL,
   MCMC.interval = NULL,
   MCMC.prop.weights = NULL,
@@ -70,8 +70,8 @@ Then, \code{obs.twostage} specifies the number of unconstrained networks
 to simulate from, which should divide the \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}'s
 \code{nsim} argument evenly.}
 
-\item{save_stats}{If \code{TRUE}, save the simulated network statistics;
-defaults to \code{FALSE} to save memory and disk space.}
+\item{array.max}{Try to avoid creating arrays larger in size (in
+megabytes) than this. Is ignored if \code{save_stats} is passed.}
 
 \item{MCMC.burnin}{Number of proposals before any MCMC sampling is done. It
 typically is set to a fairly large number.}

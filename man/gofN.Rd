@@ -7,7 +7,14 @@
 \alias{summary.gofN}
 \title{Linear model diagnostics for multinetwork linear models}
 \usage{
-gofN(object, GOF = NULL, subset = TRUE, control = control.gofN.ergm(), ...)
+gofN(
+  object,
+  GOF = NULL,
+  subset = TRUE,
+  control = control.gofN.ergm(),
+  save_stats = FALSE,
+  ...
+)
 
 \method{[}{gofN}(x, i, ..., drop = FALSE)
 
@@ -37,6 +44,9 @@ uses the original model.}
 \item{subset}{argument for the \code{\link[=ergm-terms]{N}} term.}
 
 \item{control}{See \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}.}
+
+\item{save_stats}{If \code{TRUE}, save the simulated network statistics;
+defaults to \code{FALSE} to save memory and disk space.}
 
 \item{\dots}{additional arguments to functions (\code{\link[=simulate.ergm]{simulate.ergm()}}
 and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor, \code{\link[=plot]{plot()}},

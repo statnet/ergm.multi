@@ -10,6 +10,7 @@ marg_cond_sim(
   obs.twostage = nsim/2,
   GOF = NULL,
   control = control.simulate.ergm(),
+  save_stats = FALSE,
   ...
 )
 }
