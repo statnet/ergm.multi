@@ -29,4 +29,4 @@ Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
-    github::statnet/ergm@dev
+    github::statnet/ergm-private@dev
