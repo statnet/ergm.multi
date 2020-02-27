@@ -5,8 +5,6 @@
   f
 }
 
-.despace <- function(s) gsub("[[:space:]]", "", s)
-
 .lspec_coef.names <- function(Llist, collapse=TRUE){
   reprs <- sapply(seq_along(Llist), function(l){
     name <- names(Llist)[l]
@@ -382,7 +380,7 @@ toString.ergm_LayerLogic <- function(x, ...){
   class(x) <- keep(class(x), `!=`, "ergm_LayerLogic")
   fmt <- function(x)
     switch(class(x),
-           formula = .despace(deparse(if(length(x)==2) x[[2]] else x)),
+           formula = despace(deparse(if(length(x)==2) x[[2]] else x)),
            character = x,
            list = paste0('(',paste(sapply(x,fmt),collapse=","),')'),
            as.character(x))
@@ -611,7 +609,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, response=NULL, ...){
 
   inputs <- c(nltrms)
 
-  list(name="layerCMB", coef.names = paste0('CMBL(',.despace(deparse(Ls)),')'), inputs=inputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse(Ls)),')'), inputs=inputs, dependence=TRUE, auxiliaries = auxiliaries)
 }
 
 ################################################################################
