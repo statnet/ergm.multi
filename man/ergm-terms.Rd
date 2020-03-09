@@ -583,7 +583,7 @@
     combined.
 }
 
-  \item{\code{twostarL(Ls, type, distinct=TRUE}  (binary)  (directed) (layer-aware)}{\emph{Multilayer two-star:} 
+  \item{\code{twostarL(Ls, type, distinct=TRUE)}  (binary)  (directed) (layer-aware)}{\emph{Multilayer two-star:} 
     This term adds one statistic to the model, equal to the number of
     cross-layer two-stars or two-paths in
     the network. Argument \code{Ls} specifies the two layers of
