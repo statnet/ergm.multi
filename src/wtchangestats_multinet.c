@@ -125,18 +125,6 @@ WtZ_CHANGESTAT_FN(z_wtMultiNet){
   }
 }
 
-WtU_CHANGESTAT_FN(u_wtMultiNet){
-  GET_AUX_STORAGE(StoreWtSubnets, sn);
-  GET_STORAGE(WtModel*, ms);
-
-  unsigned int i = MN_SID_TAIL(sn, tail);
-  WtModel *m = ms[i-1];
-  if(m){ // NULL if network has weights 0.
-    Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], m, NULL, edgeweight);
-  }
-}
-
 WtF_CHANGESTAT_FN(f_wtMultiNet){
   GET_AUX_STORAGE(StoreWtSubnets, sn);
   GET_STORAGE(WtModel*, ms);
@@ -178,18 +166,6 @@ WtC_CHANGESTAT_FN(c_wtMultiNets){
     WtModel *m = ms[i-1];
     WtChangeStats1(st, sh, weight, sn->onwp[i], m, edgeweight);
     memcpy(CHANGE_STAT + (unsigned int)(pos[i-1]), m->workspace, m->n_stats*sizeof(double));
-  }
-}
-
-WtU_CHANGESTAT_FN(u_wtMultiNets){
-  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreWtSubnets, sn);
-  GET_STORAGE(WtModel*, ms);
-
-  unsigned int i = MN_SID_TAIL(sn, tail);
-  if(pos[i-1]!=pos[i]){
-    Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    WtUPDATE_STORAGE(st, sh, weight, sn->onwp[i], ms[i-1], NULL, edgeweight);
   }
 }
 

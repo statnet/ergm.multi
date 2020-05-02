@@ -106,18 +106,6 @@ C_CHANGESTAT_FN(c_MultiNet){
   }
 }
 
-U_CHANGESTAT_FN(u_MultiNet){
-  GET_AUX_STORAGE(StoreSubnets, sn);
-  GET_STORAGE(Model*, ms);
-
-  unsigned int i = MN_SID_TAIL(sn, tail);
-  Model *m = ms[i-1];
-  if(m){ // NULL if network has weights 0.
-    Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    UPDATE_STORAGE(st, sh, sn->onwp[i], m, NULL, edgeflag);
-  }
-}
-
 F_CHANGESTAT_FN(f_MultiNet){
   GET_AUX_STORAGE(StoreSubnets, sn);
   GET_STORAGE(Model*, ms);
@@ -181,18 +169,6 @@ C_CHANGESTAT_FN(c_MultiNets){
   }
 }
 
-U_CHANGESTAT_FN(u_MultiNets){
-  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
-  GET_AUX_STORAGE(StoreSubnets, sn);
-  GET_STORAGE(Model*, ms);
-
-  unsigned int i = MN_SID_TAIL(sn, tail);
-  if(pos[i-1]!=pos[i]){
-    Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-    UPDATE_STORAGE(st, sh, sn->onwp[i], ms[i-1], NULL, edgeflag);
-  }
-}
-
 Z_CHANGESTAT_FN(z_MultiNets){
   unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
   GET_AUX_STORAGE(StoreSubnets, sn);
@@ -249,11 +225,6 @@ Z_CHANGESTAT_FN(z_ByNetDStats){
       ZStats(nwp, m, FALSE);
       memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
     }
-}
-
-U_CHANGESTAT_FN(u_ByNetDStats){
-  GET_STORAGE(Model, m);
-  UPDATE_STORAGE(tail, head, nwp, m, NULL, edgeflag);
 }
 
 F_CHANGESTAT_FN(f_ByNetDStats){
