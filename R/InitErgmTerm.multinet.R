@@ -82,7 +82,7 @@ get_multinet_nattr_tibble <- function(nw){
     }
 
   al <- lapply(al, sapply, NVL, NA)
-  as.tibble(al)
+  as_tibble(al)
 }
 
 get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, weights=1){
