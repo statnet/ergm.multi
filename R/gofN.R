@@ -99,6 +99,7 @@ Welford_update <- function(l, x){
 #' fit.gof <- gofN(fit, GOF=~triangles)
 #' summary(fit.gof)
 #' plot(fit.gof)
+#' plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
 #' 
 #' # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
 #' \dontrun{
@@ -357,7 +358,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @describeIn gofN A plotting method, making residual and scale-location plots.
 #'
 #' @param x a [`gofN`] object.
-#' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values.
+#' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values. The formula may also contain a `.fitted` variable which will be substituted with the fitted values.
 #' @param col,pch,cex vector of values (wrapped in [I()]), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.
 #' @param which which to plot (`1` for residuals plot, `2` for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and `3` for normal quantile-quantile plot).
 #' @param ask whether the user should be prompted between the plots.
@@ -383,13 +384,9 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
   xlab <- NVL(xlab,
               switch(class(against),
                      character = against,
-                     formula = despace(deparse(against[[length(against)]])),
-                     `NULL` = "Predicted value",
-                     despace(deparse(substitute(against)))))
-  againstval <- switch(class(against),
-                       character = nattrs[[against]],
-                       formula = eval(against[[length(against)]], envir = nattrs, enclos = environment(against)),
-                       against)
+                     formula = deparse(do.call(substitute, list(ult(against), list(.fitted=as.name("Fitted values")))),width.cutoff=500L),
+                     `NULL` = "Fitted values",
+                     despace(deparse(substitute(against),width.cutoff=500L))))
 
   for(gpar in c("col", "pch", "cex")){
     a <- get(gpar)
@@ -403,20 +400,25 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
 
   for(name in names(x)){
     summ <- x[[name]]
+    againstval <- switch(class(against),
+                         character = {nattrs$.fitted <- summ$fitted; nattrs[[against]]},
+                         formula = {nattrs$.fitted <- summ$fitted; eval(ult(against), envir = nattrs, enclos = environment(against))},
+                         against)
+
     
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
 
     if(1L %in% which){
-      plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Pearson residual",type="n")
+      plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.",type="n")
       panel.smooth(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
       if(any(ei)) text(NVL(againstval,summ$fitted)[ei], summ$pearson[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
       abline(h=0, lty=3, col="gray")
     }
     
     if(2L %in% which){
-      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Pearson residual"))), type="n")
+      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), type="n")
       panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
       if(any(ei)) text(NVL(againstval,summ$fitted)[ei], sqrt(abs(summ$pearson))[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
       abline(h=0, lty=3, col="gray")

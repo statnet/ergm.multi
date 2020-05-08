@@ -56,7 +56,7 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 
 \item{drop}{whether the indexing operator should drop attributes and return simply a list.}
 
-\item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values.}
+\item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values. The formula may also contain a \code{.fitted} variable which will be substituted with the fitted values.}
 
 \item{which}{which to plot (\code{1} for residuals plot, \code{2} for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and \code{3} for normal quantile-quantile plot).}
 
@@ -133,6 +133,7 @@ plot(fit.gof)
 fit.gof <- gofN(fit, GOF=~triangles)
 summary(fit.gof)
 plot(fit.gof)
+plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
 
 # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
 \dontrun{
