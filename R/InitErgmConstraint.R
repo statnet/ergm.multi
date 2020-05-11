@@ -96,3 +96,25 @@ InitErgmConstraint.upper_tri<-function(lhs.nw, attrname=NULL, ...){
        dependence = FALSE
        )
 }
+
+InitErgmConstraint.blacklist_block<-function(lhs.nw, block_vattr=".ubid", blacklist_nattr=".block_blacklist"){
+  n <- as.integer(network.size(lhs.nw))
+  v <- get.vertex.attribute(lhs.nw,block_vattr,unlist=FALSE,na.omit=FALSE,null.na=FALSE)
+  bl <- get_all_bl(lhs.nw, blacklist_nattr)
+
+  list(
+    block_vattr=block_vattr,
+    blacklist_nattr=blacklist_nattr,
+    free_dyads=(lapply(bl, function(b){
+      btail <- !in_block(v, b[[1]])
+      bhead <- !in_block(v, b[[2]])
+
+      col0 <- rep(rle(FALSE),n)
+      col1 <- rle(btail)
+
+      # TODO: Optimize.
+    do.call(c, lapply(seq_len(n), function(i) if(bhead[i]) col1 else col0)) %>% compress
+    }) %>% Reduce(`&`) %>% rlebdm(n)),
+    dependence=FALSE
+  )
+}

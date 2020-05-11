@@ -4,7 +4,7 @@
 \alias{Layer}
 \title{A multilayer network representation.}
 \usage{
-Layer(...)
+Layer(..., .symmetric = NULL, .bipartite = NULL)
 }
 \arguments{
 \item{...}{layer specification, in one of three formats:
@@ -12,11 +12,21 @@ Layer(...)
 \item An (optionally named) list of identically-dimensioned
 networks.
 \item Several networks as (optionally named) arguments.
-\item A single network, a character vector, and an optional
-logical vector. Then, the layers are values of the named edge
-attributes. If the network is directed, the logical vector
-specifies which of the layers should be treated as undirected.
+\item A single network, a character vector, and several optional
+arguments. Then, the layers are values of the named edge
+attributes. The optional arguments \code{.symmetric} and
+\code{.bipartite} are then interpreted as described below.
 }}
+
+\item{.symmetric}{If the layer specification is via a single
+network with edge attributes and the network is directed, an
+optional logical vector to specify which of the layers should be
+treated as undirected.}
+
+\item{.bipartite}{If the layer specification is via a single
+network with edge attributes and the network is unipartite, an
+optional integer vector to specify which of the layers should be
+treated as bipartite and how many \code{b1} vertices there are.}
 }
 \value{
 A network object with layer metadata.
@@ -24,6 +34,12 @@ A network object with layer metadata.
 \description{
 A function for specifying the LHS of a multilayer (a.k.a. multiplex
 a.k.a. multirelational a.k.a. multivariate) ERGM.
+}
+\note{
+If not all layers have the same bipartedness, all layers will
+appear as unipartite to the statistics. However, an operator term
+\code{\link[=ergm:ergm-terms]{S()}} can be used to construct a bipartite
+subgraph of a unipartite graph.
 }
 \examples{
 

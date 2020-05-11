@@ -185,12 +185,25 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #'   1. Several networks as (optionally named) arguments.
 #'
-#'   1. A single network, a character vector, and an optional
-#'      logical vector. Then, the layers are values of the named edge
-#'      attributes. If the network is directed, the logical vector
-#'      specifies which of the layers should be treated as undirected.
+#'   1. A single network, a character vector, and several optional
+#'      arguments. Then, the layers are values of the named edge
+#'      attributes. The optional arguments `.symmetric` and
+#'      `.bipartite` are then interpreted as described below.
+#' @param .symmetric If the layer specification is via a single
+#'   network with edge attributes and the network is directed, an
+#'   optional logical vector to specify which of the layers should be
+#'   treated as undirected.
+#' @param .bipartite If the layer specification is via a single
+#'   network with edge attributes and the network is unipartite, an
+#'   optional integer vector to specify which of the layers should be
+#'   treated as bipartite and how many `b1` vertices there are.
 #'
 #' @return A network object with layer metadata.
+#'
+#' @note If not all layers have the same bipartedness, all layers will
+#'   appear as unipartite to the statistics. However, an operator term
+#'   [`S()`][ergm:ergm-terms] can be used to construct a bipartite
+#'   subgraph of a unipartite graph.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -214,15 +227,21 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 #'
 #' @export
-Layer <- function(...){
+Layer <- function(..., .symmetric=NULL, .bipartite=NULL){
   args <- list(...)
-  if(length(args)%in%2:3 && is(args[[1]], "network") && is(args[[2]], "vector") && (length(args)!=3 || is(args[[3]], "vector"))){
+  if(all(sapply(args, is, "network"))){
+    nwl <- args
+  }else if(is.list(args[[1]]) && all(sapply(args[[1]], is, "network"))){
+    nwl <- args[[1]]
+  }else if(length(args)>=1 && is(args[[1]], "network") && is(args[[2]], "vector")){
+    nw <- args[[1]]
     nwl <-
       lapply(args[[2]], function(eattr){
-        network_view(args[[1]], eattr)
+        network_view(nw, eattr)
       })
-    if(length(args)==3){
-      symm <- as.logical(args[[3]])
+
+    if(is.directed(nw) && !is.null(.symmetric)){
+      symm <- as.logical(.symmetric)
       for(i in which(symm)){
         # There is probably a more efficient way to do this, but we need
         # to compute nw1 anyway.
@@ -233,12 +252,37 @@ Layer <- function(...){
         nwl[[i]] <- nw1
       }
     }
+
+    if(!is.bipartite(nw) && !is.null(.bipartite)){
+      bip <- as.integer(.bipartite)
+      for(i in which(bip!=0)){
+        nw1 <- nwl[[i]]
+        nw1 %n% "bipartite" <- bip[i]
+        nwl[[i]] <- nw1
+      }
+    }
+
     names(nwl) <- args[[2]]
-  }else if(all(sapply(args, is, "network"))){
-    nwl <- args
-  }else if(is.list(args[[1]]) && all(sapply(args[[1]], is, "network"))){
-    nwl <- args[[1]]
+
   }else stop("Unrecognized format for multilayer specification. See help for information.")
+
+  # nwl may now be a list with networks of heterogeneous bipartitedness.
+  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0)
+  blockout <- if(all_identical(bip)) rep(FALSE, length(nwl)) else bip
+
+  nwl <- mapply(function(nw, b){
+    nw %v% ".bipartite" <- b;
+    if(b){
+      n <- network.size(nw)
+      v <- rep(c(TRUE,FALSE), c(b,n-b))
+      # Blacklist b1-b1 ties and b2-b2 ties for the purpose of
+      # sampling.
+      nw <- nw %>% blacklist_intersect(v) %>% blacklist_intersect(!v)
+      # Bipartiteness is now enforced by the blacklist.
+      nw %n% "bipartite" <- FALSE
+    }
+    nw
+  }, nwl, blockout, SIMPLIFY=FALSE)
 
   # nwl may now be a list with networks of heterogeneous directedness.
   
@@ -271,6 +315,7 @@ Layer <- function(...){
         append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
   
   if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
+  if(any(blockout)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
 
   if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]] %ergmlhs% "obs.constraints"
 
@@ -316,7 +361,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, response=NULL, ...){
   
   if(test_eval.LayerLogic(ll, FALSE)) stop("Layer specifications that produce edges on the output layer for empty input layers are not supported at this time.", call.=FALSE)
   
-  list(name="_layer_net", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)),if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1])), inputs=c(ll), dependence=dependence)
+  list(name="_layer_net", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)), if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1])), inputs=c(ll), dependence=dependence)
 }
 
 LL_PREOPMAP <- list(
