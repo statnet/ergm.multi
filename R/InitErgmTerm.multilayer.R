@@ -316,7 +316,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, response=NULL, ...){
   
   if(test_eval.LayerLogic(ll, FALSE)) stop("Layer specifications that produce edges on the output layer for empty input layers are not supported at this time.", call.=FALSE)
   
-  list(name="_layer_net", coef.names=c(), inputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)),if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1]), ll), dependence=dependence)
+  list(name="_layer_net", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)),if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1])), inputs=c(ll), dependence=dependence)
 }
 
 LL_PREOPMAP <- list(

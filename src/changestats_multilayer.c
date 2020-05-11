@@ -5,29 +5,30 @@
 #include "ergm_storage.h"
 
 I_CHANGESTAT_FN(i__layer_net){
+  int *iinputs = IINPUT_PARAM;
   double *inputs = INPUT_PARAM;
   ALLOC_AUX_STORAGE(1, StoreLayerLogic, ll);
-  ll->nl = *(inputs++);
+  ll->nl = *(iinputs++);
   ll->inwp = nwp;
 
   /* Set up the layer information. */
-  ll->lid = inputs - 1; // The -1 is because Vertex IDs count from 1.
-  inputs += N_NODES;
-  ll->lmap = inputs - 1;
-  inputs += N_NODES;
+  ll->lid = (Vertex*) iinputs - 1; // The -1 is because Vertex IDs count from 1.
+  iinputs += N_NODES;
+  ll->lmap = (Vertex*) iinputs - 1;
+  iinputs += N_NODES;
   Vertex lnnodes, lbip;
   if(BIPARTITE){
-    lbip = lnnodes = *(inputs++);
-    lnnodes += *(inputs++);
-    inputs += (ll->nl-1)*2; // There will be a total of nl*2 network sizes.
+    lbip = lnnodes = *(iinputs++);
+    lnnodes += *(iinputs++);
+    iinputs += (ll->nl-1)*2; // There will be a total of nl*2 network sizes.
   }else{
     lbip = 0;
-    lnnodes = *(inputs++);
-    inputs += (ll->nl-1); // There will be a total of nl network sizes.
+    lnnodes = *(iinputs++);
+    iinputs += (ll->nl-1); // There will be a total of nl network sizes.
   }
 
   if(DIRECTED){
-    ll->symm = inputs - 1; // The -1 is because layer IDs count from 1.
+    ll->symm = iinputs - 1; // The -1 is because layer IDs count from 1.
     unsigned int need_symm = FALSE;
     for(unsigned int l=1; l<=ll->nl; l++){
       if(ll->symm[l]){
@@ -37,7 +38,7 @@ I_CHANGESTAT_FN(i__layer_net){
     }
     if(!need_symm) ll->symm = NULL;
     
-    inputs += ll->nl;
+    iinputs += ll->nl;
   }else ll->symm = NULL;
 
   ll->onwp = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);

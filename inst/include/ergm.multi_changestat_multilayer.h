@@ -42,9 +42,9 @@
 typedef struct {
   unsigned int nl;
   Network *inwp, *onwp;
-  double *lid;
-  double *lmap;
-  double *symm;
+  Vertex *lid;
+  Vertex *lmap;
+  int *symm;
   double *commands;
   double *stacks;
 } StoreLayerLogic;
