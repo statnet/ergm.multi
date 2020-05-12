@@ -67,6 +67,62 @@ flo[,, names.eval="b"] <- as.matrix(flobusiness)
 flo <- Layer(flo, c("m","b"))
 ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 
+### Specifying modes and mixed bipartitedness
+
+# Suppose we have a two-mode network with 5 nodes on Mode 1 and 15
+# on Mode 2, and suppose that we observe two layers, one only among
+# actors of Mode 1 and the other bipartite between Modes 1 and 2.
+
+# Construct the two layers' networks:
+nw1 <- network.initialize(20, dir=FALSE)
+nw12 <- network.initialize(20, dir=FALSE, bipartite=5)
+nw1 \%v\% "mode" <- rep(1:2,c(5,15))
+
+# For testing: the maximal set of edges for each type of network:
+nw1[1:5,1:5] <- 1
+nw12[1:5,6:20] <- 1
+
+# The .active argument specifies the following:
+# * nw1's vertices are only active if their mode=1 (i.e., 1-2, 2-1,
+#   and 2-2 can't have edges).
+# * nw12's vertices are all active, but the network is bipartite,
+#   so constraints will be adjusted automatically.
+lnw <- Layer(nw1, nw12, .active=list(~mode==1, ~TRUE))
+
+summary(lnw~
+edges+ # 5*4/2+5*15 = 10+75 = 85
+L(~edges,~`1`)+ # 5*4/2 = 10
+L(~edges,~`2`)+ # 5*15 = 75
+L(~edges,~(`1`|`2`))+ # This logical layer has contents of both, so also 85.
+L(~edges,~(`1`&`2`)) # There is no overlap between the two layers, so 0.
+)
+
+# Layer-aware terms can be used:
+
+nw1[,] <-0
+nw1[1,2:3] <- 1
+nw1[2,3] <- 1
+nw12[,] <- 0
+nw12[1,6:7] <- 1
+nw12[2,6:7] <- 1
+
+lnw <- Layer(nw1, nw12, .active=list(~mode==1,~TRUE))
+
+summary(lnw~L(~triangles, ~`1`)+ # 1-2-3 triangle.
+  L(~triangles, ~`1`|`2`)+ # 1-2-3, 1-2-6, 1-2-7 triangles
+  dgwespL(L.base=~`1`, Ls.path=list(~`2`,~`2`)) # 1-2-6 and 1-2-7 only
+)
+
+# Because the layers are represented as a block-diagonal matrix,
+# this will only count triangles entirely contained within a single
+# layer, i.e., 1-2-3:
+summary(lnw~triangles)
+
+# If you need to evaluate bipartite-only statistics on the second
+# layer, you need to use the S() operator to select the bipartite
+# view:
+summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
+
 }
 \seealso{
 \link[=ergm-terms]{Help on model specification} for specific terms.
