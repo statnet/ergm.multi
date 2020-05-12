@@ -105,16 +105,16 @@ InitErgmConstraint.blacklist_block<-function(lhs.nw, block_vattr=".ubid", blackl
   list(
     block_vattr=block_vattr,
     blacklist_nattr=blacklist_nattr,
-    free_dyads=(lapply(bl, function(b){
-      btail <- !in_block(v, b[[1]])
-      bhead <- !in_block(v, b[[2]])
+    free_dyads=if(length(bl)) (lapply(bl, function(b){
+      btail <- in_block(v, b[[1]])
+      bhead <- in_block(v, b[[2]])
 
       col0 <- rep(rle(FALSE),n)
       col1 <- rle(btail)
 
       # TODO: Optimize.
-    do.call(c, lapply(seq_len(n), function(i) if(bhead[i]) col1 else col0)) %>% compress
-    }) %>% Reduce(`&`) %>% rlebdm(n)),
+      do.call(c, lapply(seq_len(n), function(i) if(bhead[i]) col1 else col0)) %>% compress %>% `!`
+    }) %>% reduce(`&`) %>% rlebdm(n)),
     dependence=FALSE
   )
 }

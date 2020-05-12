@@ -52,7 +52,6 @@ add_block_guid <- function(nw, blocks, attrname=".ubid"){
 #' @param v a list of lists of `guid`s.
 #' @param guid a one or more `guid`, either as an integer vector or a
 #'   list containing one or more integer vectors.
-#' @param attrname the vertex attribute containing the IDs.
 #' @return If `guid` is an integer vector or a list whose sole element
 #'   is such a vector, returns a logical vector of length
 #'   `network.size(nw)` indicating whether each vertex carries that
@@ -100,9 +99,10 @@ blacklist_intersect <- function(nw, tails, heads=tails, block_vattr=".ubid", bla
 }
 
 flatten_guid_pairs <- function(guidll){
-  guidll %>% unlist %>% unname %>%
-    split(.,(seq_along(.)-1L)%/%4L) %>% unname %>%
-    lapply(split, c(1L,1L,2L,2L)) %>% lapply(unname)
+  if(length(guidll))
+    guidll %>% unlist %>% unname %>%
+      split(.,(seq_along(.)-1L)%/%4L) %>% unname %>%
+      lapply(split, c(1L,1L,2L,2L)) %>% lapply(unname)
 }
 
 get_all_bl_subnetattr <- function(l){

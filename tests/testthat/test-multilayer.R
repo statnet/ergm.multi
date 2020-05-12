@@ -324,3 +324,28 @@ test_that("twostarL statistics for homogeneously directed networks", {
 
 ##   expect_equivalent(attr(sim,"stats"), stats)
 ## })
+
+nw1 <- network.initialize(20, dir=FALSE)
+nw12 <- network.initialize(20, dir=FALSE, bipartite=5)
+nw1 %v% "mode" <- rep(1:2,c(5,15))
+
+test_that("Statistics evaluation for heterogeneously bipartite networks", {
+  nw1[1:5,1:5] <- 1
+  nw12[1:5,6:20] <- 1
+
+  lnw <- Layer(nw1, nw12, .active=list(~mode==1,~TRUE))
+
+  expect_equivalent(summary(lnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
+                    c(85,10,75,85,0))
+})
+
+test_that("Statistics simulation for heterogeneously bipartite networks", {
+  nw1[,] <- 0
+  nw12[,] <- 0
+  lnw <- Layer(nw1, nw12, .active=list(~mode==1,~TRUE))
+
+  simulate(lnw~edges, coef=1000) -> slnw
+
+  expect_equivalent(summary(slnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
+                    c(85,10,75,85,0))
+})

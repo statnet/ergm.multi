@@ -189,6 +189,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'      arguments. Then, the layers are values of the named edge
 #'      attributes. The optional arguments `.symmetric` and
 #'      `.bipartite` are then interpreted as described below.
+#'
 #' @param .symmetric If the layer specification is via a single
 #'   network with edge attributes and the network is directed, an
 #'   optional logical vector to specify which of the layers should be
@@ -197,13 +198,20 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   network with edge attributes and the network is unipartite, an
 #'   optional integer vector to specify which of the layers should be
 #'   treated as bipartite and how many `b1` vertices there are.
+#' @param .active A [nodal attribute specification][node-attr]
+#'   specifying which nodes on each network *may* have ties, or a list
+#'   with an element for each network. The list will be recycled up to
+#'   the number of layers.
 #'
 #' @return A network object with layer metadata.
 #'
-#' @note If not all layers have the same bipartedness, all layers will
-#'   appear as unipartite to the statistics. However, an operator term
-#'   [`S()`][ergm:ergm-terms] can be used to construct a bipartite
-#'   subgraph of a unipartite graph.
+#' @note The resulting network will be the "least common denominator"
+#'   network: if not all layers have the same bipartedness, all layers
+#'   will appear as unipartite to the statistics, and if any are
+#'   directed, all will be. However, [certain operator
+#'   terms][ergm:ergm-terms], particularly `Undir()` and `S()`, can be
+#'   used to construct a bipartite subgraph of a unipartite graph or
+#'   change directedness.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -227,7 +235,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 #'
 #' @export
-Layer <- function(..., .symmetric=NULL, .bipartite=NULL){
+Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   args <- list(...)
   if(all(sapply(args, is, "network"))){
     nwl <- args
@@ -266,8 +274,17 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL){
 
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
+  if(!is.null(.active)){
+    if(!is.list(.active)) .active <- list(.active)
+    .active <- rep(.active, length.out=length(nwl))
+    nwl <- mapply(function(nw, a){
+      a <- ergm_get_vattr(a, nw, accept="logical")
+      if(all(a)) nw else blacklist_intersect(nw, a, invert=TRUE)
+    }, nwl, .active, SIMPLIFY=FALSE)
+  }
+
   # nwl may now be a list with networks of heterogeneous bipartitedness.
-  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0)
+  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0L)
   blockout <- if(all_identical(bip)) rep(FALSE, length(nwl)) else bip
 
   nwl <- mapply(function(nw, b){
@@ -315,7 +332,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL){
         append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
   
   if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
-  if(any(blockout)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
+  if(any(blockout!=0)||!is.null(.active)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
 
   if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]] %ergmlhs% "obs.constraints"
 
