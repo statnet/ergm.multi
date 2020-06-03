@@ -181,7 +181,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
 
   # Get the extended state and empty network stats wrapping. Note that
   # naming, curved models, etc., are handled "in-house" (for now).
-  wms <- lapply(ms, wrap.ergm_model, nw, response)
+  wms <- mapply(wrap.ergm_model, ms, nwl, MoreArgs=list(response=response), SIMPLIFY=FALSE, USE.NAMES=FALSE)
   
   ## An important special case is when all models are linear and have
   ## the same number of stats. lm-offset does not work with this
