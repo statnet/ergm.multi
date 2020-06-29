@@ -146,9 +146,10 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   weights <- lmi$weights
   offset <- lmi$offset
   nm <- sum(subset)
+  nwl <- nwl[subset]
   rm(lmi)
-    
-  ms <- lapply(nwl[subset], function(nw1){
+
+  ms <- lapply(nwl, function(nw1){
     f <- nonsimp_update.formula(f, nw1~.)
     ergm_model(f, nw1, response=response,...)
   })
