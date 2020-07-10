@@ -31,6 +31,7 @@
 #
 ##########################################################################################
 
+#' @import rle
 InitErgmConstraint.blockdiag<-function(lhs.nw, attrname=NULL, ...){
   if(length(list(...)))
     stop(paste("Block diagonal constraint takes one argument at this time."), call.=FALSE)
