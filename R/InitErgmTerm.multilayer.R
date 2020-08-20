@@ -5,7 +5,7 @@
   f
 }
 
-.lspec_coef.names <- function(Llist, collapse=TRUE){
+.lspec_coef.namewrap <- function(Llist, collapse=TRUE){
   reprs <- sapply(seq_along(Llist), function(l){
     name <- names(Llist)[l]
     L <- Llist[[l]]
@@ -13,7 +13,7 @@
     if(NVL(name,"")!="") s <- paste0(name,"=",s)
     s
   })
-  if(collapse) paste0("L(",paste0(reprs, collapse=","),")") else reprs
+  if(collapse) ergm_mk_std_op_namewrap("L", reprs) else reprs
 }
 
 #' Construct a "view" of a network.
@@ -704,7 +704,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   inputs <- c(nltrms, w)
 
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
-  wm <- wrap.ergm_model(m, nw1, response, function(x) paste0(.lspec_coef.names(list(a$Ls)),":",x))
+  wm <- wrap.ergm_model(m, nw1, response, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
   wm$dependence <- wm$dependence || !is.dyad.independent(nonsimp_update.formula(auxiliaries, nw~., from.new="nw"))
@@ -859,7 +859,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
 
   nlayers <- length(unique(.peek_vattrv(nw, ".LayerID")))
   auxiliaries <- .mk_.layer.net_auxform(Ls, nlayers)
-  reprs <- .lspec_coef.names(Ls, collapse=FALSE)
+  reprs <- .lspec_coef.namewrap(Ls, collapse=FALSE)
   coef.names <- paste0("twostarL(",
                         switch(type,
                                out = paste0(reprs, collapse="<>"),

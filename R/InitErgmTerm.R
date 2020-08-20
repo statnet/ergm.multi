@@ -164,7 +164,7 @@ GWDECAY <- list(
     inputs <- c(length(Ls), dir, inputs)
     if(!is.null(emptynwstats)) emptynwstats <- emptynwstats / length(unique(.peek_vattrv(nw, ".LayerID")))
     name <- paste0(name,"_ML_sum")
-    coef.names <- paste0(.lspec_coef.names(Ls),":",coef.names)
+    coef.names <- .lspec_coef.namewrap(Ls)(coef.names)
   }else ergm_Init_abort("Use the non-layer version.")
 
   list(name = name, coef.names = coef.names, inputs = inputs, emptynwstats = emptynwstats, auxiliaries=auxiliaries, minval=0, maxval=network.size(nw), dependence=TRUE)
@@ -698,7 +698,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
     aux2 <- .mk_.layer.net_auxform(L2, nl)
     auxiliaries[[2]] <- call("+", auxiliaries[[2]], aux2[[2]])
     name <- paste(name, "ML", sep="_")
-    coef.names <- paste0(.lspec_coef.names(if(L1==L2) list(L1) else list(L1,L2)),":",coef.names)
+    coef.names <- .lspec_coef.namewrap(if(L1==L2) list(L1) else list(L1,L2))(coef.names)
     maxval <- maxval*2
   }else auxiliaries <- NULL
   

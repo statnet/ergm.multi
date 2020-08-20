@@ -171,7 +171,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   params <- rep(list(NULL), nparam*ncol(xm))
   parnames <- colnames(xm)
   parnames <- ifelse(parnames=="(Intercept)", "1", parnames)
-  names(params) <- paste0('N(',NVL3(a$label,paste0(.,","),""),rep(parnames, nparam),'):',rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)))
+  names(params) <- ergm_mk_std_op_namewrap('N',c(NVL3(a$label,paste0(.,","))))(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)),parnames)
   if(with(ms[[1]]$etamap,
           any(mintheta[!offsettheta]!=-Inf) || any(maxtheta[!offsettheta]!=+Inf))){
     warning("Submodel specified to N() operator with a linear model formula has parameter constraints. They will be ignored.")
@@ -280,7 +280,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
         do.call(cbind,.)
     }
 
-    coef.names <- paste0('N#',rep(seq_len(nm), nstats),':',unlist(lapply(ms, param_names, canonical=TRUE)))
+    coef.names <- ergm_mk_std_op_namewrap(paste0('N#',rep(seq_len(nm), nstats)))(unlist(lapply(ms, param_names, canonical=TRUE)))
 
     # Empty network statistics.
     gss <- map(wms, "emptynwstats")
@@ -315,7 +315,7 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
   f <- nonsimp_update.formula(f, nw~.)
   m <- ergm_model(f, nw, response=response,...)
 
-  coef.names <- paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE)),':',param_names(m, canonical=TRUE))
+  coef.names <- ergm_mk_std_op_namewrap(paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE))))(param_names(m, canonical=TRUE))
   iinputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)
   wm <- wrap.ergm_model(m, nw, response=response, NULL) # Only need a few things from wrap.
   list(name="ByNetDStats", coef.names = coef.names, iinputs=iinputs, submodel=m, auxiliaries=auxiliaries, dependence=wm$dependence, ext.encode=wm$ext.encode)
