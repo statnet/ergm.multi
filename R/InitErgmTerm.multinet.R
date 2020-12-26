@@ -130,7 +130,6 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
                       defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
-  f <- a$formula
   auxiliaries <- trim_env(~.subnets(".NetworkID"))
 
   nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
@@ -150,8 +149,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   rm(lmi)
 
   ms <- lapply(nwl, function(nw1){
-    f <- nonsimp_update.formula(f, nw1~.)
-    ergm_model(f, nw1, response=response,...)
+    ergm_model(a$formula, nw1, response=response,...)
   })
 
   nparams <- ms %>% map_int(nparam, canonical=FALSE)
@@ -302,7 +300,6 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
                       defaultvalues = list(NULL,TRUE),
                       required = c(TRUE,FALSE))
 
-  f <- a$formula
   auxiliaries <- trim_env(~.subnets(".NetworkID"))
   nattrs <- get_multinet_nattr_tibble(nw)
 
@@ -312,8 +309,7 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
   nn <- sum(subset)
   rm(lmi)
     
-  f <- nonsimp_update.formula(f, nw~.)
-  m <- ergm_model(f, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, response=response,...)
 
   coef.names <- ergm_mk_std_op_namewrap(paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE))))(param_names(m, canonical=TRUE))
   iinputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)

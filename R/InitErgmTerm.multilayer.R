@@ -677,7 +677,6 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
                       vartypes = c("formula", "formula,list"),
                       defaultvalues = list(NULL, trim_env(~.)),
                       required = c(TRUE, FALSE))
-  f <- a$formula
 
   nwl <- .split_constr_network(nw,".LayerID",".LayerID")
   nwnames <- names(nwl)
@@ -685,7 +684,6 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   Ls <- a$Ls
   if(is(Ls, "formula")) Ls <- list(Ls)
   Ls.dotexp <- .layers_expand_dot(Ls, length(nwl))
-  
 
   auxiliaries <- .mk_.layer.net_auxform(Ls, length(nwl))  
   nltrms <- length(list_rhs.formula(auxiliaries))
@@ -695,11 +693,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   w[have.LHS] <- as.numeric(sapply(lapply(Ls.dotexp[have.LHS], "[[", 2), eval,environment(Ls[[1]])))
   
   nw1 <- nwl[[1]]
-  
-  if(length(f)==2) f <- nonsimp_update.formula(f, nw1~.)
-  else nw1 <- ergm.getnetwork(f)
-  
-  m <- ergm_model(f, nw1, response=response,...)
+  m <- ergm_model(a$formula, nw1, response=response,...)
 
   inputs <- c(nltrms, w)
 
