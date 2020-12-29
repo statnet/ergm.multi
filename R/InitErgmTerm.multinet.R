@@ -71,6 +71,11 @@ InitErgmTerm..subnets <- function(nw, arglist, response=NULL, ...){
   list(name="_subnets", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, a$attrname))), dependence=FALSE)
 }
 
+simplify_if_simple <- function(x){
+  if(all(lengths(x)==1L) && all(vapply(x, is.atomic, logical(1)))) unlist(x, recursive=FALSE)
+  else x
+}
+
 get_multinet_nattr_tibble <- function(nw){
   ## TODO: It should be possible to do this without splitting the network.
   al <-
@@ -81,8 +86,7 @@ get_multinet_nattr_tibble <- function(nw){
       lapply(nattrs, function(nattr) lapply(nwl, get.network.attribute, nattr)) %>% set_names(nattrs)
     }
 
-  al <- lapply(al, sapply, NVL, NA)
-  as_tibble(al)
+  al <- al %>% lapply(lapply, NVL, NA) %>% lapply(simplify_if_simple) %>% as_tibble()
 }
 
 get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, weights=1){
