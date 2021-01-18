@@ -1,3 +1,5 @@
+^Meta$
+^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 .RSession
@@ -11,3 +13,5 @@ appveyor.yml
 .*\.rej$
 .gdb_history
 ^revdep$
+^.github$
+^man-roxygen$
