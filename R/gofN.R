@@ -134,14 +134,14 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
-  pernet.m <- ergm_model(~ByNetDStats(GOF), nw=nw, response = object$response, ...)
+  pernet.m <- ergm_model(~ByNetDStats(GOF), nw=nw, ...)
   nmonitored <- nparam(pernet.m, canonical=TRUE)
   nstats <- nmonitored/nnets
   cn <- param_names(pernet.m)[seq_len(nstats)] %>% sub(".*?:","", .)
@@ -206,7 +206,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
     SST.obs <- attr(sim.obs, "SST")
     if(!save_stats) rm(sim.obs)
   }else{
-    SST.obs <- list(0, summary(pernet.m, object$network, response = object$response, ...))
+    SST.obs <- list(0, summary(pernet.m, object$network, ...))
     SST.obs[[3]] <- numeric(length(SST.obs[[2]]))
     if(save_stats) sim.obs <- matrix(SST.obs[[2]], control$nsim, nparam(pernet.m, canonical=TRUE), byrow=TRUE)
     suppressWarnings(rm(pernet.m))

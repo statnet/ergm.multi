@@ -26,14 +26,14 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", response = object$response, ..., do.sim=FALSE)
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
-  gof.m <- ergm_model(GOF, nw=nw, response = object$response, ...)
+  gof.m <- ergm_model(GOF, nw=nw, ...)
   nmonitored <- nstats <- nparam(gof.m, canonical=TRUE)
   
   # Indices of monitored elements.
@@ -92,7 +92,7 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
     suppressWarnings(rm(sim.s.obs_settings))
     sim.obs <- sim.obs[,monitored,drop=FALSE]
   }else{
-    sim.obs <- summary(gof.m, object$network, response = object$response, ...)
+    sim.obs <- summary(gof.m, object$network, ...)
     suppressWarnings(rm(gof.m))
   }
   message("Collating the simulations.")

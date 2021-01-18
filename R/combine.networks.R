@@ -438,8 +438,10 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
   nwl
 }
 
-.split_constr_network <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName"){
-  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr"))
+.split_constr_network <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
+  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr")) %>% map(function(nw1){
+    for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
+    nw1})
 }
 
 #' Calculate a vector that maps the combined (block-diagonal) LHS network Vertex indices within-layer/within-network Vertex and a Vertex to layer/network lookup table.

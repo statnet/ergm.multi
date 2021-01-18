@@ -396,7 +396,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 }
 
 
-## InitErgmTerm..layer.nets <- function(nw, arglist, response=NULL, ...){
+## InitErgmTerm..layer.nets <- function(nw, arglist, ...){
 ##   a <- check.ErgmTerm(nw, arglist,
 ##                       varnames = c(),
 ##                       vartypes = c(),
@@ -412,7 +412,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   unique(coms)
 }
 
-InitErgmTerm..layer.net <- function(nw, arglist, response=NULL, ...){
+InitErgmTerm..layer.net <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("L"),
                       vartypes = c("formula"),
@@ -671,7 +671,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
   do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f))))
 }
 
-InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
+InitErgmTerm.L <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "Ls"),
                       vartypes = c("formula", "formula,list"),
@@ -693,12 +693,12 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
   w[have.LHS] <- as.numeric(sapply(lapply(Ls.dotexp[have.LHS], "[[", 2), eval,environment(Ls[[1]])))
   
   nw1 <- nwl[[1]]
-  m <- ergm_model(a$formula, nw1, response=response,...)
+  m <- ergm_model(a$formula, nw1, ...)
 
   inputs <- c(nltrms, w)
 
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
-  wm <- wrap.ergm_model(m, nw1, response, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
+  wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
   wm$dependence <- wm$dependence || !is.dyad.independent(nonsimp_update.formula(auxiliaries, nw~., from.new="nw"))
@@ -707,7 +707,7 @@ InitErgmTerm.L <- function(nw, arglist, response=NULL, ...){
     wm)
 }
 
-InitErgmTerm.CMBL <- function(nw, arglist, response=NULL, ...){
+InitErgmTerm.CMBL <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
                       vartypes = c("formula,list"),

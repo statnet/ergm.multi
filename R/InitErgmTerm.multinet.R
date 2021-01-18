@@ -52,7 +52,7 @@ Networks <- function(...){
   nw
 }
 
-## InitErgmTerm..layer.nets <- function(nw, arglist, response=NULL, ...){
+## InitErgmTerm..layer.nets <- function(nw, arglist, ...){
 ##   a <- check.ErgmTerm(nw, arglist,
 ##                       varnames = c(),
 ##                       vartypes = c(),
@@ -61,7 +61,7 @@ Networks <- function(...){
 ##   list(name="_layer_nets", coef.names=c(), inputs=unlist(.layer_vertexmap(nw)), dependence=FALSE)
 ## }
 
-InitErgmTerm..subnets <- function(nw, arglist, response=NULL, ...){
+InitErgmTerm..subnets <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("attrname"),
                       vartypes = c("character"),
@@ -122,7 +122,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 
 #' @import purrr
 #' @import tibble
-InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...){
+InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
@@ -148,7 +148,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   rm(lmi)
 
   ms <- lapply(nwl, function(nw1){
-    ergm_model(a$formula, nw1, response=response,...)
+    ergm_model(a$formula, nw1, ...)
   })
 
   nparams <- ms %>% map_int(nparam, canonical=FALSE)
@@ -179,7 +179,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
 
   # Get the extended state and empty network stats wrapping. Note that
   # naming, curved models, etc., are handled "in-house" (for now).
-  wms <- mapply(wrap.ergm_model, ms, nwl, MoreArgs=list(response=response), SIMPLIFY=FALSE, USE.NAMES=FALSE)
+  wms <- mapply(wrap.ergm_model, ms, nwl, SIMPLIFY=FALSE, USE.NAMES=FALSE)
   
   ## An important special case is when all models are linear and have
   ## the same number of stats. lm-offset does not work with this
@@ -292,7 +292,7 @@ InitErgmTerm.N <- function(nw, arglist, response=NULL, N.compact_stats=TRUE,...)
   }
 }
 
-InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
+InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "subset"),
                       vartypes = c("formula","formula,logical,numeric,expression,call"),
@@ -308,10 +308,10 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, response=NULL,...){
   nn <- sum(subset)
   rm(lmi)
     
-  m <- ergm_model(a$formula, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, ...)
 
   coef.names <- ergm_mk_std_op_namewrap(paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE))))(param_names(m, canonical=TRUE))
   iinputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)
-  wm <- wrap.ergm_model(m, nw, response=response, NULL) # Only need a few things from wrap.
+  wm <- wrap.ergm_model(m, nw, NULL) # Only need a few things from wrap.
   list(name="ByNetDStats", coef.names = coef.names, iinputs=iinputs, submodel=m, auxiliaries=auxiliaries, dependence=wm$dependence, ext.encode=wm$ext.encode)
 }
