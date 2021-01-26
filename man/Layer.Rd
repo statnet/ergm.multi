@@ -28,10 +28,10 @@ network with edge attributes and the network is unipartite, an
 optional integer vector to specify which of the layers should be
 treated as bipartite and how many \code{b1} vertices there are.}
 
-\item{.active}{A \link[=node-attr]{nodal attribute specification}
-specifying which nodes on each network \emph{may} have ties, or a list
-with an element for each network. The list will be recycled up to
-the number of layers.}
+\item{.active}{A \link[=nodal_attributes]{nodal attribute specification}
+(\code{? nodal_attributes}) specifying which nodes on each network
+\emph{may} have ties, or a list with an element for each network. The
+list will be recycled up to the number of layers.}
 }
 \value{
 A network object with layer metadata.
@@ -44,7 +44,7 @@ a.k.a. multirelational a.k.a. multivariate) ERGM.
 The resulting network will be the "least common denominator"
 network: if not all layers have the same bipartedness, all layers
 will appear as unipartite to the statistics, and if any are
-directed, all will be. However, \link[=ergm:ergm-terms]{certain operator terms}, particularly \code{Undir()} and \code{S()}, can be
+directed, all will be. However, \link[=ergm-terms]{certain operator terms}, particularly \code{Undir()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 }

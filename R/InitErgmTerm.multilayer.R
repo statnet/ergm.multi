@@ -198,10 +198,10 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   network with edge attributes and the network is unipartite, an
 #'   optional integer vector to specify which of the layers should be
 #'   treated as bipartite and how many `b1` vertices there are.
-#' @param .active A [nodal attribute specification][node-attr]
-#'   specifying which nodes on each network *may* have ties, or a list
-#'   with an element for each network. The list will be recycled up to
-#'   the number of layers.
+#' @param .active A [nodal attribute specification][nodal_attributes]
+#'   (`? nodal_attributes`) specifying which nodes on each network
+#'   *may* have ties, or a list with an element for each network. The
+#'   list will be recycled up to the number of layers.
 #'
 #' @return A network object with layer metadata.
 #'
@@ -209,7 +209,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   network: if not all layers have the same bipartedness, all layers
 #'   will appear as unipartite to the statistics, and if any are
 #'   directed, all will be. However, [certain operator
-#'   terms][ergm:ergm-terms], particularly `Undir()` and `S()`, can be
+#'   terms][ergm-terms], particularly `Undir()` and `S()`, can be
 #'   used to construct a bipartite subgraph of a unipartite graph or
 #'   change directedness.
 #'
