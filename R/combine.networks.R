@@ -45,9 +45,10 @@
 #'   [uncombine_network()]), an expensive call to [split.network()]
 #'   can be avoided, at the cost of storage.
 #'
-#' @return a [`network::network`] with a block-diagonal structure (or
-#'   its bipartite equivalent) comprising the networks passed in
-#'   `nwl`. In particular,
+#' @return an object of class `combined_networks` inheriting from
+#'   [`network::network`] with a block-diagonal structure (or its
+#'   bipartite equivalent) comprising the networks passed in `nwl`. In
+#'   particular,
 #'
 #' * the returned network's size is the sum of the input networks';
 #' 
@@ -81,7 +82,8 @@
 #' 
 #' If `blockID.vattr` already exists on the constituent networks, the
 #' index is *prepended* to the attribute.
-#' 
+#'
+#' @aliases combined_networks
 #' @examples
 #'
 #' data(samplk)

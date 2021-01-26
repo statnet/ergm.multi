@@ -2,6 +2,7 @@
 % Please edit documentation in R/combine.networks.R
 \name{combine_networks}
 \alias{combine_networks}
+\alias{combined_networks}
 \title{A single block-diagonal network created by combining multiple networks}
 \usage{
 combine_networks(
@@ -49,9 +50,10 @@ resplit using on the same attribute (e.g. using
 can be avoided, at the cost of storage.}
 }
 \value{
-a \code{\link[network:network]{network::network}} with a block-diagonal structure (or
-its bipartite equivalent) comprising the networks passed in
-\code{nwl}. In particular,
+an object of class \code{combined_networks} inheriting from
+\code{\link[network:network]{network::network}} with a block-diagonal structure (or its
+bipartite equivalent) comprising the networks passed in \code{nwl}. In
+particular,
 \itemize{
 \item the returned network's size is the sum of the input networks';
 \item its basic properties (directedness and bipartednes) are the same;

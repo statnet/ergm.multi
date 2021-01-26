@@ -379,7 +379,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
 
   if(any(sapply(list(against, col, pch, cex),
                 function(x) is.character(x) || is(x,"formula"))))
-    nattrs <- get_multinet_nattr_tibble(attr(x,"nw"))[attr(x,"subset"),]
+    nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
   
   xlab <- NVL(xlab,
               switch(class(against),
@@ -445,7 +445,7 @@ summary.gofN <- function(object, by=NULL, ...){
          `Std. dev. of Pearson residuals` = object %>% map("pearson") %>% map(sd,na.rm=TRUE))
   }else{
     if(is(by,"formula"))
-      nattrs <- get_multinet_nattr_tibble(attr(object,"nw"))[attr(object,"subset"),]
+      nattrs <- as_tibble(attr(object,"nw"), unit="networks")[attr(object,"subset"),]
     
     byname <- switch(class(by),
                      formula = despace(deparse(by[[length(by)]])),
@@ -612,7 +612,7 @@ lm.gofN <- function(formula, data, ...){
   if(!is(data, "gofN")) stop("lm.gofN() requires a gofN object as the data= argument.")
   if("weights" %in% names(list(...))) stop("lm.gofN() does not accept a weights= argument at this time.")
 
-  nattrs <- get_multinet_nattr_tibble(attr(data,"nw"))[attr(data,"subset"),]
+  nattrs <- as_tibble(attr(data,"nw"), unit="networks")[attr(data,"subset"),]
   residuals <- data %>% map(~.$observed-.$fitted) %>% do.call(cbind, .)
 
   data.all <- cbind(residuals, nattrs)

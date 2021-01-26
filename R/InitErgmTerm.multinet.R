@@ -71,17 +71,37 @@ InitErgmTerm..subnets <- function(nw, arglist, ...){
   list(name="_subnets", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, a$attrname))), dependence=FALSE)
 }
 
-get_multinet_nattr_tibble <- function(nw){
-  ## TODO: It should be possible to do this without splitting the network.
+#' An `as_tibble` method for combined networks.
+#'
+#' A method to obtain a network attribute table from a
+#' [`combined_networks`] object, falling back to the
+#' [network::as_tibble.network()] if vertex or edge attributes are
+#' required.
+#'
+#' @param x  a [`combined_networks`] (inheriting from [`network::network`]).
+#' @param attrnames a list (or a selection index) for attributes to obtain; for combined networks, defaults to all.
+#' @param unit whether to obtain edge, vertex, or network attributes.
+#' @param ... additional arguments, currently passed to unlist()].
+#'
+#' @seealso [network::as_tibble.network()]
+#' @export
+as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks")){
+  unit <- match.arg(unit)
+  if(unit!="networks") return(NextMethod())
+
   al <-
-    if(is(nw, "combined_networks") && !is.null(nw %n% ".subnetattr")) (nw %n% ".subnetattr")[[".NetworkID"]]
+    if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[".NetworkID"]]
     else{
-      nwl <- if(is.network(nw)) .split_constr_network(nw, ".NetworkID", ".NetworkName") else nw
-      nattrs <- Reduce(union, lapply(nwl, list.network.attributes))
-      lapply(nattrs, function(nattr) lapply(nwl, get.network.attribute, nattr)) %>% set_names(nattrs)
+      # FIXME: Probably more efficient to use attrnames earlier, in order to save calls to get.network.attribute().
+      xl <- if(is.network(x)) .split_constr_network(x, ".NetworkID", ".NetworkName") else x
+      nattrs <- Reduce(union, lapply(xl, list.network.attributes))
+      lapply(nattrs, function(nattr) lapply(xl, get.network.attribute, nattr)) %>% set_names(nattrs)
     }
 
-  al %>% lapply(simplify_simple) %>% as_tibble()
+  if(is.logical(attrnames) || is.numeric(attrnames)) attrnames <- na.omit(names(al)[attrnames])
+  else intersect(attrnames, names(al))
+
+  al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
 }
 
 get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, weights=1){
@@ -134,7 +154,7 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
   nwnames <- names(nwl)
   nn <- length(nwl)
-  nattrs <- get_multinet_nattr_tibble(nw)
+  nattrs <- as_tibble(nw, unit="networks")
 
   lmi <- get_lminfo(nattrs, lm=a$lm, subset=a$subset, contrasts=a$contrasts, offset=a$offset, weights=a$weights)
 
@@ -300,7 +320,7 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
                       required = c(TRUE,FALSE))
 
   auxiliaries <- trim_env(~.subnets(".NetworkID"))
-  nattrs <- get_multinet_nattr_tibble(nw)
+  nattrs <- as_tibble(nw, unit="networks")
 
   lmi <- get_lminfo(nattrs, subset=a$subset)
 
