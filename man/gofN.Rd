@@ -16,7 +16,7 @@ gofN(
   ...
 )
 
-\method{[}{gofN}(x, i, ..., drop = FALSE)
+\method{[}{gofN}(x, i, j, ..., drop = FALSE)
 
 \method{plot}{gofN}(
   x,
@@ -53,6 +53,10 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 \code{\link[=qqnorm]{qqnorm()}}, and \code{\link[=qqline]{qqline()}} for the plotting method).}
 
 \item{x}{a \code{\link{gofN}} object.}
+
+\item{i}{for the indexing operator, index of statistics to be kept in the subset.}
+
+\item{j}{for the indexing operator, index of networks to be kept in the subset.}
 
 \item{drop}{whether the indexing operator should drop attributes and return simply a list.}
 

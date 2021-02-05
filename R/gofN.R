@@ -341,14 +341,20 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 }
 
 #' @describeIn gofN Extract a subset of statistics for which goodness-of-fit had been computed.
+#' @param i for the indexing operator, index of statistics to be kept in the subset.
+#' @param j for the indexing operator, index of networks to be kept in the subset.
 #' @param drop whether the indexing operator should drop attributes and return simply a list.
 #' @export
-`[.gofN` <- function(x, i, ..., drop = FALSE){
-  y <- NextMethod("[")
+`[.gofN` <- function(x, i, j, ..., drop = FALSE){
+  y <- if(!missing(i)) unclass(x)[i] else x
+
+  if(!missing(j)) y <- lapply(y, function(.y) lapply(.y, `[`, j))
 
   if(drop) y
   else{
     mostattributes(y) <- attributes(x)
+    if(!missing(j)) attr(y, "subset") <- replace(logical(length(attr(x, "subset"))),
+                                                 which(attr(x, "subset"))[j], TRUE)
     # This is necessary because i might be a character index.
     names(y) <- setNames(nm=names(x))[i]
     y
