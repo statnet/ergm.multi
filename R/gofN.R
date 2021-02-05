@@ -394,6 +394,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
                      `NULL` = "Fitted values",
                      despace(deparse(substitute(against),width.cutoff=500L))))
 
+  np <- sum(attr(x,"subset"))
   for(gpar in c("col", "pch", "cex")){
     a <- get(gpar)
     a <- switch(class(a),
@@ -401,6 +402,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
                 character = nattrs[[a]],
                 formula = eval(a[[length(a)]], envir = nattrs, enclos = environment(a)),
                 a)
+    a <- rep(a, length.out=np)
     assign(gpar, a)
   }
 
@@ -418,15 +420,21 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
 
     if(1L %in% which){
       plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.",type="n")
-      panel.smooth(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
-      if(any(ei)) text(NVL(againstval,summ$fitted)[ei], summ$pearson[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
+      for(c in unique(col)){
+        csel <- col==c
+        panel.smooth(NVL(againstval,summ$fitted)[csel], summ$pearson[csel], col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+      }
       abline(h=0, lty=3, col="gray")
     }
     
     if(2L %in% which){
       plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), type="n")
-      panel.smooth(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=ifelse(ei, NA, pch), cex=cex, ...)
-      if(any(ei)) text(NVL(againstval,summ$fitted)[ei], sqrt(abs(summ$pearson))[ei], col=col[ei], label=seq_along(summ$pearson)[ei], cex=cex[ei], ...)
+      for(c in unique(col)){
+        csel <- col==c
+        panel.smooth(NVL(againstval,summ$fitted)[csel], sqrt(abs(summ$pearson[csel])), col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+      }
       abline(h=0, lty=3, col="gray")
     }
 
