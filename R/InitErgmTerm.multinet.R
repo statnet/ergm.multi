@@ -188,7 +188,7 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   params <- rep(list(NULL), nparam*ncol(xm))
   parnames <- colnames(xm)
   parnames <- ifelse(parnames=="(Intercept)", "1", parnames)
-  names(params) <- ergm_mk_std_op_namewrap('N',c(NVL3(a$label,paste0(.,","))))(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)),parnames)
+  names(params) <- ergm_mk_std_op_namewrap('N',a$label)(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)),parnames)
   if(with(ms[[1]]$etamap,
           any(mintheta[!offsettheta]!=-Inf) || any(maxtheta[!offsettheta]!=+Inf))){
     warning("Submodel specified to N() operator with a linear model formula has parameter constraints. They will be ignored.")
