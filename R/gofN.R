@@ -144,7 +144,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   pernet.m <- ergm_model(~ByNetDStats(GOF), nw=nw, ...)
   nmonitored <- nparam(pernet.m, canonical=TRUE)
   nstats <- nmonitored/nnets
-  cn <- param_names(pernet.m)[seq_len(nstats)] %>% sub(".*?:","", .)
+  cn <- param_names(pernet.m)[seq_len(nstats)] %>% sub(".*?~","", .)
 
   # Indices of monitored elements.
   monitored <- nparam(sim.m_settings$object, canonical=TRUE) + seq_len(nmonitored)
