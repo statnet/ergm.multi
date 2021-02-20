@@ -332,7 +332,11 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   out
 }
 
-.peek_vattrv <- function(nw, vattr){
+
+.peek_vattrv <- function(nw, vattr, missing=c("NA","NULL")){
+  missing <- match.arg(missing)
+  if(missing=="NULL" && ! vattr%in%list.vertex.attributes(nw)) return(NULL)
+
   av <- get.vertex.attribute(nw, vattr, unlist=FALSE)
   sapply(av, "[", 1)
 }
@@ -423,7 +427,7 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' @export
 uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=".NetworkID", names.vattr=NULL){
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
-  if(!is.null(names.vattr)) tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr
+  if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
   nwl <-
     if(".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]

@@ -145,17 +145,11 @@ GWDECAY <- list(
   minpar = c(-Inf, 0)
 )
 
-.spcache.aux <- function(type){
-  type <- toupper(type)
-  trim_env(as.formula(as.call(list(as.name('~'), as.call(list(as.name('.spcache.net'),type=if(type=='ITP')'OTP' else type))))))
-}
-
 .process_layers_degree <- function(nw, a, name, coef.names, inputs, emptynwstats=NULL){
   if(!is.null(a$Ls)){
-    Ls <- a$Ls
+    Ls <- .set_layer_namemap(a$Ls)
     if(is(Ls,"formula")) Ls <- list(Ls)
-    nlayers <- length(unique(.peek_vattrv(nw, ".LayerID")))
-    auxiliaries <- .mk_.layer.net_auxform(Ls, nlayers)
+    auxiliaries <- .mk_.layer.net_auxform(Ls)
     if(!is.null(a$dir)){
       dir <- rep(a$dir, length.out=length(Ls))
       dir <- pmatch(a$dir, c("in","all","out"))-2
@@ -687,15 +681,15 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 
   maxval <- network.dyadcount(nw,FALSE)/2
 
-  if(is(a$Ls,"formula")) a$Ls <- list(a$Ls)
-  L1 <- a$Ls[[1]]
-  L2 <- a$Ls[[2]]
+  Ls <- .set_layer_namemap(a$Ls, nw)
+  if(is(Ls,"formula")) Ls <- list(Ls)
+  L1 <- Ls[[1]]
+  L2 <- Ls[[2]]
   if(!is.null(L1) || !is.null(L2)){
     NVL(L1) <- L2
     NVL(L2) <- L1
-    nl <- max(.peek_vattrv(nw, ".LayerID"))
-    auxiliaries <- .mk_.layer.net_auxform(L1, nl)
-    aux2 <- .mk_.layer.net_auxform(L2, nl)
+    auxiliaries <- .mk_.layer.net_auxform(L1)
+    aux2 <- .mk_.layer.net_auxform(L2)
     auxiliaries[[2]] <- call("+", auxiliaries[[2]], aux2[[2]])
     name <- paste(name, "ML", sep="_")
     coef.names <- .lspec_coef.namewrap(if(L1==L2) list(L1) else list(L1,L2))(coef.names)

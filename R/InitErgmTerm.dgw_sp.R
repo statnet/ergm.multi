@@ -121,41 +121,41 @@
 
 .spcache.auxL <- function(type, Ls.path, L.in_order){
   type <- toupper(type)
-  as.formula(as.call(list(as.name('~'), as.call(list(as.name('.spcache.netL'),type=if(type=='ITP')'OTP' else type,Ls.path=Ls.path,L.in_order=L.in_order)))))
+  base_env(as.formula(as.call(list(as.name('~'), as.call(list(as.name('.spcache.netL'),type=if(type=='ITP')'OTP' else type,Ls.path=Ls.path,L.in_order=L.in_order))))))
 }
 
 .sp.handle_layers <- function(nw, a, type, has_base, cache.sp=FALSE){
   out <- list()
 
+  namemap <- .layer_namemap(nw)
+
   if(is(a$Ls.path,"formula")) a$Ls.path <- list(a$Ls.path)
-  L.path1 <- a$Ls.path[[1]]
-  L.path2 <- a$Ls.path[[2]]
-  L.base <- a$L.base
+  L.path1 <- NVL3(a$Ls.path[[1]], .set_layer_namemap(., namemap))
+  L.path2 <- NVL3(a$Ls.path[[2]], .set_layer_namemap(., namemap))
+  L.base <- NVL3(a$L.base, .set_layer_namemap(., namemap))
 
   if(is.null(L.path1) && is.null(L.path2) && is.null(L.base)) return(out)
 
   if(type=="RTP") stop("Layer-aware shared partner terms do not support reciprocated two-paths at this time.",call.=FALSE)
 
-  
   NVL(L.path1) <- NVL(L.path2, L.base)
   NVL(L.path2) <- NVL(L.path1, L.base)
   if(has_base) NVL(L.base) <- NVL(L.path1, L.path2)
   
-  nl <- max(.peek_vattrv(nw, ".LayerID"))
-
-  layer0 <-
+  layer0 <- .set_layer_namemap(
     if(has_base)
       as.formula(call("~",call("|",call("|", L.path1[[2]], L.path2[[2]]),L.base[[2]])))
     else
-      as.formula(call("~",call("|", L.path1[[2]], L.path2[[2]])))
+      as.formula(call("~",call("|", L.path1[[2]], L.path2[[2]]))),
+    namemap)
 
-  out$auxiliaries <- .mk_.layer.net_auxform(layer0, nl)
-  aux1 <- .mk_.layer.net_auxform(L.path1, nl)
+  out$auxiliaries <- .mk_.layer.net_auxform(layer0)
+  aux1 <- .mk_.layer.net_auxform(L.path1)
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux1[[2]])
-  aux2 <- .mk_.layer.net_auxform(L.path2, nl)
+  aux2 <- .mk_.layer.net_auxform(L.path2)
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux2[[2]])
   if(has_base){
-    aux3 <- .mk_.layer.net_auxform(L.base, nl)
+    aux3 <- .mk_.layer.net_auxform(L.base)
     out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux3[[2]])
   }
   if(cache.sp){
@@ -171,7 +171,9 @@
   out
 }
 
-
+no_layer_err <- function(instead){
+  ergm_Init_abort(paste("No layer specification found. Use", sQuote(instead), "instead."))
+}
 
 
 ################################################################################
@@ -222,7 +224,7 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
   linfo <- .sp.handle_layers(nw, a, type, TRUE, cache.sp)
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste(conam,d,sep="")), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0)
-  else ergm_Init_abort("Use desp() instead.")
+  else no_layer_err("desp()")
 }
 
 
@@ -287,9 +289,7 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
     if(length(linfo)) c(list(name=paste0(dname,linfo$name_suffix),
                              coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("esp.",type,"#",d,sep="") else paste("esp#",d,sep="")),auxiliaries=linfo$auxiliaries,
                              inputs=c(linfo$any_order,typecode,d), params=params), GWDECAY)
-    else c(list(name=dname,
-                coef.names=if(is.directed(nw)) paste("esp.",type,"#",d,sep="") else paste("esp#",d,sep=""), 
-                inputs=c(typecode,d), params=params, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL), GWDECAY)
+    else no_layer_err("dgwesp()")
   }else{
     if(is.null(a$decay)) stop("Term 'dgwesp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
 
@@ -301,7 +301,7 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
       coef.names <- paste("gwesp.fixed.",decay,sep="")
 
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=c(linfo$any_order,decay,typecode,maxesp),auxiliaries=linfo$auxiliaries)
-    else ergm_Init_abort("Use dgwesp() instead.")
+    else no_layer_err("dgwesp()")
   }
 }
 
@@ -367,7 +367,7 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   }
   
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else ergm_Init_abort("Use ddsp() instead.")
+  else no_layer_err("ddsp()")
 }
 
 
@@ -424,10 +424,7 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
                              coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("dsp.",type,"#",d,sep="") else paste("dsp#",d,sep="")),
                              inputs=c(linfo$any_order,typecode,d), params=params,
                              auxiliaries = linfo$auxiliaries), GWDECAY)
-    else c(list(name=dname,
-                coef.names=if(is.directed(nw)) paste("dsp.",type,"#",d,sep="") else paste("dsp#",d,sep=""), 
-                inputs=c(typecode,d), params=params, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL),
-           GWDECAY)
+    else no_layer_err("dgwdsp()")
   }else{
     if(is.null(a$decay)) stop("Term 'dgwdsp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
 
@@ -439,7 +436,7 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
       coef.names <- paste("gwdsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else ergm_Init_abort("Use dgwdspL() instead.")
+    else no_layer_err("dgwdspL()")
   }
 }
 
@@ -502,7 +499,7 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
     emptynwstats <- NULL
   }
   if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste0(conam,d)), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else ergm_Init_abort("Use dnspL() instead.")
+  else no_layer_err("dnspL()")
 }
 
 
@@ -558,10 +555,7 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
                              coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("nsp.",type,"#",d,sep="") else paste("nsp#",d,sep="")),
                              inputs=c(linfo$any_order,typecode,d), params=params,
                              auxiliaries = linfo$auxiliaries), GWDECAY)
-    else c(list(name=dname,
-                coef.names=if(is.directed(nw)) paste("nsp.",type,"#",d,sep="") else paste("nsp#",d,sep=""), 
-                
-                inputs=c(typecode,d), params=params, auxiliaries=if(cache.sp) .spcache.aux(type) else NULL),GWDECAY)
+    else no_layer_err("dgwnsp()")
   }else{
     if(is.null(a$decay)) stop("Term 'dgwnsp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
 
@@ -573,6 +567,6 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
       coef.names <- paste("gwnsp.fixed",decay,sep=".")
     
     if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=c(linfo$any_order, decay,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else ergm_Init_abort("Use dgwnspL() instead.")
+    else no_layer_err("dgwnspL()")
   }
 }
