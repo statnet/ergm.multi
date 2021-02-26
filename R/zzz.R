@@ -30,10 +30,8 @@
 }
 
 .RegisterProposals <- function(){
-  ergm_proposal_table("c", "Bernoulli", c("blockdiag","bd+blockdiag"), 0, "random", "blockdiag")
-  ergm_proposal_table("c", "Bernoulli", c("blockdiag","bd+blockdiag"), 1, "TNT", "blockdiagTNT")
-  ergm_proposal_table("c", "Bernoulli", c("blockdiag+observed","bd+blockdiag+observed"),  0, "random", "blockdiagNonObserved")
-  ergm_proposal_table("c", "Bernoulli", c("blockdiag+observed","bd+blockdiag+observed"),  1, "TNT", "blockdiagNonObservedTNT")
+  ergm_proposal_table("c", "Bernoulli", "|bd&blockdiag", 0, "random", "blockdiag")
+  ergm_proposal_table("c", "Bernoulli", "|bd&blockdiag&sparse", 1, "TNT", "blockdiagTNT")
 }
 
 #' @useDynLib ergm.multi

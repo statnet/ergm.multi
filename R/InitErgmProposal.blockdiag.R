@@ -155,24 +155,3 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   
   list(name = "blockdiagTNT", BDI=BDI)
 }
-
-## Helper function, since the following two have the same body except for the MH_ function.
-.InitErgmProposal.blockdiagNonObserved <- function(arguments, nw, ...){
-  ## Bipartite is handled seamlessly.
-  
-  a <- .get.blockdiag.attr(nw, arguments$constraints)
-
-  el <- as.edgelist(is.na(nw))
-  el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
-  
-  c(list(iinputs=to_ergm_Cdouble(el)), list(...))
-}
-
-
-InitErgmProposal.blockdiagNonObserved <- function(arguments, nw){
-  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "randomtoggleList", pkgname="ergm")
-}
-
-InitErgmProposal.blockdiagNonObservedTNT <- function(arguments, nw){
-  .InitErgmProposal.blockdiagNonObserved(arguments, nw, name = "listTNT", pkgname="ergm")
-}
