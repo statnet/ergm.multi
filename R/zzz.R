@@ -54,8 +54,8 @@ snctrl <- statnet.common::snctrl
 eval(UPDATE_MY_SCTRL_EXPR)
 
 .RegisterProposals <- function(){
-  ergm_proposal_table("c", "Bernoulli", "|bd&blockdiag", 0, "random", "blockdiag")
-  ergm_proposal_table("c", "Bernoulli", "|bd&blockdiag&sparse", 1, "TNT", "blockdiagTNT")
+  ergm_proposal_table("c", "Bernoulli", "|bd|bdmax&blockdiag", 0, "random", "blockdiag")
+  ergm_proposal_table("c", "Bernoulli", "|bd|bdmax&blockdiag&sparse", 1, "TNT", "blockdiagTNT")
 }
 
 #' @useDynLib ergm.multi
