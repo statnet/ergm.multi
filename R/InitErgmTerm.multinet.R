@@ -33,10 +33,8 @@ Networks <- function(...){
     nwl <- args[[1]]
   }else stop("Unrecognized format for multinetwork specification. See help for information.")
 
-  constraintsl <- lapply(nwl, get.network.attribute, "constraints")
-  if(!all_identical(lapply(constraintsl, .unenv))) stop("Networks have differing constraint structures. This is not supported at this time.")
-  obs.constraintsl <- lapply(nwl, get.network.attribute, "obs.constraints")
-  if(!all_identical(lapply(obs.constraintsl, .unenv))) stop("Networks have differing observation processes. This is not supported at this time.")
+  if(!.same_constraints(nwl, "constraints")) stop("Networks have differing constraint structures. This is not supported at this time.")
+  if(!.same_constraints(nwl, "obs.constraints")) stop("Networks have differing observation processes. This is not supported at this time.")
   
   nw <- combine_networks(nwl, blockID.vattr=".NetworkID", blockName.vattr=".NetworkName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 

@@ -1,8 +1,8 @@
 ## TODO: LL-Constrained proposals.
 ## TODO: Check that noncommutative LL operators work as intended.
-.unenv <- function(f){
-  environment(f) <- NULL
-  f
+
+.same_constraints <- function(nwl, nattr){
+  map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
 }
 
 .layer_namemap <- function(nw){
@@ -398,10 +398,8 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   if(anyDuplicated(nnames)) stop("Duplicate layer names.")
   names(nwl) <- nnames
 
-  constraintsl <- lapply(nwl, get.network.attribute, "constraints")
-  if(!all_identical(lapply(constraintsl, .unenv))) stop("Layers have differing constraint structures. This is not supported at this time.")
-  obs.constraintsl <- lapply(nwl, get.network.attribute, "obs.constraints")
-  if(!all_identical(lapply(obs.constraintsl, .unenv))) stop("Layers have differing observation processes. This is not supported at this time.")
+  if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
+  if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
   
   nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
