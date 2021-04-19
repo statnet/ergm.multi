@@ -348,10 +348,11 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   if(!is.null(.active)){
     if(!is.list(.active)) .active <- list(.active)
     .active <- rep(.active, length.out=length(nwl))
-    nwl <- mapply(function(nw, a){
-      a <- ergm_get_vattr(a, nw, accept="logical")
-      if(all(a)) nw else blacklist_intersect(nw, a, invert=TRUE)
-    }, nwl, .active, SIMPLIFY=FALSE)
+    al <- mapply(function(nw, a) ergm_get_vattr(a, nw, accept="logical"),
+                 nwl, .active, SIMPLIFY=FALSE)
+    if(!all(unlist(al)))
+      nwl <- mapply(function(nw, a) blacklist_intersect(nw, a, invert=TRUE),
+                    nwl, al, SIMPLIFY=FALSE)
   }
 
   # nwl may now be a list with networks of heterogeneous bipartitedness.
