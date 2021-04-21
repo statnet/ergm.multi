@@ -224,7 +224,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   network: if not all layers have the same bipartedness, all layers
 #'   will appear as unipartite to the statistics, and if any are
 #'   directed, all will be. However, [certain operator
-#'   terms][ergm-terms], particularly `Undir()` and `S()`, can be
+#'   terms][ergm-terms], particularly `Symmetrize()` and `S()`, can be
 #'   used to construct a bipartite subgraph of a unipartite graph or
 #'   change directedness.
 #'
