@@ -142,7 +142,7 @@ ergm_block_diag_samp_info <- function(nw, a){
 
 InitErgmProposal.blockdiag <- function(arguments, nw){
   BDI <- ergm_block_diag_samp_info(nw, .get.blockdiag.attr(nw, arguments$constraints))
-  list(name = "blockdiag", BDI=BDI)
+  list(name = "blockdiag", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
 
 InitErgmProposal.blockdiagTNT <- function(arguments, nw){
@@ -153,5 +153,5 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
 
   BDI <- ergm_block_diag_samp_info(nw, a)
   
-  list(name = "blockdiagTNT", BDI=BDI)
+  list(name = "blockdiagTNT", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
