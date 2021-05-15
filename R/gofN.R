@@ -134,10 +134,10 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., do.sim=FALSE)
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
@@ -153,7 +153,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   # sample.
   if(!control$obs.twostage){
     message("Simulating unconstrained sample.")
-    args <- .update.list(sim.m_settings, list(monitor=pernet.m, do.sim=FALSE))
+    args <- .update.list(sim.m_settings, list(monitor=pernet.m, return.args="ergm_state"))
     sim.s_settings <- do.call(simulate, args)
     sim <- sim_stats_piecemeal(sim.s_settings, monitored,  max_elts, save_stats=save_stats)
     rm(sim.s_settings)
@@ -169,14 +169,14 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
     # Construct a simulate.ergm_state() call list for constrained simulation.
     args <- .update.list(sim.m.obs_settings,
                          list(monitor=pernet.m, nsim=control$nsim/control$obs.twostage,
-                              do.sim=FALSE))
+                              return.args="ergm_state"))
     sim.s.obs_settings <- do.call(simulate, args)
     suppressWarnings(rm(sim.m.obs_settings, pernet.m))
 
     if(control$obs.twostage){
       message("Simulating imputed networks.", appendLF=FALSE)
       # Construct a simulate.ergm_state() call list for unconstrained simulation.
-      args <- .update.list(sim.m_settings, list(do.sim=FALSE))
+      args <- .update.list(sim.m_settings, list(return.args="ergm_state"))
       sim.s_settings <- do.call(simulate, args)
       suppressWarnings(rm(sim.m_settings, args))
 
