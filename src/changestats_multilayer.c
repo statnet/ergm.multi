@@ -411,6 +411,24 @@ C_CHANGESTAT_FN(c_twostarL) {
     *id1 = (int*) ML_IN_DEG(ll1), *id2 = (int*) ML_IN_DEG(ll2);
   
   switch(typeID){
+  case 0: // any / undirected
+    if(change1_th || change2_th || change1_ht || change2_ht){ // any counts change.
+
+      // Calculate the change in number of relevant coincident relations.
+      int change12 = 0;
+      if(distinct){
+        if(ML_IS_UNDIRECTED_EDGE(ll1, lt, lh)) change12 += change2_th + change2_ht;
+        if(ML_IS_UNDIRECTED_EDGE(ll2, lt, lh)) change12 += change1_th + change1_ht;
+        change12 += (change1_th+change1_ht) * (change2_th+change2_ht);
+      }
+
+      CHANGE_STAT[0] +=
+        + (od1[lt]+id1[lt]+change1_th+change1_ht)*(od2[lt]+id2[lt]+change2_th+change2_ht) - (od1[lt]+id1[lt])*(od2[lt]+id2[lt]) // Change due to lt
+        + (od1[lh]+id1[lh]+change1_th+change1_ht)*(od2[lh]+id2[lh]+change2_th+change2_ht) - (od1[lh]+id1[lh])*(od2[lh]+id2[lh]) // Change due to lh
+
+        - change12*2;
+    }
+    break;
   case 1: // out
     if(change1_th || change2_th){ // lt's outstar counts change.
       

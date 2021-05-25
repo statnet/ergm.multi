@@ -901,14 +901,17 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
 
 ################################################################################
 InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
-  a <- check.ErgmTerm(nw, arglist, directed=TRUE,
+  a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls", "type", "distinct"),
                       vartypes = c("formula,list", "character", "logical"),
                       defaultvalues = list(NULL, NULL, TRUE),
                       required = c(TRUE, TRUE, FALSE))
-  TYPES <- c("out", "in", "path")
+  TYPES <- c("any", "out", "in", "path")
+  TYPEREP <- setNames(c("--", "<>", "><", ">>"), TYPES)
   type <- match.arg(tolower(a$type), TYPES)
-  typeID <- match(type, TYPES)
+  if(!is.directed(nw)) type <- "any"
+  else if(type == "any") ergm_Init_abort(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
+  typeID <- match(type, TYPES) - 1L
 
   Ls <- .set_layer_namemap(a$Ls, nw)
   if(is(Ls, "formula")) Ls <- list(Ls)
@@ -917,13 +920,10 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   auxiliaries <- .mk_.layer.net_auxform(Ls)
   reprs <- .lspec_coef.namewrap(Ls, collapse=FALSE)
   coef.names <- paste0("twostarL(",
-                        switch(type,
-                               out = paste0(reprs, collapse="<>"),
-                               `in` = paste0(reprs, collapse="><"),
-                               path = paste0(reprs, collapse=">>")),
+                       paste0(reprs, collapse=TYPEREP[type]),
                        if(a$distinct) ",distinct",
-                        ")")
-  
+                       ")")
+
   inputs <- c(typeID, a$distinct)
   list(name="twostarL", coef.names=coef.names, inputs=inputs, auxiliaries=auxiliaries, minval=0, dependence=TRUE)
 }

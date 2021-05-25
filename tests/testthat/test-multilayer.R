@@ -15,16 +15,20 @@ twopath <- function(m1,m2, distinct=TRUE){
   sum(colSums(m1)*rowSums(m2) - distinct*colSums(m1*t(m2)))
 }
 
+twostar <- function(m1,m2, distinct=TRUE){
+  ostar(m1,m2,distinct)
+}
+
 
 library(ergm)
 library(purrr)
 n <- 5
-nw1 <- nw2 <- network.initialize(n,dir=TRUE)
-lnw <- Layer(nw1,nw2)
-
 ctrl <- control.simulate.formula(MCMC.burnin=n^2*2, MCMC.interval=n)
 
-test_that("twostarL statistics for homogeneously directed networks", {
+test_that("twostarL statistics for directed networks", {
+  nw1 <- nw2 <- network.initialize(n, directed = TRUE)
+  lnw <- Layer(nw1, nw2)
+
   sim <- suppressWarnings(simulate(lnw~
                     twostarL(c(~`1`,~`2`), "out",FALSE)+
                     twostarL(c(~`1`,~`2`), "in",FALSE)+
@@ -54,6 +58,33 @@ test_that("twostarL statistics for homogeneously directed networks", {
 
   expect_equivalent(attr(sim,"stats"), stats)
 })
+
+test_that("twostarL statistics for undirected networks", {
+  nw1 <- nw2 <- network.initialize(n, directed = FALSE)
+  lnw <- Layer(nw1, nw2)
+
+  sim <- suppressWarnings(simulate(lnw~
+                    twostarL(c(~`1`,~`2`), "any",FALSE)+
+                    twostarL(c(~`1`,~`2`), "any", TRUE),
+                  control=ctrl,
+                  nsim=200))
+
+  stats <- sapply(sim,
+                  function(nw){
+                    n <- network.size(nw)/2
+                    m <- as.matrix(nw)
+                    m1 <- m[seq_len(n),seq_len(n)]
+                    m2 <- m[seq_len(n)+n,seq_len(n)+n]
+
+                    c(
+                      twostar(m1,m2,FALSE),
+                      twostar(m1,m2, TRUE)
+                    )
+                  }) %>% t()
+
+  expect_equivalent(attr(sim,"stats"), stats)
+})
+
 
 ## ### Heterogeneous directedness.
 ## nw1 <- nw3 <- network.initialize(n,dir=TRUE)

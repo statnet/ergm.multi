@@ -583,12 +583,16 @@
     combined.
 }
 
-  \item{\code{twostarL(Ls, type, distinct=TRUE)}  (binary)  (directed) (layer-aware)}{\emph{Multilayer two-star:} 
+  \item{\code{twostarL(Ls, type, distinct=TRUE)}  (binary)  (directed) (undirected) (layer-aware)}{\emph{Multilayer two-star:}
     This term adds one statistic to the model, equal to the number of
     cross-layer two-stars or two-paths in
     the network. Argument \code{Ls} specifies the two layers of
     interest, and argument \code{type} determines what is counted:
     \describe{
+      \item{\code{"any"}}{Number of configurations
+	\eqn{(i-j), (i-k)}{(i,j), (i,k)}, where
+	\eqn{(i-j)}{(i,j)} is in logical layer \code{Ls[[1]]}
+	and \eqn{(i-k)}{(i,k)} is in logical layer \code{Ls[[2]]}.}
       \item{\code{"out"}}{Number of configurations
 	\eqn{(i{\rightarrow}j), (i{\rightarrow}k)}{(i,j), (i,k)}, where
 	\eqn{(i{\rightarrow}j)}{(i,j)} is in logical layer \code{Ls[[1]]}
@@ -603,6 +607,7 @@
 	and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer
 	\code{Ls[[2]]}.}
     }
+    At this time, \code{"any"} is only supported for undirected networks, and if the network is undirected, \code{type} is ignored and \code{"any"} is assumed.
 
     If \code{distinct==TRUE}, \eqn{j} and \eqn{k} above are required to
     be distinct. That is, the constituent edges may not be coincident or
