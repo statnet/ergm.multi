@@ -924,6 +924,6 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
                        if(a$distinct) ",distinct",
                        ")")
 
-  inputs <- c(typeID, a$distinct)
-  list(name="twostarL", coef.names=coef.names, inputs=inputs, auxiliaries=auxiliaries, minval=0, dependence=TRUE)
+  iinputs <- c(typeID, a$distinct)
+  list(name="twostarL", coef.names=coef.names, iinputs=iinputs, auxiliaries=auxiliaries, minval=0, dependence=TRUE)
 }

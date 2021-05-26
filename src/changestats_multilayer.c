@@ -390,9 +390,8 @@ C_CHANGESTAT_FN(c_gwdegreeL_by_attr_ML_sum) {
  changestat: c_twopathL
 *****************/
 C_CHANGESTAT_FN(c_twostarL) { 
-  double *inputs = INPUT_PARAM;
-  unsigned int typeID = inputs[0];
-  unsigned int distinct = inputs[1];
+  unsigned int typeID = IINPUT_PARAM[0];
+  unsigned int distinct = IINPUT_PARAM[1];
   
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 0);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 1);
