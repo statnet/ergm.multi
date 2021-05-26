@@ -15,7 +15,6 @@
 
 I_CHANGESTAT_FN(i__layer_net){
   int *iinputs = IINPUT_PARAM;
-  double *inputs = INPUT_PARAM;
   ALLOC_AUX_STORAGE(1, StoreLayerLogic, ll);
   ll->nl = *(iinputs++);
   ll->inwp = nwp;
@@ -54,8 +53,8 @@ I_CHANGESTAT_FN(i__layer_net){
   
   /* Set up the layer logic. */
 
-  ll->commands = inputs;
-  ll->stacks = Calloc(2*ll->commands[0], double);
+  ll->commands = iinputs;
+  ll->stacks = Calloc(2*ll->commands[0], int);
 
   /* Figure out if this layer needs to calculate reciprocal toggles. */
 
