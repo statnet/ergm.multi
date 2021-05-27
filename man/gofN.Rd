@@ -29,7 +29,8 @@ gofN(
   ask = length(which) > 1 && dev.interactive(TRUE),
   id.n = 3,
   main = "{type} for {sQuote(name)}",
-  xlab = NULL
+  xlab = NULL,
+  ylim = NULL
 )
 
 \method{summary}{gofN}(object, by = NULL, ...)
@@ -73,6 +74,8 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 \item{main}{A template for the plots' titles; these use \code{\link[=glue]{glue()}}'s templating, with \code{{type}} replaced with the type of plot and \code{{name}} replaced with the statistic.}
 
 \item{xlab}{Horizontal axis label; defaults to a character representation of \code{against}.}
+
+\item{ylim}{Vertical range for the plots, interpreted as in \code{\link[graphics:plot.default]{graphics::plot()}}; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the \verb{which=} argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.}
 
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }
@@ -144,4 +147,9 @@ plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
 fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
 }
 
+}
+\seealso{
+\code{\link[ergm:gof]{ergm::gof()}} for single-network goodness-of-fit simulations in \pkg{ergm}
+
+\code{\link[=plot.lm]{plot.lm()}}, \code{\link[graphics:plot.default]{graphics::plot()}} for regression diagnostic plots and their parameters
 }

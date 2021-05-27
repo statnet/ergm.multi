@@ -78,6 +78,8 @@ Welford_update <- function(l, x){
 #' 
 #' \item{control}{Control parameters passed.}
 #'
+#' @seealso [ergm::gof()] for single-network goodness-of-fit simulations in \pkg{ergm}
+#'
 #' @examples
 #' data(samplk)
 #' monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
@@ -371,17 +373,23 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @param id.n Number of extreme points to label explicitly.
 #' @param main A template for the plots' titles; these use [glue()]'s templating, with `{type}` replaced with the type of plot and `{name}` replaced with the statistic.
 #' @param xlab Horizontal axis label; defaults to a character representation of `against`.
+#' @param ylim Vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage
 #' @importFrom graphics abline panel.smooth plot text
 #' @importFrom methods is
 #' @importFrom glue glue
+#'
+#' @seealso [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters
 #' @export
-plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL){
+plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL){
   if(ask){
     prev.ask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(prev.ask))
   }
+
+  if(!is.list(ylim)) ylim <- list(ylim)
+  ylim <- rep_len(ylim, 3)
 
   if(any(sapply(list(against, col, pch, cex),
                 function(x) is.character(x) || is(x,"formula"))))
@@ -419,7 +427,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
 
     if(1L %in% which){
-      plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.",type="n")
+      plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.",type="n", ylim=ylim[[1L]])
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], summ$pearson[csel], col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
@@ -429,7 +437,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     }
     
     if(2L %in% which){
-      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), type="n")
+      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), type="n", ylim=ylim[[2L]])
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], sqrt(abs(summ$pearson[csel])), col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
@@ -439,7 +447,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     }
 
     if(3L %in% which){
-      qqnorm(summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Normal Q-Q"))
+      qqnorm(summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Normal Q-Q"), ylim=ylim[[3L]])
       qqline(summ$pearson, ...)
     }
     
