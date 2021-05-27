@@ -203,7 +203,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
     suppressWarnings(rm(sim.s_settings))
     message("Simulating constrained sample.")
     sim.obs <- sim_stats_piecemeal(.update.list(sim.s.obs_settings,
-                                                list(nsim=control$nsim)), monitored, max_elts, save_stats)
+                                                list(nsim=control$nsim, return.args=NULL)), monitored, max_elts, save_stats)
     rm(sim.s.obs_settings)
     SST.obs <- attr(sim.obs, "SST")
     if(!save_stats) rm(sim.obs)

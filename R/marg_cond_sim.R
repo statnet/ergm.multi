@@ -88,7 +88,7 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
     suppressWarnings(rm(sim.s_settings))
     message("Simulating constrained sample.")
     sim.obs <- do.call(simulate, .update.list(sim.s.obs_settings,
-                                              list(nsim=control$nsim)))
+                                              list(nsim=control$nsim, return.args=NULL)))
     suppressWarnings(rm(sim.s.obs_settings))
     sim.obs <- sim.obs[,monitored,drop=FALSE]
   }else{
