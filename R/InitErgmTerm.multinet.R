@@ -166,7 +166,7 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   rm(lmi)
 
   ms <- lapply(nwl, function(nw1){
-    ergm_model(a$formula, nw1, ...)
+    ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
   })
 
   nparams <- ms %>% map_int(nparam, canonical=FALSE)
@@ -326,7 +326,7 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
   nn <- sum(subset)
   rm(lmi)
     
-  m <- ergm_model(a$formula, nw, ...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
 
   coef.names <- ergm_mk_std_op_namewrap(paste0('N#',rep(seq_len(nn)[subset], each=nparam(m, canonical=TRUE))))(param_names(m, canonical=TRUE))
   iinputs <- cumsum(c(-1,subset))*nparam(m, canonical=TRUE)

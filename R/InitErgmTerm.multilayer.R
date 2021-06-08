@@ -757,7 +757,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   w[have.LHS] <- as.numeric(sapply(lapply(Ls.dotexp[have.LHS], "[[", 2), eval,environment(Ls[[1]])))
   
   nw1 <- nwl[[1]]
-  m <- ergm_model(a$formula, nw1, ...)
+  m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
 
   inputs <- c(nltrms, w)
 
