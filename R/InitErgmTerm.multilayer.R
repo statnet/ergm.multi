@@ -324,8 +324,8 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
       for(i in which(symm)){
         # There is probably a more efficient way to do this, but we need
         # to compute nw1 anyway.
-        nw1 <- symmetrize(nwl[[i]], rule="weak")
-        nw2 <- symmetrize(nwl[[i]], rule="strong")
+        nw1 <- ergm_symmetrize(nwl[[i]], rule="weak")
+        nw2 <- ergm_symmetrize(nwl[[i]], rule="strong")
         if(!identical(as.vector(as.edgelist(nw1)),as.vector(as.edgelist(nw2))))
           stop("Layer specified to be treated as undirected is not symmetric.")
         nwl[[i]] <- nw1
