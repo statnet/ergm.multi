@@ -736,6 +736,22 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
   do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f))))
 }
 
+#' @name L-ergmTerm
+#' @title Evaluation on layers
+#' @description Evaluation on layers
+#' @details Evaluates the terms in `formula` on an actual or logical layers
+#'   specified in formula `Ls` and sums the results. `Ls` is a
+#'   one-sided formula with terms separated by `+` operators, and
+#'   corresponding statistics for each layer specification is summed
+#'   up. A dot ( `.` ) stands for summing all layers.
+#'
+#' @usage
+#' # binary: L(formula, Ls=~.)
+#'
+#' @template ergmTerm-general
+#'
+#' @concept operator
+#' @concept layer-aware
 InitErgmTerm.L <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "Ls"),
@@ -771,6 +787,32 @@ InitErgmTerm.L <- function(nw, arglist, ...){
     wm)
 }
 
+#' @name CMBL-ergmTerm
+#' @title Conway--Maxwell-Binomial dependence among layers
+#' @description Conway--Maxwell-Binomial dependence among layers
+#' @details Models marginal dependence layers within each dyad by imposing
+#'   a Conway--Maxwell-Binomial (CMB) distribution on the number of
+#'   layers in each dyad that have a tie.
+#'
+#'   The term adds one statistic to the model, equalling the sum over
+#'   all the dyads in the network of \eqn{\log\{E!(R-E)!/R!\}} , where
+#'   \eqn{E} is the number of layers in `Ls` with an edge in that
+#'   dyad and \eqn{R} being the total number of layers in `Ls` .
+#'
+#'   A positive coefficient induces positive dependence and a negative
+#'   one induces negative dependence.
+#'
+#' @usage
+#' # binary: CMBL(Ls=~.)
+#' @param Ls a list of one-sided formulas indicating the layers
+#'   whose dependence is being modeled. A dot ( `.` ) stands for all
+#'   layers in the network.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept undirected
+#' @concept layer-aware
 InitErgmTerm.CMBL <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
@@ -788,6 +830,70 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 }
 
 ################################################################################
+
+#' @name b2degrangeL-ergmTerm
+#' @title Degree range for the second mode in a bipartite network
+#' @description Degree range for the second mode in a bipartite (a.k.a. two-mode) network
+#' @details This term adds one
+#'   network statistic to the model for each element of `from` (or `to` ); the \eqn{i} th
+#'   such statistic equals the number of nodes of the second mode
+#'   ("events") in the network of degree
+#'   greater than or equal to `from[i]` but strictly less than `to[i]` , i.e. with
+#'   edge count in semiopen interval `[from,to)` .
+#'
+#'   This term can only be used with bipartite networks; for directed networks
+#'   see `idegrange` and `odegrange` . For undirected networks,
+#'   see `degrange` , and see `b1degrange` for degrees of the first mode ("actors").
+#'
+#' @usage
+#' # binary: b2degrangeL(from, to=+Inf, by=NULL, homophily=FALSE, levels=NULL)
+#' @param from,to vectors of distinct
+#'   integers (or `+Inf` , for `to` (its default)). If one of the vectors has
+#'   length 1, it is recycled to the length of the other. Otherwise, they
+#'   must have the same length.
+#' @param by an optional character string giving the name of an attribute in the
+#'   network's vertex attribute list.
+#' @param homophily Only used if `by` is specified. If set to `TRUE` ,
+#'   then degrees are calculated using the subnetwork consisting of only
+#'   edges whose endpoints have the same value of the `by` attribute.
+#'   Otherwise (the default), then separate degree range
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param levels TODO
+#'
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+NULL
+
+################################################################################
+
+#' @name degreeL-multilayer-ergmTerm
+#' @title Layer combinaton degree
+#' @description Layer combinaton degree
+#' @details This term adds one network statistic to
+#'   the model for each element in `d` ; the \eqn{i} th such statistic equals
+#'   the number of nodes in the network whose total degree across all
+#'   layers listed in `Ls` combined (with direction being
+#'   corresponding element of vector `dir` , `"in"` or `"out"` ), is `d[i]` .
+#'
+#'   This term can only be used with directed networks; for undirected networks
+#'   see `degree` .
+#'
+#' @usage
+#' # binary: degreeL(d, by=NULL, Ls, dir)
+#' @param d a vector of distinct integers
+#' @param by if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param dir vector specifying direction
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept categorical nodal attribute
+#' @concept frequently-used
 InitErgmTerm.degreeL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("d", "by", "Ls", "dir"),
@@ -846,12 +952,44 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 }
 
 ################################################################################
+
+#' @name gwdegreeL-ergmTerm
+#' @title Geometrically weighted layer-combination-degree distribution
+#' @description Geometrically weighted layer-combination-degree distribution
+#' @details This term adds one network statistic to the model
+#'   equal to the weighted layer-cumulative degree distribution with decay parameter. This
+#'   term can only be used with directed networks.
+#'
+#'   In this term, the layer-cumulative degree frequency equals
+#'   the number of nodes in the network whose total degree across all
+#'   layers listed in `Ls` combined (with direction being
+#'   corresponding element of vector `dir` , `"in"` or `"out"` ), is `d[i]` .
+#'
+#' @usage
+#' # binary: gwdegreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls, dir)
+#' @param decay non negative model parameter (this parameter was called `alpha` prior to `ergm 3.7` )
+#' @param fixed if `TRUE`, use the value specified by `decay`. Otherwise (the default) use the value as the starting value for the estimation of `decay`
+#'   in a curved exponential family model (see Hunter and Handcock, 2006).
+#' @param attrname if specified then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff optional argument that is only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels TODO
+#' @param Ls layers specification
+#' @param dir vector of directions
+#'
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept curved
 InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls", "dir"),
                       vartypes = c("numeric", "logical", "character","numeric", "character,numeric,logical", "formula,list", "character"),
-                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL),
-                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+                      defaultvalues = list(NULL, FALSE, NULL, 30, NULL, NULL), required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; attrname<-a$attrname; fixed<-a$fixed  
   cutoff<-a$cutoff
 
@@ -900,6 +1038,46 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
 
 
 ################################################################################
+
+#' @name twostarL-ergmTerm
+#' @title Multilayer two-star
+#' @description Multilayer two-star
+#' @details This term adds one statistic to the model, equal to the number of
+#'   cross-layer two-stars or two-paths in
+#'   the network.
+#'
+#' @usage
+#' # binary: twostarL(Ls, type, distinct=TRUE)
+#' @param Ls specifies the two layers of interest
+#' @param type determines what is counted:
+#'   1) *"any"* Number of configurations
+#'   \eqn{(i-j), (i-k)}{(i,j), (i,k)} , where
+#'   \eqn{(i-j)}{(i,j)} is in logical layer `Ls[[1]]`
+#'   and \eqn{(i-k)}{(i,k)} is in logical layer `Ls[[2]]` .
+#'   2) *"out"* Number of configurations
+#'   \eqn{(i{\rightarrow}j), (i{\rightarrow}k)}{(i,j), (i,k)}, where
+#'   \eqn{(i{\rightarrow}j)}{(i,j)} is in logical layer `Ls[[1]]`
+#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.
+#'   3) *"in"* Number of configurations
+#'   \eqn{(j{\rightarrow}i), (k{\rightarrow}i)}{(j,i), (k,i)}, where
+#'   \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer `Ls[[1]]`
+#'   and \eqn{(k{\rightarrow}i)}{(k,i)} is in logical layer `Ls[[2]]`.
+#'   4) *"path"* Number of configurations
+#'   \eqn{(j{\rightarrow}i), (i{\rightarrow}k)}{(j,i), (i,k)}, where
+#'   \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer `Ls[[1]]`
+#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.
+#'
+#'   At this time, `"any"` is only supported for undirected networks, and if the network is undirected, `type` is ignored and `"any"` is assumed.
+#'
+#' @param distinct if `TRUE`, \eqn{j} and \eqn{k} above are required to
+#'   be distinct. That is, the constituent edges may not be coincident or
+#'   reciprocal.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept undirected
+#' @concept layer-aware
 InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls", "type", "distinct"),

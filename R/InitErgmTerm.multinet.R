@@ -140,6 +140,36 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 
 #' @import purrr
 #' @import tibble
+#' @name N-ergmTerm
+#' @title Evaluation on multiple networks
+#' @description Evaluation on multiple networks
+#' @details Evaluates the terms in `formula` on each of the networks joined
+#'   using [`Networks`] function, and returns either a weighted
+#'   sum or an [`lm`] -style linear model for the ERGM
+#'   coefficients. Its syntax follows that of [`lm`] closely,
+#'   with sensible defaults. The default formula ( `~1` ) sums the
+#'   specified network statistics. If `lm` refers to any
+#'   network attributes for which some networks have missing values, the
+#'   term will stop with an error. This can be avoided by pre-filtering
+#'   with `subset` , which controls which networks are affected by
+#'   the term.
+#'
+#'   Care should be taken to avoid multicollinearity when using this operator. When `lm` is given a model with intercept and a categorical predictor (including a [`logical`] one), it will use the first level (or `FALSE` ) as the baseline, but if the model is without intercept, it will use all levels of the first categorical predictor. This is typically what is wanted in a linear regression, but for the `N` operator, this can be problematic if the "intercept" effect is added by a different term. A workaround is to convert the categorical predictor to dummy variables before putting it into the `lm` formula.
+#'
+#' @usage
+#' # binary: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
+#' @param offset A constant, a vector of length equal to the number of networks, or a matrix whose number of rows is the number of networks and whose number of columns is the number of free parameters of the ERGM. It can be specified in `lm` as well.
+#' @param weights reserved for future use; attempting to change it will cause an
+#'   error: at this time, there is no way to assign sampling weights to
+#'   networks.
+#' @param label An optional parameter which will add a label to model
+#'   parameters to help identify the term (which may have similar
+#'   predictors but, say, a different network subset) in the output.
+#'
+#'
+#' @template ergmTerm-general
+#'
+#' @concept operator
 InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula","lm","subset","weights","contrasts","offset","label"),

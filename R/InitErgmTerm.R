@@ -165,6 +165,35 @@ GWDECAY <- list(
 }
 
 ################################################################################
+
+#' @name b1degreeL-ergmTerm
+#' @title Degree for the first mode in a bipartite (aka two-mode) network
+#' @description Degree for the first mode in a bipartite (aka two-mode) network
+#' @details This term adds one network statistic to the model for
+#'   each element in `d` ; the \eqn{i} th such statistic equals the number of
+#'   nodes of degree `d[i]` in the first mode of a bipartite network, i.e.
+#'   with exactly `d[i]` edges. The first mode of a bipartite network object
+#'   is sometimes known as the "actor" mode.
+#'
+#'   This term can only be used with undirected bipartite networks.
+#'
+#' @usage
+#' # binary: b1degreeL(d, by=NULL, levels=NULL)
+#' @param d a vector of distinct integers.
+#' @param by a character string giving the name of an attribute in the network's vertex
+#'   attribute list. If this is specified
+#'   then each node's degree is tabulated only with other nodes having the same
+#'   value of the `by` attribute.
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept categorical nodal attribute
+#' @concept frequently-used
 InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
   ### Check the network and arguments to make sure they are appropriate.
   a <- check.ErgmTerm (nw, arglist, directed=FALSE, bipartite=TRUE,
@@ -207,6 +236,35 @@ InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
 }
 
 ################################################################################
+
+#' @name b2degree-ergmTerm
+#' @title Degree for the second mode in a bipartite (aka two-mode) network
+#' @description Degree for the second mode in a bipartite (aka two-mode) network
+#' @details This term adds one network statistic to the model for
+#'   each element in `d` ; the \eqn{i} th such statistic equals the number of
+#'   nodes of degree `d[i]` in the second mode of a bipartite network, i.e.
+#'   with exactly `d[i]` edges. The second mode of a bipartite network
+#'   object is sometimes known as the "event" mode. The optional term
+#'   `by` is a character string giving the name of an attribute in the
+#'   network's vertex attribute list.
+#'   This term can only be used with undirected bipartite networks.
+#'
+#' @usage
+#' # binary: b2degree(d, by=NULL)
+#' @param d a vector of distinct integers
+#' @param by If this is specified
+#'   then each node's degree is tabulated only with other nodes having the same
+#'   value of the given attribute.
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept categorical nodal attribute
+#' @concept frequently-used
 InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
   ### Check the network and arguments to make sure they are appropriate.
   a <- check.ErgmTerm (nw, arglist, directed=FALSE, bipartite=TRUE,
@@ -250,6 +308,40 @@ InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
 }
 
 ################################################################################
+
+#' @name degreeL-ergmTerm
+#' @title Degree
+#' @description Degree
+#' @details This term adds one
+#'   network statistic to the model for each element in `d` ; the \eqn{i} th
+#'   such statistic equals the number of nodes in the network of degree
+#'   `d[i]` , i.e. with exactly `d[i]` edges.
+#'
+#'   This term can only be used with undirected networks; for directed networks
+#'   see `idegree` and `odegree` .
+#'
+#' @usage
+#' # binary: degreeL(d, by=NULL, homophily=FALSE, levels=NULL, Ls=NULL)
+#' @param d a vector of distinct integers
+#' @param by a character string giving the name of an attribute in the
+#'   network's vertex attribute list.
+#' @param homophily If this is specified and `homophily` is `TRUE` ,
+#'   then degrees are calculated using the subnetwork consisting of only
+#'   edges whose endpoints have the same value of the `by` attribute.
+#'   If `by` is specified and
+#'   `homophily` is `FALSE` (the default), then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param Ls if specified, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept undirected
+#' @concept categorical nodal attribute
+#' @concept frequently-used
+#' @concept directed
 InitErgmTerm.degreeL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("d", "by", "homophily", "levels", "Ls"),
@@ -309,6 +401,42 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 #=======================InitErgmTerm functions:  G============================#
 
 ################################################################################
+
+#' @name gwb1degreeL-ergmTerm
+#' @title Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
+#' @description Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
+#' @details This term adds one network statistic to the model equal to the weighted
+#'   degree distribution with decay controlled by the `decay` parameter, which should be non-negative,
+#'   for nodes in the
+#'   first mode of a bipartite network. The first mode of a bipartite network
+#'   object is sometimes known as the "actor" mode.
+#'
+#'   This term can only be used with undirected bipartite
+#'   networks.
+#'
+#' @usage
+#' # binary: gwb1degreeL(decay, fixed=FALSE, cutoff=30, levels=NULL, Ls=NULL)
+#' @param decay non-negative model parameter that is the same as theta_s in
+#'   equation (14) in Hunter (2007).
+#' @param fixed specify if the value supplied for `decay` may be fixed (if `fixed=TRUE` ),
+#'   or it may be used as merely the starting value for the estimation
+#'   in a curved exponential family model (the default).
+#' @param attrname if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @param Ls TODO
+#'
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept curved
 InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE, bipartite=TRUE,                     
   # default for 'fixed' should be made 'FALSE' when the function can handle it!                    
@@ -365,6 +493,42 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 
 ################################################################################
+
+#' @name gwb2degreeL-ergmTerm
+#' @title Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
+#' @description Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
+#' @details This term adds one network statistic to the model equal to the weighted
+#'   degree distribution with decay controlled by the which should be non-negative,
+#'   for nodes in the
+#'   second mode of a bipartite network. The second mode of a bipartite network
+#'   object is sometimes known as the "event" mode.
+#'
+#'   This term can only be used with undirected bipartite
+#'   networks.
+#'
+#' @usage
+#' # binary: gwb2degreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls=NULL)
+#' @param decay non-negative model parameter that is the same as theta_s in
+#'   equation (14) in Hunter (2007).
+#' @param fixed specify if the value supplied for `decay` may be fixed (if `fixed=TRUE` ),
+#'   or it may be used as merely the starting value for the estimation
+#'   in a curved exponential family model (the default).
+#' @param attrname if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @param Ls TODO
+#'
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept curved
 InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE, bipartite=TRUE,
   # default for 'fixed' should be made 'FALSE' when the function can handle it!                    
@@ -417,6 +581,37 @@ InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 }
 
 ################################################################################
+
+#' @name gwdegreeL-ergmTerm
+#' @title Geometrically weighted degree distribution
+#' @description Geometrically weighted degree distribution
+#' @details This term adds one network statistic to the model equal to the weighted
+#'   degree distribution with decay controlled by the `decay` parameter.
+#'
+#'   This term can only be used with undirected networks.
+#'
+#' @usage
+#' # binary: gwdegreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL)
+#' @param decay non-negative model parameter that is the same as theta_s in
+#'   equation (14) in Hunter (2007).
+#' @param fixed specify if the value supplied for `decay` may be fixed (if `fixed=TRUE` ),
+#'   or it may be used as merely the starting value for the estimation
+#'   in a curved exponential family model (the default).
+#' @param attrname if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept undirected
+#' @concept curved
+#' @concept frequently-used
 InitErgmTerm.gwdegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
@@ -467,6 +662,35 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 }
 
 ################################################################################
+
+#' @name gwidegreeL-ergmTerm
+#' @title Geometrically weighted in-degree distribution
+#' @description Geometrically weighted in-degree distribution
+#' @details This term adds one network statistic to the model
+#'   equal to the weighted in-degree distribution with decay parameter. This
+#'   term can only be used with directed networks.
+#'
+#' @usage
+#' # binary: gwidegreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls=NULL)
+#' @param decay non-negative model parameter that is the same as theta_s in
+#'   equation (14) in Hunter (2007).
+#' @param fixed specify if the value supplied for `decay` may be fixed (if `fixed=TRUE` ),
+#'   or it may be used as merely the starting value for the estimation
+#'   in a curved exponential family model (the default).
+#' @param attrname if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept curved
 InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
@@ -518,6 +742,36 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 }
 
 ################################################################################
+
+#' @name gwodegreeL-ergmTerm
+#' @title Geometrically weighted out-degree distribution
+#' @description Geometrically weighted out-degree distribution
+#' @details This term adds one network statistic to the model
+#'   equal to the weighted out-degree distribution with decay parameter . This
+#'   term can only be used with directed networks.
+#'
+#' @usage
+#' # binary: gwodegreeL(decay, fixed=FALSE, attrname=NULL, cutoff=30, levels=NULL, Ls=NULL)
+#' @param decay non-negative model parameter that is the same as theta_s in
+#'   equation (14) in Hunter (2007).
+#' @param fixed specify if the value supplied for `decay` may be fixed (if `fixed=TRUE` ),
+#'   or it may be used as merely the starting value for the estimation
+#'   in a curved exponential family model (the default).
+#' @param attrname if specified, then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param cutoff only relevant if `fixed=FALSE` . In that case it only uses this
+#'   number of terms in computing the statistics to reduce the computational
+#'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @param Ls TODO
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept curved
 InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("decay", "fixed", "attrname","cutoff", "levels", "Ls"),
@@ -569,6 +823,36 @@ InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 }
 
 ################################################################################
+
+#' @name idegreeL-ergmTerm
+#' @title In-degree
+#' @description In-degree
+#' @details This term adds one network statistic to
+#'   the model for each element in `d` ; the \eqn{i} th such statistic equals
+#'   the number of nodes in the network of in-degree `d[i]` , i.e. the number
+#'   of nodes with exactly `d[i]` in-edges.
+#'   This term can only be used with directed networks; for undirected networks
+#'   see `degree` .
+#'
+#' @usage
+#' # binary: idegreeL(d, by=NULL, homophily=FALSE, levels=NULL)
+#' @param d a vector of distinct integers.
+#' @param by an optional character string giving the name of an attribute in the
+#'   network's vertex attribute list.
+#' @param homophily only applied if by is specified. If set (`homophile == TRUE`),
+#'   then degrees are calculated using the subnetwork consisting of only
+#'   edges whose endpoints have the same value of the `by` attribute.
+#'   Otherwise (the default), then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param levels a list of layer specifications. If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers, combined.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept categorical nodal attribute
+#' @concept frequently-used
 InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("d", "by", "homophily", "levels", "Ls"),
@@ -625,6 +909,52 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 }
 
 ################################################################################
+
+#' @name mutualL-ergmTerm
+#' @title Mutuality
+#' @description Mutuality
+#' @details In binary ERGMs, equal to the number of
+#'   pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
+#'   and \eqn{(j{\rightarrow}i)}{(j,i)} both exist. For valued ERGMs, equal to \eqn{\sum_{i<j} m(y_{i,j},y_{j,i})} ,
+#'   where \eqn{m} is determined by `form` argument:
+#'   - `"min"` for \eqn{\min(y_{i,j},y_{j,i})}
+#'   - `"nabsdiff"` for \eqn{-|y_{i,j},y_{j,i}|}
+#'   - `"product"` for \eqn{y_{i,j}y_{j,i}}
+#'   - `"geometric"` for \eqn{\sqrt{y_{i,j}}\sqrt{y_{j,i}}}
+#'
+#'   See Krivitsky (2012) for a discussion of these statistics. `form="threshold"` simply
+#'   computes the binary `mutuality` after thresholding at `threshold` .
+#'
+#'   This term can only be used with directed networks.
+#'
+#' @usage
+#' # binary: mutualL(same=NULL, diff=FALSE, by=NULL, keep=NULL, Ls=NULL)
+#' @param same optional argument. If passed the name of a vertex attribute,
+#'   only mutual pairs that match on the attribute are counted. Only one of `same`
+#'   or `by` may be used. If both parameters are passed, `same` takes precedent. This
+#'   parameter is affected by `diff`.
+#' @param diff separate counts for each unique matching value can be obtained by using
+#'   `diff=TRUE` with `same`.
+#' @param by each node is counted separately for each mutual pair in which it
+#'   occurs and the counts are tabulated by unique values of the attribute if
+#'   passed the name of a vertex attribute. This means that the sum of the mutual statistics when `by` is used
+#'   will equal twice the standard mutual statistic. Only one of `same`
+#'   or `by` may be used. If both parameters are passed, `same` takes precedent. This
+#'   parameter is not affected by `diff`.
+#' @param keep a numerical vector to specify which statistics should be kept whenever the `mutual` term would
+#'   ordinarily result in multiple statistics.
+#' @param Ls a list of two layer logic formulas or a single layer logic formula.
+#'   If given, the statistic will count the number of dyads where a tie in
+#'   `Ls[[1]]` reciprocates a tie in `Ls[[2]]` and vice
+#'   versa. (Note that dyad that has mutual ties in `Ls[[1]]` and in
+#'   `Ls[[2]]` will add 2 to this statistic.) If a formula is given,
+#'   it is replicated.
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept frequently-used
+#' @concept layer-aware
 InitErgmTerm.mutualL<-function (nw, arglist, ...) {
   ### Check the network and arguments to make sure they are appropriate.
   a <- check.ErgmTerm(nw, arglist, directed=TRUE, bipartite=NULL,
@@ -705,6 +1035,41 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 }
 
 ################################################################################
+
+#' @name odegreeL-ergmTerm
+#' @title Out-degree
+#' @description Out-degree
+#' @details This term adds one network statistic to
+#'   the model for each element in `d` ; the \eqn{i} th such statistic equals
+#'   the number of nodes in the network of out-degree `d[i]` , i.e. the
+#'   number of nodes with exactly `d[i]` out-edges.
+#'
+#'   This term can only be used with directed networks; for undirected networks
+#'   see `degree` .
+#'
+#'   If a list of layer specifications is given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#'
+#' @usage
+#' # binary: odegreeL(d, by=NULL, homophily=FALSE, levels=NULL)
+#' @param d a vector of distinct integers
+#' @param by a character string giving the name of an attribute in the
+#'   network's vertex attribute list.
+#' @param homophily If this is specified and `homophily` is `TRUE` ,
+#'   then degrees are calculated using the subnetwork consisting of only
+#'   edges whose endpoints have the same value of the `by` attribute.
+#'   If `by` is specified and
+#'   `homophily` is `FALSE` (the default), then separate degree
+#'   statistics are calculated for nodes having each separate
+#'   value of the attribute.
+#' @param levels list of layer specifications
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept categorical nodal attribute
+#' @concept frequently-used
 InitErgmTerm.odegreeL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=TRUE,
                       varnames = c("d", "by", "homophily", "levels", "Ls"),

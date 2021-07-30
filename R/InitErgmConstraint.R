@@ -31,7 +31,33 @@
 #
 ##########################################################################################
 
+#' @name blockdiag-ergmConstraint
+#' @title Block-diagonal structure constraint
+#' @description Block-diagonal structure constraint
+#' @details Force a block-diagonal structure (and its bipartite analogue) on
+#'   the network. Only dyads \eqn{(i,j)} for which
+#'   `attrname(i)==attrname(j)` can have edges.
+#'
+#'   Note that the current implementation requires that blocks be
+#'   contiguous for unipartite graphs, and for bipartite
+#'   graphs, they must be contiguous within a partition and must have
+#'   the same ordering in both partitions. (They do not, however,
+#'   require that all blocks be represented in both partitions, but
+#'   those that overlap must have the same order.)
+#'
+#'   If multiple block-diagonal constraints are given, or if
+#'   `attrname` is a vector with multiple attribute names, blocks
+#'   will be constructed on all attributes matching.
+#'
+#' @usage
+#' # blockdiag(attrname)
+#' @template ergmTerm-attr
+#'
+#' @template ergmConstraint-general
+#'
 #' @import rle
+#'
+#' @concept dyad-independent
 InitErgmConstraint.blockdiag<-function(lhs.nw, attr=NULL, ...){
   if(length(list(...)))
     stop(paste("Block diagonal constraint takes one argument at this time."), call.=FALSE)

@@ -9,6 +9,10 @@ InitWtErgmTerm..subnets <- function(...){
 }
 
 # Arguments and outputs are identical to the binary version, except for the C routine names.
+
+#' @rdname N-ergmTerm
+#' @usage
+#' # valued: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 InitWtErgmTerm.N <- function(...){
   # Rename the function to avoid the extra nesting level in the
   # diagnostic messages.
