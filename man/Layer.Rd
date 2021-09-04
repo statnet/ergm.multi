@@ -48,6 +48,65 @@ directed, all will be. However, \link[=ergm-terms]{certain operator terms}, part
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 }
+\section{Specifying models for multilayer network}{
+
+In order to fit a model for multilayer
+networks, first use \code{\link{Layer}} construct an LHS network that
+\code{\link{ergm}} will understand as multilayered.
+
+Used on the formula directly, most, but not all, terms included in this
+package will sum their statistics over the layers.
+
+Some terms are \emph{layer-aware}. These terms have explicit (usually
+optional) layer specification arguments. For other terms, an operator
+\code{L(formula, Ls=~.)} can be used to specify to which layer(s) they
+apply. Layer specification documentation follows.
+\subsection{Layer Logic}{
+
+Each formula's right-hand side describes an observed layer \emph{or} some
+"logical" layer, whose ties are a function of corresponding ties in
+observed layers.
+
+The observed layers can be referenced either by name or by number (i.e.,
+order in which they were passed to \code{\link{Layer}}). When referencing by
+number, enclose the number in quotation marks (e.g., "1") or
+backticks (e.g., \dQuote{\code{1}}).
+
+\link[base:Arithmetic]{Arithmetical}, \link[base:Comparison]{relational},
+and \link[base:Logic]{logical} operators can be used to combine them. All
+listed operators are implemented, as well as functions \code{\link{abs}},
+\code{\link{round}}, and \code{\link{sign}}. Standard
+\link[base:Syntax]{operator precedence} applies, so use of parentheses is
+recommended to ensure the logical expression is what it looks like.
+
+For example, if LHS is \code{Layer(A=nwA, B=nwB)}, both \code{~`2`} and
+\code{~B} refer to \code{nwB}, while \code{A&!B} refers to a
+\dQuote{logical} layer that has ties that are in \code{nwA} but not in
+\code{nwB}.
+
+Transpose function \code{\link{t}} applied to a directed layer will reverse
+the direction of all relations (transposing the sociomatrix). Unlike the
+others, it can only be used on an observed layer directly. For example,
+\code{~t(`1`)&t(`2`)} is valid but \code{~t(`1`&`2`)} is not.
+
+At this time, logical expressions that produce complete graphs from empty
+graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.
+}
+
+\subsection{Summing layers}{
+
+Some terms combine multiple layers. I that case al ist of formulas may be
+passed. For example, \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))}
+produces the number of edges in layer 1 plus the number of edges in layer 2
+but not in layer 1.
+
+For these formulas, one can specify the layer's weight on its left-handside.
+For example, \code{Layer(nw1,nw2)~L(~edges, c(3~`1`,-1~(`2`&!`1`)))} will
+produce three times the number of edges in layer 1, minus the number of
+edges in layer 2 but not in layer 1.
+}
+}
+
 \examples{
 
 data(florentine)

@@ -30,7 +30,7 @@
 #'   that vertex originally belonged.
 #' 
 #' @param detect.edgecov if `TRUE`, combine network attributes that
-#'   look like dyadic covariate ([`ergm::edgecov`]) matrices into a
+#'   look like dyadic covariate ([`edgecov-ergmTerm`]) matrices into a
 #'   block-diagonal matrix.
 #'
 #' @param keep.unshared.attr whether to keep those network, vertex,
@@ -398,7 +398,7 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' @param split.vattr name of the vertex attribute on which to split.
 #'
 ## #' @param detect.edgecov if `TRUE`, split up network attributes that
-## #'   look like dyadic covariate ([`ergm::edgecov`]) matrices.
+## #'   look like dyadic covariate ([`edgecov-ergmTerm`]) matrices.
 #'
 #' @param names.vattr optional name of the vertex attribute to use as network
 #'   names in the output list.
