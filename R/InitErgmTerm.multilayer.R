@@ -887,44 +887,6 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 
 ################################################################################
 
-#' @name b2degrangeL-ergmTerm
-#' @title Degree range for the second mode in a bipartite network
-#' @description Degree range for the second mode in a bipartite (a.k.a. two-mode) network
-#' @details This term adds one
-#'   network statistic to the model for each element of `from` (or `to` ); the \eqn{i} th
-#'   such statistic equals the number of nodes of the second mode
-#'   ("events") in the network of degree
-#'   greater than or equal to `from[i]` but strictly less than `to[i]` , i.e. with
-#'   edge count in semiopen interval `[from,to)` .
-#'
-#'   This term can only be used with bipartite networks; for directed networks
-#'   see `idegrange` and `odegrange` . For undirected networks,
-#'   see `degrange` , and see `b1degrange` for degrees of the first mode ("actors").
-#'
-#' @usage
-#' # binary: b2degrangeL(from, to=+Inf, by=NULL, homophily=FALSE, levels=NULL)
-#' @param from,to vectors of distinct
-#'   integers (or `+Inf` , for `to` (its default)). If one of the vectors has
-#'   length 1, it is recycled to the length of the other. Otherwise, they
-#'   must have the same length.
-#' @param by an optional character string giving the name of an attribute in the
-#'   network's vertex attribute list.
-#' @param homophily Only used if `by` is specified. If set to `TRUE` ,
-#'   then degrees are calculated using the subnetwork consisting of only
-#'   edges whose endpoints have the same value of the `by` attribute.
-#'   Otherwise (the default), then separate degree range
-#'   statistics are calculated for nodes having each separate
-#'   value of the attribute.
-#' @param levels TODO
-#'
-#' @template ergmTerm-general
-#'
-#' @concept bipartite
-#' @concept undirected
-NULL
-
-################################################################################
-
 #' @name degreeL-multilayer-ergmTerm
 #' @title Layer combinaton degree
 #' @description Layer combinaton degree
