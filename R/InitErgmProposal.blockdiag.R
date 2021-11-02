@@ -140,10 +140,27 @@ ergm_block_diag_samp_info <- function(nw, a){
   structure(out, class="ergm_block_diag_samp_info")
 }
 
+#' @templateVar name blockdiag
+#' @aliases InitErgmProposal.blockdiag
+#' @title MHp for diagonal block constraints
+#' @description MHp for \eqn{constraints= ~blockdiag}. Select a diagonal
+#'   block according to the weight, then randomly select a dayd within the
+#'   block for the toggle proposal.
+#' @template ergmProposal
+NULL
+
 InitErgmProposal.blockdiag <- function(arguments, nw){
   BDI <- ergm_block_diag_samp_info(nw, .get.blockdiag.attr(nw, arguments$constraints))
   list(name = "blockdiag", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
+
+#' @templateVar name blockdiagTNT
+#' @aliases InitErgmProposal.blockdiagTNT
+#' @title MHp for blockdiag constraints
+#' @description MHp for \eqn{constraints= ~blockdiag}. Similar to InitErgmProposal.blockdiag, except that it selects ties
+#'   and non-ties for proposed toggles (in the block by construction) with equal probability.  Like the unconstrained TNT proposal, this is useful for improving performance in sparse networks.
+#' @template ergmProposal
+NULL
 
 InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   el <- as.edgelist(nw)
