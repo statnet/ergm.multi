@@ -792,7 +792,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
   do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f))))
 }
 
-#' @name L-ergmTerm
+#' @templateVar name L
 #' @title Evaluation on layers
 #' @description Evaluation on layers
 #' @details Evaluates the terms in `formula` on an actual or logical layers
@@ -843,7 +843,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
     wm)
 }
 
-#' @name CMBL-ergmTerm
+#' @templateVar name CMBL
 #' @title Conway--Maxwell-Binomial dependence among layers
 #' @description Conway--Maxwell-Binomial dependence among layers
 #' @details Models marginal dependence layers within each dyad by imposing
@@ -887,7 +887,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 
 ################################################################################
 
-#' @name degreeL-multilayer-ergmTerm
+#' @templateVar name degreeL-multilayer
 #' @title Layer combinaton degree
 #' @description Layer combinaton degree
 #' @details This term adds one network statistic to
@@ -971,7 +971,7 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name gwdegreeL-ergmTerm
+#' @templateVar name gwdegreeL
 #' @title Geometrically weighted layer-combination-degree distribution
 #' @description Geometrically weighted layer-combination-degree distribution
 #' @details This term adds one network statistic to the model
@@ -1057,7 +1057,7 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
 
 ################################################################################
 
-#' @name twostarL-ergmTerm
+#' @templateVar name twostarL
 #' @title Multilayer two-star
 #' @description Multilayer two-star
 #' @details This term adds one statistic to the model, equal to the number of

@@ -140,7 +140,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 
 #' @import purrr
 #' @import tibble
-#' @name N-ergmTerm
+#' @templateVar name N
 #' @title Evaluation on multiple networks
 #' @description Evaluation on multiple networks
 #' @details Evaluates the terms in `formula` on each of the networks joined

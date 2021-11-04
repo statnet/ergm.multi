@@ -31,7 +31,7 @@
 #
 ##########################################################################################
 
-#' @name blockdiag-ergmConstraint
+#' @templateVar name blockdiag
 #' @title Block-diagonal structure constraint
 #' @description Block-diagonal structure constraint
 #' @details Force a block-diagonal structure (and its bipartite analogue) on

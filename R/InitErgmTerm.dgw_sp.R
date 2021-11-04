@@ -195,7 +195,7 @@ no_layer_err <- function(instead){
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
 
-#' @name despL-ergmTerm
+#' @templateVar name despL
 #' @title Directed edgewise shared partners
 #' @description Directed edgewise shared partners
 #' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible.
@@ -271,7 +271,7 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
 #overridden.  UTP cannot be chosen otherwise, since it won't work.
 #
 
-#' @name dgwespL-ergmTerm
+#' @templateVar name dgwespL
 #' @title Geometrically weighted edgewise shared partner distribution
 #' @description Geometrically weighted edgewise shared partner distribution
 #' @details : This term adds a statistic equal to the geometrically weighted edgewise (not dyadwise) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
@@ -377,7 +377,7 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
 
-#' @name ddspL-ergmTerm
+#' @templateVar name ddspL
 #' @title Directed dyadwise shared partners
 #' @description Directed dyadwise shared partners
 #' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of dyads in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
@@ -461,7 +461,7 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
 
 ################################################################################
 
-#' @name dgwdspL-ergmTerm
+#' @templateVar name dgwdspL
 #' @title Geometrically weighted dyadwise shared partner distribution
 #' @description Geometrically weighted dyadwise shared partner distribution
 #' @details This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to employ (see `ddsp` for definitions). By default, outgoing two-paths are employed.
@@ -574,7 +574,7 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 #the user's selection.  UTP cannot be chosen otherwise, since it won't work.
 #
 
-#' @name dnspL-ergmTerm
+#' @templateVar name dnspL
 #' @title Directed non-edgewise shared partners
 #' @description Directed non-edgewise shared partners
 #' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possibl.
@@ -646,7 +646,7 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
 
 ################################################################################
 
-#' @name dgwnspL-ergmTerm
+#' @templateVar name dgwnspL
 #' @title Geometrically weighted non-edgewise shared partner distribution
 #' @description Geometrically weighted non-edgewise shared partner distribution
 #' @details This term is just like gwesp and gwdsp except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.

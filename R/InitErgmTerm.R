@@ -166,7 +166,7 @@ GWDECAY <- list(
 
 ################################################################################
 
-#' @name b1degreeL-ergmTerm
+#' @templateVar name b1degreeL
 #' @title Degree for the first mode in a bipartite (aka two-mode) network
 #' @description Degree for the first mode in a bipartite (aka two-mode) network
 #' @details This term adds one network statistic to the model for
@@ -237,7 +237,7 @@ InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name b2degree-ergmTerm
+#' @templateVar name b2degree
 #' @title Degree for the second mode in a bipartite (aka two-mode) network
 #' @description Degree for the second mode in a bipartite (aka two-mode) network
 #' @details This term adds one network statistic to the model for
@@ -309,7 +309,7 @@ InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name degreeL-ergmTerm
+#' @templateVar name degreeL
 #' @title Degree
 #' @description Degree
 #' @details This term adds one
@@ -402,7 +402,7 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name gwb1degreeL-ergmTerm
+#' @templateVar name gwb1degreeL
 #' @title Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
 #' @description Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
 #' @details This term adds one network statistic to the model equal to the weighted
@@ -494,7 +494,7 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 ################################################################################
 
-#' @name gwb2degreeL-ergmTerm
+#' @templateVar name gwb2degreeL
 #' @title Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
 #' @description Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
 #' @details This term adds one network statistic to the model equal to the weighted
@@ -582,7 +582,7 @@ InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 
 ################################################################################
 
-#' @name gwdegreeL-ergmTerm
+#' @templateVar name gwdegreeL
 #' @title Geometrically weighted degree distribution
 #' @description Geometrically weighted degree distribution
 #' @details This term adds one network statistic to the model equal to the weighted
@@ -663,7 +663,7 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 ################################################################################
 
-#' @name gwidegreeL-ergmTerm
+#' @templateVar name gwidegreeL
 #' @title Geometrically weighted in-degree distribution
 #' @description Geometrically weighted in-degree distribution
 #' @details This term adds one network statistic to the model
@@ -743,7 +743,7 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 
 ################################################################################
 
-#' @name gwodegreeL-ergmTerm
+#' @templateVar name gwodegreeL
 #' @title Geometrically weighted out-degree distribution
 #' @description Geometrically weighted out-degree distribution
 #' @details This term adds one network statistic to the model
@@ -824,7 +824,7 @@ InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 ################################################################################
 
-#' @name idegreeL-ergmTerm
+#' @templateVar name idegreeL
 #' @title In-degree
 #' @description In-degree
 #' @details This term adds one network statistic to
@@ -910,7 +910,7 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name mutualL-ergmTerm
+#' @templateVar name mutualL
 #' @title Mutuality
 #' @description Mutuality
 #' @details In binary ERGMs, equal to the number of
@@ -1036,7 +1036,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 
 ################################################################################
 
-#' @name odegreeL-ergmTerm
+#' @templateVar name odegreeL
 #' @title Out-degree
 #' @description Out-degree
 #' @details This term adds one network statistic to
