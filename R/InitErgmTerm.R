@@ -168,8 +168,7 @@ GWDECAY <- list(
 
 #' @templateVar name b1degreeL
 #' @title Degree for the first mode in a bipartite (aka two-mode) network
-#' @description Degree for the first mode in a bipartite (aka two-mode) network
-#' @details This term adds one network statistic to the model for
+#' @description This term adds one network statistic to the model for
 #'   each element in `d` ; the \eqn{i} th such statistic equals the number of
 #'   nodes of degree `d[i]` in the first mode of a bipartite network, i.e.
 #'   with exactly `d[i]` edges. The first mode of a bipartite network object
@@ -239,8 +238,7 @@ InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
 
 #' @templateVar name b2degree
 #' @title Degree for the second mode in a bipartite (aka two-mode) network
-#' @description Degree for the second mode in a bipartite (aka two-mode) network
-#' @details This term adds one network statistic to the model for
+#' @description This term adds one network statistic to the model for
 #'   each element in `d` ; the \eqn{i} th such statistic equals the number of
 #'   nodes of degree `d[i]` in the second mode of a bipartite network, i.e.
 #'   with exactly `d[i]` edges. The second mode of a bipartite network
@@ -311,8 +309,7 @@ InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
 
 #' @templateVar name degreeL
 #' @title Degree
-#' @description Degree
-#' @details This term adds one
+#' @description This term adds one
 #'   network statistic to the model for each element in `d` ; the \eqn{i} th
 #'   such statistic equals the number of nodes in the network of degree
 #'   `d[i]` , i.e. with exactly `d[i]` edges.
@@ -404,8 +401,7 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 
 #' @templateVar name gwb1degreeL
 #' @title Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
-#' @description Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
-#' @details This term adds one network statistic to the model equal to the weighted
+#' @description This term adds one network statistic to the model equal to the weighted
 #'   degree distribution with decay controlled by the `decay` parameter, which should be non-negative,
 #'   for nodes in the
 #'   first mode of a bipartite network. The first mode of a bipartite network
@@ -496,8 +492,7 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 #' @templateVar name gwb2degreeL
 #' @title Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
-#' @description Geometrically weighted degree distribution for the second mode in a bipartite (aka two-mode) network
-#' @details This term adds one network statistic to the model equal to the weighted
+#' @description This term adds one network statistic to the model equal to the weighted
 #'   degree distribution with decay controlled by the which should be non-negative,
 #'   for nodes in the
 #'   second mode of a bipartite network. The second mode of a bipartite network
@@ -584,8 +579,7 @@ InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 
 #' @templateVar name gwdegreeL
 #' @title Geometrically weighted degree distribution
-#' @description Geometrically weighted degree distribution
-#' @details This term adds one network statistic to the model equal to the weighted
+#' @description This term adds one network statistic to the model equal to the weighted
 #'   degree distribution with decay controlled by the `decay` parameter.
 #'
 #'   This term can only be used with undirected networks.
@@ -665,8 +659,7 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 #' @templateVar name gwidegreeL
 #' @title Geometrically weighted in-degree distribution
-#' @description Geometrically weighted in-degree distribution
-#' @details This term adds one network statistic to the model
+#' @description This term adds one network statistic to the model
 #'   equal to the weighted in-degree distribution with decay parameter. This
 #'   term can only be used with directed networks.
 #'
@@ -745,8 +738,7 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 
 #' @templateVar name gwodegreeL
 #' @title Geometrically weighted out-degree distribution
-#' @description Geometrically weighted out-degree distribution
-#' @details This term adds one network statistic to the model
+#' @description This term adds one network statistic to the model
 #'   equal to the weighted out-degree distribution with decay parameter . This
 #'   term can only be used with directed networks.
 #'
@@ -826,8 +818,7 @@ InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 
 #' @templateVar name idegreeL
 #' @title In-degree
-#' @description In-degree
-#' @details This term adds one network statistic to
+#' @description This term adds one network statistic to
 #'   the model for each element in `d` ; the \eqn{i} th such statistic equals
 #'   the number of nodes in the network of in-degree `d[i]` , i.e. the number
 #'   of nodes with exactly `d[i]` in-edges.
@@ -912,8 +903,7 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 
 #' @templateVar name mutualL
 #' @title Mutuality
-#' @description Mutuality
-#' @details In binary ERGMs, equal to the number of
+#' @description In binary ERGMs, equal to the number of
 #'   pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
 #'   and \eqn{(j{\rightarrow}i)}{(j,i)} both exist. For valued ERGMs, equal to \eqn{\sum_{i<j} m(y_{i,j},y_{j,i})} ,
 #'   where \eqn{m} is determined by `form` argument:
@@ -922,7 +912,7 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 #'   - `"product"` for \eqn{y_{i,j}y_{j,i}}
 #'   - `"geometric"` for \eqn{\sqrt{y_{i,j}}\sqrt{y_{j,i}}}
 #'
-#'   See Krivitsky (2012) for a discussion of these statistics. `form="threshold"` simply
+#'  @details See Krivitsky (2012) for a discussion of these statistics. `form="threshold"` simply
 #'   computes the binary `mutuality` after thresholding at `threshold` .
 #'
 #'   This term can only be used with directed networks.
@@ -1038,13 +1028,12 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 
 #' @templateVar name odegreeL
 #' @title Out-degree
-#' @description Out-degree
-#' @details This term adds one network statistic to
+#' @description This term adds one network statistic to
 #'   the model for each element in `d` ; the \eqn{i} th such statistic equals
 #'   the number of nodes in the network of out-degree `d[i]` , i.e. the
 #'   number of nodes with exactly `d[i]` out-edges.
 #'
-#'   This term can only be used with directed networks; for undirected networks
+#' @details This term can only be used with directed networks; for undirected networks
 #'   see `degree` .
 #'
 #'   If a list of layer specifications is given, degree of a node

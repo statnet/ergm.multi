@@ -794,8 +794,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 
 #' @templateVar name L
 #' @title Evaluation on layers
-#' @description Evaluation on layers
-#' @details Evaluates the terms in `formula` on an actual or logical layers
+#' @description Evaluates the terms in `formula` on an actual or logical layers
 #'   specified in formula `Ls` and sums the results. `Ls` is a
 #'   one-sided formula with terms separated by `+` operators, and
 #'   corresponding statistics for each layer specification is summed
@@ -845,8 +844,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
 
 #' @templateVar name CMBL
 #' @title Conway--Maxwell-Binomial dependence among layers
-#' @description Conway--Maxwell-Binomial dependence among layers
-#' @details Models marginal dependence layers within each dyad by imposing
+#' @description Models marginal dependence layers within each dyad by imposing
 #'   a Conway--Maxwell-Binomial (CMB) distribution on the number of
 #'   layers in each dyad that have a tie.
 #'
@@ -855,7 +853,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
 #'   \eqn{E} is the number of layers in `Ls` with an edge in that
 #'   dyad and \eqn{R} being the total number of layers in `Ls` .
 #'
-#'   A positive coefficient induces positive dependence and a negative
+#' @details A positive coefficient induces positive dependence and a negative
 #'   one induces negative dependence.
 #'
 #' @usage
@@ -889,8 +887,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 
 #' @templateVar name degreeL-multilayer
 #' @title Layer combinaton degree
-#' @description Layer combinaton degree
-#' @details This term adds one network statistic to
+#' @description This term adds one network statistic to
 #'   the model for each element in `d` ; the \eqn{i} th such statistic equals
 #'   the number of nodes in the network whose total degree across all
 #'   layers listed in `Ls` combined (with direction being
@@ -973,8 +970,7 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 
 #' @templateVar name gwdegreeL
 #' @title Geometrically weighted layer-combination-degree distribution
-#' @description Geometrically weighted layer-combination-degree distribution
-#' @details This term adds one network statistic to the model
+#' @description This term adds one network statistic to the model
 #'   equal to the weighted layer-cumulative degree distribution with decay parameter. This
 #'   term can only be used with directed networks.
 #'
@@ -1059,8 +1055,7 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
 
 #' @templateVar name twostarL
 #' @title Multilayer two-star
-#' @description Multilayer two-star
-#' @details This term adds one statistic to the model, equal to the number of
+#' @description This term adds one statistic to the model, equal to the number of
 #'   cross-layer two-stars or two-paths in
 #'   the network.
 #'

@@ -26,9 +26,6 @@ and the second must be the second; otherwise, any ordering counts,
 provided there is exactly one of each. (For types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the one incident on the tail of the base tie.)}
 }
 \description{
-Geometrically weighted dyadwise shared partner distribution
-}
-\details{
 This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the \code{type} argument may be used to select the type of shared partner to employ (see \code{ddsp} for definitions). By default, outgoing two-paths are employed.
 
 See term \code{ddsp} for layer specification information.

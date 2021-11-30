@@ -33,8 +33,7 @@
 
 #' @templateVar name blockdiag
 #' @title Block-diagonal structure constraint
-#' @description Block-diagonal structure constraint
-#' @details Force a block-diagonal structure (and its bipartite analogue) on
+#' @description Force a block-diagonal structure (and its bipartite analogue) on
 #'   the network. Only dyads \eqn{(i,j)} for which
 #'   `attrname(i)==attrname(j)` can have edges.
 #'

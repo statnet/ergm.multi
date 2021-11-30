@@ -17,9 +17,6 @@ value of the attribute.}
 \item{dir}{vector specifying direction}
 }
 \description{
-Layer combinaton degree
-}
-\details{
 This term adds one network statistic to
 the model for each element in \code{d} ; the \eqn{i} th such statistic equals
 the number of nodes in the network whose total degree across all

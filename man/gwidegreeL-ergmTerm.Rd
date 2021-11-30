@@ -28,9 +28,6 @@ burden. Its default value can also be controlled by the \code{gw.cutoff} term op
 combined.}
 }
 \description{
-Geometrically weighted in-degree distribution
-}
-\details{
 This term adds one network statistic to the model
 equal to the weighted in-degree distribution with decay parameter. This
 term can only be used with directed networks.

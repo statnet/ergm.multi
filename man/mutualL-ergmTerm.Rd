@@ -34,9 +34,6 @@ versa. (Note that dyad that has mutual ties in \code{Ls[[1]]} and in
 it is replicated.}
 }
 \description{
-Mutuality
-}
-\details{
 In binary ERGMs, equal to the number of
 pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
 and \eqn{(j{\rightarrow}i)}{(j,i)} both exist. For valued ERGMs, equal to \eqn{\sum_{i<j} m(y_{i,j},y_{j,i})} ,
@@ -48,7 +45,7 @@ where \eqn{m} is determined by \code{form} argument:
 \item \code{"geometric"} for \eqn{\sqrt{y_{i,j}}\sqrt{y_{j,i}}}
 }
 
-See Krivitsky (2012) for a discussion of these statistics. \code{form="threshold"} simply
+@details See Krivitsky (2012) for a discussion of these statistics. \code{form="threshold"} simply
 computes the binary \code{mutuality} after thresholding at \code{threshold} .
 
 This term can only be used with directed networks.

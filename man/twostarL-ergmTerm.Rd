@@ -37,9 +37,6 @@ be distinct. That is, the constituent edges may not be coincident or
 reciprocal.}
 }
 \description{
-Multilayer two-star
-}
-\details{
 This term adds one statistic to the model, equal to the number of
 cross-layer two-stars or two-paths in
 the network.

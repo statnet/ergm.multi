@@ -13,9 +13,6 @@ whose dependence is being modeled. A dot ( \code{.} ) stands for all
 layers in the network.}
 }
 \description{
-Conway--Maxwell-Binomial dependence among layers
-}
-\details{
 Models marginal dependence layers within each dyad by imposing
 a Conway--Maxwell-Binomial (CMB) distribution on the number of
 layers in each dyad that have a tie.
@@ -24,7 +21,8 @@ The term adds one statistic to the model, equalling the sum over
 all the dyads in the network of \eqn{\log\{E!(R-E)!/R!\}} , where
 \eqn{E} is the number of layers in \code{Ls} with an edge in that
 dyad and \eqn{R} being the total number of layers in \code{Ls} .
-
+}
+\details{
 A positive coefficient induces positive dependence and a negative
 one induces negative dependence.
 }

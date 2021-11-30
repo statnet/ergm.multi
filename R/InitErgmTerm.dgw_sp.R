@@ -197,8 +197,7 @@ no_layer_err <- function(instead){
 
 #' @templateVar name despL
 #' @title Directed edgewise shared partners
-#' @description Directed edgewise shared partners
-#' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible.
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: despL(d, type="OTP", L.base=NULL, Ls.path=NULL, L.in_order=FALSE)
@@ -273,8 +272,7 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
 
 #' @templateVar name dgwespL
 #' @title Geometrically weighted edgewise shared partner distribution
-#' @description Geometrically weighted edgewise shared partner distribution
-#' @details : This term adds a statistic equal to the geometrically weighted edgewise (not dyadwise) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
+#' @description This term adds a statistic equal to the geometrically weighted edgewise (not dyadwise) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
 #'
 #'   See term `desp` for layer specification information.
 #'
@@ -379,10 +377,9 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 
 #' @templateVar name ddspL
 #' @title Directed dyadwise shared partners
-#' @description Directed dyadwise shared partners
-#' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of dyads in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of dyads in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
 #'
-#'   While there is only one shared partner configuration in the undirected case, nine distinct configurations are possible for directed graphs. Currently, edgewise shared partner terms may be defined with respect to five of these configurations; they are defined here as follows (using terminology from Butts (2008) and the `relevent` package):
+#' @details While there is only one shared partner configuration in the undirected case, nine distinct configurations are possible for directed graphs. Currently, edgewise shared partner terms may be defined with respect to five of these configurations; they are defined here as follows (using terminology from Butts (2008) and the `relevent` package):
 #'   1) *Outgoing Two-path (OTP)* vertex \eqn{k} is an OTP shared partner of ordered pair \eqn{(i,j)} iff \eqn{i \to k \to j}{i->k->j}. Also known as "transitive shared partner".
 #'   2) *Incoming Two-path (ITP)* vertex \eqn{k} is an ITP shared partner of ordered pair \eqn{(i,j)} iff \eqn{j \to k \to i}{j->k->i}. Also known as "cyclical shared partner"
 #'   3) *Outgoing Shared Partner (OSP)* vertex \eqn{k} is an OSP shared partner of ordered pair \eqn{(i,j)} iff \eqn{i \to k, j \to k}{i->k, j->k}.
@@ -463,8 +460,7 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
 
 #' @templateVar name dgwdspL
 #' @title Geometrically weighted dyadwise shared partner distribution
-#' @description Geometrically weighted dyadwise shared partner distribution
-#' @details This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to employ (see `ddsp` for definitions). By default, outgoing two-paths are employed.
+#' @description This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to employ (see `ddsp` for definitions). By default, outgoing two-paths are employed.
 #'
 #'   See term `ddsp` for layer specification information.
 #'
@@ -576,8 +572,7 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 
 #' @templateVar name dnspL
 #' @title Directed non-edgewise shared partners
-#' @description Directed non-edgewise shared partners
-#' @details This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possibl.
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possibl.
 #'
 #'   See term `desp` for layer specification information.
 #'
@@ -648,8 +643,7 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
 
 #' @templateVar name dgwnspL
 #' @title Geometrically weighted non-edgewise shared partner distribution
-#' @description Geometrically weighted non-edgewise shared partner distribution
-#' @details This term is just like gwesp and gwdsp except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
+#' @description This term is just like gwesp and gwdsp except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
 #'
 #'   See term `desp` for layer specification information.
 #'

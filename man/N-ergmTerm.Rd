@@ -23,9 +23,6 @@ parameters to help identify the term (which may have similar
 predictors but, say, a different network subset) in the output.}
 }
 \description{
-Evaluation on multiple networks
-}
-\details{
 Evaluates the terms in \code{formula} on each of the networks joined
 using \code{\link{Networks}} function, and returns either a weighted
 sum or an \code{\link{lm}} -style linear model for the ERGM

@@ -24,9 +24,6 @@ value of the attribute.}
 \code{i} is considered to be the number of edges in all layers, combined.}
 }
 \description{
-In-degree
-}
-\details{
 This term adds one network statistic to
 the model for each element in \code{d} ; the \eqn{i} th such statistic equals
 the number of nodes in the network of in-degree \code{d[i]} , i.e. the number
