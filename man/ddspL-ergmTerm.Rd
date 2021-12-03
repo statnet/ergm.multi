@@ -8,11 +8,9 @@
 # binary: ddspL(d, type="OTP", Ls.path=NULL, L.in_order=FALSE)
 }
 \description{
-Directed dyadwise shared partners
+This term adds one network statistic to the model for each element in \code{d} where the \eqn{i} th such statistic equals the number of dyads in the network with exactly \code{d[i]} shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the \code{type} argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
 }
 \details{
-This term adds one network statistic to the model for each element in \code{d} where the \eqn{i} th such statistic equals the number of dyads in the network with exactly \code{d[i]} shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the \code{type} argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
-
 While there is only one shared partner configuration in the undirected case, nine distinct configurations are possible for directed graphs. Currently, edgewise shared partner terms may be defined with respect to five of these configurations; they are defined here as follows (using terminology from Butts (2008) and the \code{relevent} package):
 \enumerate{
 \item \emph{Outgoing Two-path (OTP)} vertex \eqn{k} is an OTP shared partner of ordered pair \eqn{(i,j)} iff \eqn{i \to k \to j}{i->k->j}. Also known as "transitive shared partner".

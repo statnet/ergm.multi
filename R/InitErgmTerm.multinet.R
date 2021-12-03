@@ -142,8 +142,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #' @import tibble
 #' @templateVar name N
 #' @title Evaluation on multiple networks
-#' @description Evaluation on multiple networks
-#' @details Evaluates the terms in `formula` on each of the networks joined
+#' @description Evaluates the terms in `formula` on each of the networks joined
 #'   using [`Networks`] function, and returns either a weighted
 #'   sum or an [`lm`] -style linear model for the ERGM
 #'   coefficients. Its syntax follows that of [`lm`] closely,

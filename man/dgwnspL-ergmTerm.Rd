@@ -26,9 +26,6 @@ and the second must be the second; otherwise, any ordering counts,
 provided there is exactly one of each. (For types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the one incident on the tail of the base tie.)}
 }
 \description{
-Geometrically weighted non-edgewise shared partner distribution
-}
-\details{
 This term is just like gwesp and gwdsp except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
 
 See term \code{desp} for layer specification information.

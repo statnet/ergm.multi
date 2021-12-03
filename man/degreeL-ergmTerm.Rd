@@ -26,9 +26,6 @@ value of the attribute.}
 combined.}
 }
 \description{
-Degree
-}
-\details{
 This term adds one
 network statistic to the model for each element in \code{d} ; the \eqn{i} th
 such statistic equals the number of nodes in the network of degree

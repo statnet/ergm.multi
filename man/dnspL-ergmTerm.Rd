@@ -23,9 +23,6 @@ and the second must be the second; otherwise, any ordering counts,
 provided there is exactly one of each. (For types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the one incident on the tail of the base tie.)}
 }
 \description{
-Directed non-edgewise shared partners
-}
-\details{
 This term adds one network statistic to the model for each element in \code{d} where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly \code{d[i]} shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possibl.
 
 See term \code{desp} for layer specification information.

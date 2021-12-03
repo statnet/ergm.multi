@@ -8,9 +8,6 @@
 # binary: L(formula, Ls=~.)
 }
 \description{
-Evaluation on layers
-}
-\details{
 Evaluates the terms in \code{formula} on an actual or logical layers
 specified in formula \code{Ls} and sums the results. \code{Ls} is a
 one-sided formula with terms separated by \code{+} operators, and

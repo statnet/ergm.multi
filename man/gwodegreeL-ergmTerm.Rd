@@ -30,9 +30,6 @@ combined.}
 \item{Ls}{TODO}
 }
 \description{
-Geometrically weighted out-degree distribution
-}
-\details{
 This term adds one network statistic to the model
 equal to the weighted out-degree distribution with decay parameter . This
 term can only be used with directed networks.

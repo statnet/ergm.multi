@@ -19,9 +19,6 @@ value of the given attribute.}
 combined.}
 }
 \description{
-Degree for the second mode in a bipartite (aka two-mode) network
-}
-\details{
 This term adds one network statistic to the model for
 each element in \code{d} ; the \eqn{i} th such statistic equals the number of
 nodes of degree \code{d[i]} in the second mode of a bipartite network, i.e.

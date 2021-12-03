@@ -30,9 +30,6 @@ combined.}
 \item{Ls}{TODO}
 }
 \description{
-Geometrically weighted degree distribution for the first mode in a bipartite (aka two-mode) network
-}
-\details{
 This term adds one network statistic to the model equal to the weighted
 degree distribution with decay controlled by the \code{decay} parameter, which should be non-negative,
 for nodes in the
