@@ -431,7 +431,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], summ$pearson[csel], col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
       }
       abline(h=0, lty=3, col="gray")
     }
@@ -441,7 +441,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], sqrt(abs(summ$pearson[csel])), col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
       }
       abline(h=0, lty=3, col="gray")
     }
