@@ -60,7 +60,7 @@ eval(UPDATE_MY_SCTRL_EXPR)
 }
 
 .RegisterKeywords <- function() {
-  ergm_keyword(name="layer-aware", short="layer", description="This term operates on multilayer network constructs", popular=TRUE, package="ergm.multi")
+  ergm_keyword(name="layer-aware", short="layer", description="operates on multilayer network constructs", popular=TRUE, package="ergm.multi")
 }
 
 #' @useDynLib ergm.multi
