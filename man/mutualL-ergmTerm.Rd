@@ -46,7 +46,7 @@ where \eqn{m} is determined by \code{form} argument:
 }
 
 @details See Krivitsky (2012) for a discussion of these statistics. \code{form="threshold"} simply
-computes the binary \code{mutuality} after thresholding at \code{threshold} .
+computes the binary \code{mutuality} after thresholding at \code{threshold}.
 
 This term can only be used with directed networks.
 }
