@@ -36,19 +36,9 @@ it is replicated.}
 \description{
 In binary ERGMs, equal to the number of
 pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
-and \eqn{(j{\rightarrow}i)}{(j,i)} both exist. For valued ERGMs, equal to \eqn{\sum_{i<j} m(y_{i,j},y_{j,i})} ,
-where \eqn{m} is determined by \code{form} argument:
-\itemize{
-\item \code{"min"} for \eqn{\min(y_{i,j},y_{j,i})}
-\item \code{"nabsdiff"} for \eqn{-|y_{i,j},y_{j,i}|}
-\item \code{"product"} for \eqn{y_{i,j}y_{j,i}}
-\item \code{"geometric"} for \eqn{\sqrt{y_{i,j}}\sqrt{y_{j,i}}}
-}
+and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
 
-@details See Krivitsky (2012) for a discussion of these statistics. \code{form="threshold"} simply
-computes the binary \code{mutuality} after thresholding at \code{threshold}.
-
-This term can only be used with directed networks.
+@details This term can only be used with directed networks.
 }
 \concept{directed}
 \concept{frequently-used}
