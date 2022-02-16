@@ -1,5 +1,5 @@
 --------------------------------------------------
-License for the 'statnet' component package 'ergm'
+License for the 'statnet' component package 'ergm.multi'
 --------------------------------------------------
 
 This software is distributed under the GPL-3 license.  It is free,
@@ -36,7 +36,7 @@ Martina Morris, University of Washington
 
 The 'statnet' development team
 
-Copyright 2003-2020
+Copyright 2003-2022
 
 
 Other contributors
