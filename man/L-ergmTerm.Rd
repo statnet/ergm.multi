@@ -7,6 +7,9 @@
 \usage{
 # binary: L(formula, Ls=~.)
 }
+\arguments{
+\item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}
+}
 \description{
 Evaluates the terms in \code{formula} on an actual or logical layers
 specified in formula \code{Ls} and sums the results. \code{Ls} is a

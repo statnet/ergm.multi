@@ -26,19 +26,15 @@ parameter is not affected by \code{diff}.}
 \item{keep}{a numerical vector to specify which statistics should be kept whenever the \code{mutual} term would
 ordinarily result in multiple statistics.}
 
-\item{Ls}{a list of two layer logic formulas or a single layer logic formula.
-If given, the statistic will count the number of dyads where a tie in
-\code{Ls[[1]]} reciprocates a tie in \code{Ls[[2]]} and vice
-versa. (Note that dyad that has mutual ties in \code{Ls[[1]]} and in
-\code{Ls[[2]]} will add 2 to this statistic.) If a formula is given,
-it is replicated.}
+\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of one or two Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation). If given, the statistic will count the number of dyads where a tie in \code{Ls[[1]]} reciprocates a tie in \code{Ls[[2]]} and vice versa. (Note that dyad that has mutual ties in \code{Ls[[1]]} and in \code{Ls[[2]]} will add 2 to this statistic.) If a formula is given, it is replicated.}
 }
 \description{
 In binary ERGMs, equal to the number of
 pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
 and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
-
-@details This term can only be used with directed networks.
+}
+\details{
+This term can only be used with directed networks.
 }
 \concept{directed}
 \concept{frequently-used}

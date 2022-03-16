@@ -8,9 +8,7 @@
 # binary: CMBL(Ls=~.)
 }
 \arguments{
-\item{Ls}{a list of one-sided formulas indicating the layers
-whose dependence is being modeled. A dot ( \code{.} ) stands for all
-layers in the network.}
+\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of at least two Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation).}
 }
 \description{
 Models marginal dependence layers within each dyad by imposing

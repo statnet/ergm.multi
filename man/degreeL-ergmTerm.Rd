@@ -21,9 +21,7 @@ If \code{by} is specified and
 statistics are calculated for nodes having each separate
 value of the attribute.}
 
-\item{Ls}{if specified, degree of a node
-\code{i} is considered to be the number of edges in all layers,
-combined.}
+\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of one or more Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation). If specified, degree of a node \code{i} is considered to be the number of edges in all layers, combined.}
 }
 \description{
 This term adds one

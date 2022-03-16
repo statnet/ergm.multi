@@ -54,13 +54,23 @@ In order to fit a model for multilayer
 networks, first use \code{\link{Layer}} construct an LHS network that
 \code{\link{ergm}} will understand as multilayered.
 
-Used on the formula directly, most, but not all, terms included in this
-package will sum their statistics over the layers.
+Used in the formula directly, most, but not all, \code{ergm} terms will
+sum their statistics over the observed layers.
 
-Some terms are \emph{layer-aware}. These terms have explicit (usually
-optional) layer specification arguments. For other terms, an operator
-\code{L(formula, Ls=~.)} can be used to specify to which layer(s) they
-apply. Layer specification documentation follows.
+Some terms are \emph{layer-aware}, however. By convention, layer-aware
+terms have capital \code{L} appended to them. For example,
+\code{\link[=mutualL-ergmTerm]{mutualL}} is a layer-aware generalization of
+\code{\link[=mutual-ergmTerm]{mutual}}. These terms have one or more explicit
+(usually optional) layer specification arguments. By convention, an
+argument that requires one layer specification is named \verb{L=} and
+one that requires a list of specifications (constructed by \code{\link[=list]{list()}}
+or \code{\link[=c]{c()}}) is named \verb{Ls=}; and a specification of the form \code{~.} is a
+placeholder for all observed layers.
+
+Operator \code{\link[=L-ergmTerm]{L(formula, Ls=...)}} can be used to evaluate
+arbitrary terms in the \code{formula} on specified layers.
+
+Layer specification documentation follows.
 \subsection{Layer Logic}{
 
 Each formula's right-hand side describes an observed layer \emph{or} some
@@ -95,10 +105,11 @@ graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.
 
 \subsection{Summing layers}{
 
-Some terms combine multiple layers. I that case al ist of formulas may be
-passed. For example, \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))}
-produces the number of edges in layer 1 plus the number of edges in layer 2
-but not in layer 1.
+Some of the terms that call for a list of layers (i.e., have \verb{Ls=}
+arguments) will sum the statistic over the layers. For example,
+\code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))} produces the
+number of edges in layer 1 plus the number of edges in layer 2 but
+not in layer 1.
 
 For these formulas, one can specify the layer's weight on its left-handside.
 For example, \code{Layer(nw1,nw2)~L(~edges, c(3~`1`,-1~(`2`&!`1`)))} will
@@ -184,5 +195,5 @@ summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
 
 }
 \seealso{
-\link[=ergm-terms]{Help on model specification} for specific terms.
+\link[=ergmTerm]{Help on model specification} for specific terms.
 }

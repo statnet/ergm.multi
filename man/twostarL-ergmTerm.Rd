@@ -8,7 +8,7 @@
 # binary: twostarL(Ls, type, distinct=TRUE)
 }
 \arguments{
-\item{Ls}{specifies the two layers of interest}
+\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of two Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation){} specifying the layers of interest.}
 
 \item{type}{determines what is counted:
 \enumerate{

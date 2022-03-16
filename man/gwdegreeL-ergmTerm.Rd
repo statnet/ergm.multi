@@ -25,7 +25,7 @@ burden. Its default value can also be controlled by the \code{gw.cutoff} term op
 
 \item{levels}{TODO}
 
-\item{Ls}{layers specification}
+\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of one or more Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation).}
 
 \item{dir}{vector of directions}
 }

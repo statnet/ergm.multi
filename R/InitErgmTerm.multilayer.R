@@ -233,13 +233,23 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' networks, first use [`Layer`] construct an LHS network that
 #' [`ergm`] will understand as multilayered.
 #'
-#' Used on the formula directly, most, but not all, terms included in this
-#' package will sum their statistics over the layers.
+#' Used in the formula directly, most, but not all, `ergm` terms will
+#' sum their statistics over the observed layers.
 #'
-#' Some terms are *layer-aware*. These terms have explicit (usually
-#' optional) layer specification arguments. For other terms, an operator
-#' `L(formula, Ls=~.)` can be used to specify to which layer(s) they
-#' apply. Layer specification documentation follows.
+#' Some terms are *layer-aware*, however. By convention, layer-aware
+#' terms have capital `L` appended to them. For example,
+#' [`mutualL`][mutualL-ergmTerm] is a layer-aware generalization of
+#' [`mutual`][mutual-ergmTerm]. These terms have one or more explicit
+#' (usually optional) layer specification arguments. By convention, an
+#' argument that requires one layer specification is named `L=` and
+#' one that requires a list of specifications (constructed by [list()]
+#' or [c()]) is named `Ls=`; and a specification of the form `~.` is a
+#' placeholder for all observed layers.
+#'
+#' Operator [`L(formula, Ls=...)`][L-ergmTerm] can be used to evaluate
+#' arbitrary terms in the `formula` on specified layers.
+#'
+#' Layer specification documentation follows.
 #'
 #' ## Layer Logic
 #'
@@ -274,17 +284,18 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' ## Summing layers
 #'
-#' Some terms combine multiple layers. I that case al ist of formulas may be
-#' passed. For example, \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))}
-#' produces the number of edges in layer 1 plus the number of edges in layer 2
-#' but not in layer 1.
+#' Some of the terms that call for a list of layers (i.e., have `Ls=`
+#' arguments) will sum the statistic over the layers. For example,
+#' \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))} produces the
+#' number of edges in layer 1 plus the number of edges in layer 2 but
+#' not in layer 1.
 #'
 #' For these formulas, one can specify the layer's weight on its left-handside.
 #' For example, \code{Layer(nw1,nw2)~L(~edges, c(3~`1`,-1~(`2`&!`1`)))} will
 #' produce three times the number of edges in layer 1, minus the number of
 #' edges in layer 2 but not in layer 1.
 #'
-#' @seealso [Help on model specification][ergm-terms] for specific terms.
+#' @seealso [Help on model specification][ergmTerm] for specific terms.
 #' 
 #' @examples
 #'
@@ -803,6 +814,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 #' @usage
 #' # binary: L(formula, Ls=~.)
 #'
+#' @template ergmTerm-formula
 #' @template ergmTerm-general
 #'
 #' @concept operator
@@ -858,9 +870,9 @@ InitErgmTerm.L <- function(nw, arglist, ...){
 #'
 #' @usage
 #' # binary: CMBL(Ls=~.)
-#' @param Ls a list of one-sided formulas indicating the layers
-#'   whose dependence is being modeled. A dot ( `.` ) stands for all
-#'   layers in the network.
+#' @templateVar Ls.howmany at least two
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
@@ -991,7 +1003,9 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 #'   number of terms in computing the statistics to reduce the computational
 #'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
 #' @param levels TODO
-#' @param Ls layers specification
+#' @templateVar Ls.howmany one or more
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
 #' @param dir vector of directions
 #'
 #'
@@ -1061,7 +1075,9 @@ InitErgmTerm.gwdegreeL<-function(nw, arglist,  ...) {
 #'
 #' @usage
 #' # binary: twostarL(Ls, type, distinct=TRUE)
-#' @param Ls specifies the two layers of interest
+#' @templateVar Ls.howmany two
+#' @templateVar Ls.interp {} specifying the layers of interest.
+#' @template ergmTerm-Ls
 #' @param type determines what is counted:
 #'   1) *"any"* Number of configurations
 #'   \eqn{(i-j), (i-k)}{(i,j), (i,k)} , where

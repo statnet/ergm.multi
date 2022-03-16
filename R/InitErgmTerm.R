@@ -329,9 +329,9 @@ InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
 #'   `homophily` is `FALSE` (the default), then separate degree
 #'   statistics are calculated for nodes having each separate
 #'   value of the attribute.
-#' @param Ls if specified, degree of a node
-#'   `i` is considered to be the number of edges in all layers,
-#'   combined.
+#' @templateVar Ls.howmany one or more
+#' @templateVar Ls.interp . If specified, degree of a node `i` is considered to be the number of edges in all layers, combined.
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
@@ -426,7 +426,9 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 #' @param levels a list of layer specifications. If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
-#' @param Ls TODO
+#' @templateVar Ls.howmany one or more
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
@@ -517,7 +519,9 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 #' @param levels a list of layer specifications. If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
-#' @param Ls TODO
+#' @templateVar Ls.howmany one or more
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
@@ -758,7 +762,9 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 #' @param levels a list of layer specifications. If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
-#' @param Ls TODO
+#' @templateVar Ls.howmany one or more
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
@@ -907,7 +913,7 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 #'   pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
 #'   and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
 #'
-#'  @details This term can only be used with directed networks.
+#' @details This term can only be used with directed networks.
 #'
 #' @usage
 #' # binary: mutualL(same=NULL, diff=FALSE, by=NULL, keep=NULL, Ls=NULL)
@@ -925,12 +931,9 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 #'   parameter is not affected by `diff`.
 #' @param keep a numerical vector to specify which statistics should be kept whenever the `mutual` term would
 #'   ordinarily result in multiple statistics.
-#' @param Ls a list of two layer logic formulas or a single layer logic formula.
-#'   If given, the statistic will count the number of dyads where a tie in
-#'   `Ls[[1]]` reciprocates a tie in `Ls[[2]]` and vice
-#'   versa. (Note that dyad that has mutual ties in `Ls[[1]]` and in
-#'   `Ls[[2]]` will add 2 to this statistic.) If a formula is given,
-#'   it is replicated.
+#' @templateVar Ls.howmany one or two
+#' @templateVar Ls.interp . If given, the statistic will count the number of dyads where a tie in `Ls[[1]]` reciprocates a tie in `Ls[[2]]` and vice versa. (Note that dyad that has mutual ties in `Ls[[1]]` and in `Ls[[2]]` will add 2 to this statistic.) If a formula is given, it is replicated.
+#' @template ergmTerm-Ls
 #'
 #' @template ergmTerm-general
 #'
