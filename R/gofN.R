@@ -11,32 +11,6 @@
   l
 }
 
-# l must be a list with three elements (in this specific order):
-# * running sample size
-# * running mean
-# * running sum squared deviations
-Welford_update <- function(l, x){
-  if(is.numeric(x)){ # Either a vector or a matrix with statistics in rows.
-    xm <- rbind(x)
-    for(r in seq_len(nrow(xm))){
-      x <- xm[r,]
-      n.prev <- l[[1]]
-      l[[1]] <- n.new <- n.prev + 1
-      m.prev <- l[[2]]
-      l[[2]] <- m.new <- m.prev + (x-m.prev)/n.new
-      l[[3]] <- l[[3]] + (x-m.prev)*(x-m.new)
-    }
-  }else{ # Multielement update: both l and x are lists
-    l.n <- l[[1]]; x.n <- x[[1]]; l[[1]] <- n.new <- l.n + x.n
-    l.m <- l[[2]]; x.m <- x[[2]]
-    d <- x.m - l.m
-    # In our application, n for x and n for l are going to be similar, so we use weighted average.
-    l[[2]] <- (l.n*l.m + x.n*x.m)/n.new
-    l[[3]] <- l[[3]] + x[[3]] + d*d*l.n*x.n/n.new
-  }
-  l
-}
-
 #' Linear model diagnostics for multinetwork linear models
 #'
 #' @param object an [`ergm`] object.
@@ -196,7 +170,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
       message("")
       if(save_stats) sim <- do.call(rbind, sim) else rm(sim)
       
-      SST <- Reduce(Welford_update, SST)
+      SST <- Reduce(update, SST)
       MV <- colMeans(do.call(rbind, MV))
       message("")
     }
@@ -276,8 +250,7 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
                     numeric = length(monitored),
                     logical = sum(monitored))
 
-  # Welford's algorithm setup
-  SST <- list(0L, numeric(nstats), numeric(nstats))
+  SST <- Welford(nstats)
 
   sim.s_settings$control$MCMC.samplesize <- first_nsim
   o <- with(sim.s_settings, ergm_MCMC_sample(object, control, coef))
@@ -285,7 +258,7 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
   sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
 
   if(save_stats) sim[[1L]] <- sim1
-  SST <- Welford_update(SST, sim1)
+  SST <- update(SST, sim1)
   rm(sim1)
 
   for(rerun in seq_len(nreruns)){
@@ -296,7 +269,7 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
     sim1 <- as.matrix(o$stats)[,monitored,drop=FALSE]
 
     if(save_stats) sim[[rerun+1L]] <- sim1
-    SST <- Welford_update(SST, sim1)
+    SST <- update(SST, sim1)
     rm(sim1)
   }
 
@@ -318,8 +291,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
                     numeric = length(monitored),
                     logical = sum(monitored))
   MV <- numeric(nstats)
-  # Welford's algorithm setup
-  SST <- list(0L, numeric(nstats), numeric(nstats))
+  SST <- Welford(nstats)
 
   for(i in seq_len(n_cond)){
     # First, simulate a realisation of the unconstrained network.
@@ -334,7 +306,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
     sim1 <- with(sim.s.obs_settings, as.matrix(ergm_MCMC_sample(object, control, coef)$stats)[,monitored,drop=FALSE])
     if(save_stats) sim[[i]] <- sim1
 
-    SST <- Welford_update(SST, sim1)
+    SST <- update(SST, sim1)
     MV <- MV + (.col_var(sim1) - MV)/i
 
     message(".", appendLF=FALSE)

@@ -45,7 +45,7 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
     message("Simulating unconstrained sample.")
     sim <- do.call(simulate, .update.list(sim.m_settings, list(monitor=gof.m)))
     sim <- sim[,monitored,drop=FALSE]
-    SST <- list(nrow(sim), colMeans(sim), .col_var(sim))
+    SST <- Welford(nrow(sim), colMeans(sim), .col_var(sim))
     if(!save_stats) suppressWarnings(rm(sim))
   }
 
@@ -81,7 +81,7 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
       message("")
       if(save_stats) sim <- do.call(rbind, sim) else rm(sim)
       
-      SST <- Reduce(Welford_update, SST)
+      SST <- Reduce(update, SST)
       MV <- colMeans(do.call(rbind, MV))
       message("")
     }
@@ -103,14 +103,14 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
   }
 
   # Calculate variances for each network and statistic.
-  v <- SST[[3]]/(SST[[1]]-1)
+  v <- var(SST)
   vo <- if(control$obs.twostage) MV else .col_var(sim.obs)
   # If any statistic for the network has negative variance estimate, stop with an error.
   remain <- any(v>0 & v-vo<=0)
   if(any(remain))
     stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
-  m <- SST[[2]]
+  m <- mean(SST)
   mo <- colMeans(sim.obs)
 
   suppressWarnings(rm(sim, sim.obs))
