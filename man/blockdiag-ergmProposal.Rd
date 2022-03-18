@@ -3,9 +3,9 @@
 \name{blockdiag-ergmProposal}
 \alias{blockdiag-ergmProposal}
 \alias{InitErgmProposal.blockdiag}
-\title{MHp for diagonal block constraints}
+\title{A Metropolis--Hastings proposal for diagonal block constraints}
 \description{
-MHp for \eqn{constraints= ~blockdiag}. Select a diagonal
+Typically used for \eqn{constraints= ~blockdiag}. Select a diagonal
 block according to the weight, then randomly select a dayd within the
 block for the toggle proposal.
 }

@@ -142,8 +142,8 @@ ergm_block_diag_samp_info <- function(nw, a){
 
 #' @templateVar name blockdiag
 #' @aliases InitErgmProposal.blockdiag
-#' @title MHp for diagonal block constraints
-#' @description MHp for \eqn{constraints= ~blockdiag}. Select a diagonal
+#' @title A Metropolis--Hastings proposal for diagonal block constraints
+#' @description Typically used for \eqn{constraints= ~blockdiag}. Select a diagonal
 #'   block according to the weight, then randomly select a dayd within the
 #'   block for the toggle proposal.
 #' @template ergmProposal-general
@@ -156,9 +156,13 @@ InitErgmProposal.blockdiag <- function(arguments, nw){
 
 #' @templateVar name blockdiagTNT
 #' @aliases InitErgmProposal.blockdiagTNT
-#' @title MHp for blockdiag constraints
-#' @description MHp for \eqn{constraints= ~blockdiag}. Similar to InitErgmProposal.blockdiag, except that it selects ties
-#'   and non-ties for proposed toggles (in the block by construction) with equal probability.  Like the unconstrained TNT proposal, this is useful for improving performance in sparse networks.
+#' @title A Metropolis--Hastings proposal for diagonal block constraints
+#' @description Typically used for \eqn{constraints=
+#'   ~blockdiag}. Similar to InitErgmProposal.blockdiag, except that
+#'   it selects ties and non-ties for proposed toggles (in the block
+#'   by construction) with equal probability.  Like the unconstrained
+#'   TNT proposal, this is useful for improving performance in sparse
+#'   networks.
 #' @template ergmProposal-general
 NULL
 

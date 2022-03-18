@@ -3,10 +3,14 @@
 \name{blockdiagTNT-ergmProposal}
 \alias{blockdiagTNT-ergmProposal}
 \alias{InitErgmProposal.blockdiagTNT}
-\title{MHp for blockdiag constraints}
+\title{A Metropolis--Hastings proposal for diagonal block constraints}
 \description{
-MHp for \eqn{constraints= ~blockdiag}. Similar to InitErgmProposal.blockdiag, except that it selects ties
-and non-ties for proposed toggles (in the block by construction) with equal probability.  Like the unconstrained TNT proposal, this is useful for improving performance in sparse networks.
+Typically used for \eqn{constraints=
+  ~blockdiag}. Similar to InitErgmProposal.blockdiag, except that
+it selects ties and non-ties for proposed toggles (in the block
+by construction) with equal probability.  Like the unconstrained
+TNT proposal, this is useful for improving performance in sparse
+networks.
 }
 \details{
 \if{html}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsHtml(ergm:::.buildProposalsList(proposal="blockdiagTNT"))}}
