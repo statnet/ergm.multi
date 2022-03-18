@@ -10,13 +10,14 @@
 \arguments{
 \item{d}{a vector of distinct integers}
 
-\item{by}{If this is specified
+\item{by}{a character string giving the name of an attribute in the network's vertex
+attribute list. If this is specified
 then each node's degree is tabulated only with other nodes having the same
-value of the given attribute.}
+value of the \code{by} attribute.}
 
-\item{levels}{a list of layer specifications. If given, degree of a node
-\code{i} is considered to be the number of edges in all layers,
-combined.}
+\item{levels}{if \code{by} is specified, which levels to consider.}
+
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}). If given, degree of a node}
 }
 \description{
 This term adds one network statistic to the model for

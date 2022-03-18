@@ -37,8 +37,8 @@ list will be recycled up to the number of layers.}
 A network object with layer metadata.
 }
 \description{
-A function for specifying the LHS of a multilayer (a.k.a. multiplex
-a.k.a. multirelational a.k.a. multivariate) ERGM.
+A function for specifying the LHS of a multilayer (a.k.a. multiplex,
+a.k.a. multirelational, a.k.a. multivariate) ERGM.
 }
 \note{
 The resulting network will be the "least common denominator"
@@ -62,9 +62,9 @@ terms have capital \code{L} appended to them. For example,
 \code{\link[=mutualL-ergmTerm]{mutualL}} is a layer-aware generalization of
 \code{\link[=mutual-ergmTerm]{mutual}}. These terms have one or more explicit
 (usually optional) layer specification arguments. By convention, an
-argument that requires one layer specification is named \verb{L=} and
+argument that requires one layer specification is named \code{L=} and
 one that requires a list of specifications (constructed by \code{\link[=list]{list()}}
-or \code{\link[=c]{c()}}) is named \verb{Ls=}; and a specification of the form \code{~.} is a
+or \code{\link[=c]{c()}}) is named \code{Ls=}; and a specification of the form \code{~.} is a
 placeholder for all observed layers.
 
 Operator \code{\link[=L-ergmTerm]{L(formula, Ls=...)}} can be used to evaluate
@@ -105,7 +105,7 @@ graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.
 
 \subsection{Summing layers}{
 
-Some of the terms that call for a list of layers (i.e., have \verb{Ls=}
+Some of the terms that call for a list of layers (i.e., have \code{Ls=}
 arguments) will sum the statistic over the layers. For example,
 \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))} produces the
 number of edges in layer 1 plus the number of edges in layer 2 but

@@ -177,15 +177,17 @@ GWDECAY <- list(
 #'   This term can only be used with undirected bipartite networks.
 #'
 #' @usage
-#' # binary: b1degreeL(d, by=NULL, levels=NULL)
+#' # binary: b1degreeL(d, by=NULL, levels=NULL, Ls=NULL)
 #' @param d a vector of distinct integers.
 #' @param by a character string giving the name of an attribute in the network's vertex
 #'   attribute list. If this is specified
 #'   then each node's degree is tabulated only with other nodes having the same
 #'   value of the `by` attribute.
-#' @param levels a list of layer specifications. If given, degree of a node
+#' @param levels if `by` is specified, which levels to consider.
+#' @templateVar Ls.interp . If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
+#' @template ergmTerm-Ls-1
 #'
 #' @template ergmTerm-general
 #'
@@ -250,12 +252,15 @@ InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
 #' @usage
 #' # binary: b2degree(d, by=NULL)
 #' @param d a vector of distinct integers
-#' @param by If this is specified
+#' @param by a character string giving the name of an attribute in the network's vertex
+#'   attribute list. If this is specified
 #'   then each node's degree is tabulated only with other nodes having the same
-#'   value of the given attribute.
-#' @param levels a list of layer specifications. If given, degree of a node
+#'   value of the `by` attribute.
+#' @param levels if `by` is specified, which levels to consider.
+#' @templateVar Ls.interp . If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
+#' @template ergmTerm-Ls-1
 #'
 #' @template ergmTerm-general
 #'
@@ -762,9 +767,8 @@ InitErgmTerm.gwidegreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
 #' @param levels a list of layer specifications. If given, degree of a node
 #'   `i` is considered to be the number of edges in all layers,
 #'   combined.
-#' @templateVar Ls.howmany one or more
 #' @templateVar Ls.interp .
-#' @template ergmTerm-Ls
+#' @template ergmTerm-Ls-1
 #'
 #' @template ergmTerm-general
 #'
@@ -842,8 +846,11 @@ InitErgmTerm.gwodegreeL<-function(nw, arglist, gw.cutoff=30, ...) {
 #'   Otherwise (the default), then separate degree
 #'   statistics are calculated for nodes having each separate
 #'   value of the attribute.
-#' @param levels a list of layer specifications. If given, degree of a node
-#'   `i` is considered to be the number of edges in all layers, combined.
+#' @param levels if `by` is specified, which levels to consider.
+#' @templateVar Ls.interp . If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @template ergmTerm-Ls-1
 #'
 #' @template ergmTerm-general
 #'
@@ -1047,6 +1054,11 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 #'   `homophily` is `FALSE` (the default), then separate degree
 #'   statistics are calculated for nodes having each separate
 #'   value of the attribute.
+#' @param levels if `by` is specified, which levels to consider.
+#' @templateVar Ls.interp . If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @template ergmTerm-Ls-1
 #' @param levels list of layer specifications
 #'
 #' @template ergmTerm-general

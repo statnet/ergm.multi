@@ -20,8 +20,9 @@ Otherwise (the default), then separate degree
 statistics are calculated for nodes having each separate
 value of the attribute.}
 
-\item{levels}{a list of layer specifications. If given, degree of a node
-\code{i} is considered to be the number of edges in all layers, combined.}
+\item{levels}{if \code{by} is specified, which levels to consider.}
+
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}). If given, degree of a node}
 }
 \description{
 This term adds one network statistic to

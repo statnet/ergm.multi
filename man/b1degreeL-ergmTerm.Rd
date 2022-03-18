@@ -5,7 +5,7 @@
 \alias{InitErgmTerm.b1degreeL}
 \title{Degree for the first mode in a bipartite (aka two-mode) network}
 \usage{
-# binary: b1degreeL(d, by=NULL, levels=NULL)
+# binary: b1degreeL(d, by=NULL, levels=NULL, Ls=NULL)
 }
 \arguments{
 \item{d}{a vector of distinct integers.}
@@ -15,9 +15,9 @@ attribute list. If this is specified
 then each node's degree is tabulated only with other nodes having the same
 value of the \code{by} attribute.}
 
-\item{levels}{a list of layer specifications. If given, degree of a node
-\code{i} is considered to be the number of edges in all layers,
-combined.}
+\item{levels}{if \code{by} is specified, which levels to consider.}
+
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}). If given, degree of a node}
 }
 \description{
 This term adds one network statistic to the model for

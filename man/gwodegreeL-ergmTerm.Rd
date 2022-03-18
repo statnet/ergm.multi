@@ -27,7 +27,7 @@ burden. Its default value can also be controlled by the \code{gw.cutoff} term op
 \code{i} is considered to be the number of edges in all layers,
 combined.}
 
-\item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of one or more Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation).}
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}).}
 }
 \description{
 This term adds one network statistic to the model

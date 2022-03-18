@@ -9,13 +9,13 @@
 }
 \arguments{
 \item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}
+
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}), on which to evaluate \code{formula}}
 }
 \description{
-Evaluates the terms in \code{formula} on an actual or logical layers
-specified in formula \code{Ls} and sums the results. \code{Ls} is a
-one-sided formula with terms separated by \code{+} operators, and
-corresponding statistics for each layer specification is summed
-up. A dot ( \code{.} ) stands for summing all layers.
+Evaluates the terms in \code{formula} on an observed or
+logical layers specified in formula \code{Ls} and sums the results
+elementwise.
 }
 \concept{layer-aware}
 \concept{operator}

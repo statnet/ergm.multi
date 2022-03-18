@@ -21,6 +21,8 @@ If \code{by} is specified and
 statistics are calculated for nodes having each separate
 value of the attribute.}
 
+\item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}). If given, degree of a node}
+
 \item{levels}{list of layer specifications}
 }
 \description{

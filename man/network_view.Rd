@@ -57,7 +57,7 @@ Filtering arguments are specified the same way as attribute
 arguments, but they must be named arguments (i.e., must be passed
 without the \code{=}) and must return a logical or numeric vector
 suitable for indexing the edge list. Multiple filtering arguments
-will be specified, and the edge will be kept if it satisfise
+may be specified, and the edge will be kept if it satisfies
 \emph{all}. If the conjunction of the edge's original states and the
 filtering results is ambiguous (i.e., \code{NA}), it will be set as
 missing.

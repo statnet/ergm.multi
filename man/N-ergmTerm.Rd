@@ -37,7 +37,7 @@ with sensible defaults. The default formula ( \code{~1} ) sums the
 specified network statistics. If \code{lm} refers to any
 network attributes for which some networks have missing values, the
 term will stop with an error. This can be avoided by pre-filtering
-with \code{subset} , which controls which networks are affected by
+with \code{subset}, which controls which networks are affected by
 the term.
 }
 \note{

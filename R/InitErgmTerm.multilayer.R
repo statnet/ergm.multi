@@ -75,7 +75,7 @@
 #' arguments, but they must be named arguments (i.e., must be passed
 #' without the `=`) and must return a logical or numeric vector
 #' suitable for indexing the edge list. Multiple filtering arguments
-#' will be specified, and the edge will be kept if it satisfise
+#' may be specified, and the edge will be kept if it satisfies
 #' *all*. If the conjunction of the edge's original states and the
 #' filtering results is ambiguous (i.e., `NA`), it will be set as
 #' missing.
@@ -190,8 +190,8 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 
 #' A multilayer network representation.
 #'
-#' A function for specifying the LHS of a multilayer (a.k.a. multiplex
-#' a.k.a. multirelational a.k.a. multivariate) ERGM.
+#' A function for specifying the LHS of a multilayer (a.k.a. multiplex,
+#' a.k.a. multirelational, a.k.a. multivariate) ERGM.
 #'
 #' @param ... layer specification, in one of three formats:
 #' 
@@ -241,9 +241,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' [`mutualL`][mutualL-ergmTerm] is a layer-aware generalization of
 #' [`mutual`][mutual-ergmTerm]. These terms have one or more explicit
 #' (usually optional) layer specification arguments. By convention, an
-#' argument that requires one layer specification is named `L=` and
+#' argument that requires one layer specification is named \code{L=} and
 #' one that requires a list of specifications (constructed by [list()]
-#' or [c()]) is named `Ls=`; and a specification of the form `~.` is a
+#' or [c()]) is named \code{Ls=}; and a specification of the form `~.` is a
 #' placeholder for all observed layers.
 #'
 #' Operator [`L(formula, Ls=...)`][L-ergmTerm] can be used to evaluate
@@ -284,7 +284,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' ## Summing layers
 #'
-#' Some of the terms that call for a list of layers (i.e., have `Ls=`
+#' Some of the terms that call for a list of layers (i.e., have \code{Ls=}
 #' arguments) will sum the statistic over the layers. For example,
 #' \code{Layer(nw1,nw2)~L(~edges, c(~`1`,~(`2`&!`1`)))} produces the
 #' number of edges in layer 1 plus the number of edges in layer 2 but
@@ -805,16 +805,16 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 
 #' @templateVar name L
 #' @title Evaluation on layers
-#' @description Evaluates the terms in `formula` on an actual or logical layers
-#'   specified in formula `Ls` and sums the results. `Ls` is a
-#'   one-sided formula with terms separated by `+` operators, and
-#'   corresponding statistics for each layer specification is summed
-#'   up. A dot ( `.` ) stands for summing all layers.
+#' @description Evaluates the terms in `formula` on an observed or
+#'   logical layers specified in formula `Ls` and sums the results
+#'   elementwise.
 #'
 #' @usage
 #' # binary: L(formula, Ls=~.)
 #'
 #' @template ergmTerm-formula
+#' @templateVar Ls.interp , on which to evaluate `formula`
+#' @template ergmTerm-Ls-1
 #' @template ergmTerm-general
 #'
 #' @concept operator
@@ -915,6 +915,10 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 #'   statistics are calculated for nodes having each separate
 #'   value of the attribute.
 #' @param dir vector specifying direction
+#' @templateVar Ls.interp . If given, degree of a node
+#'   `i` is considered to be the number of edges in all layers,
+#'   combined.
+#' @template ergmTerm-Ls-1
 #'
 #' @template ergmTerm-general
 #'
@@ -1003,9 +1007,8 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
 #'   number of terms in computing the statistics to reduce the computational
 #'   burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
 #' @param levels TODO
-#' @templateVar Ls.howmany one or more
 #' @templateVar Ls.interp .
-#' @template ergmTerm-Ls
+#' @template ergmTerm-Ls-1
 #' @param dir vector of directions
 #'
 #'

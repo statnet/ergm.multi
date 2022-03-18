@@ -150,7 +150,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   specified network statistics. If `lm` refers to any
 #'   network attributes for which some networks have missing values, the
 #'   term will stop with an error. This can be avoided by pre-filtering
-#'   with `subset` , which controls which networks are affected by
+#'   with `subset`, which controls which networks are affected by
 #'   the term.
 #'
 #' @note Care should be taken to avoid multicollinearity when using this operator. When `lm` is given a model with intercept and a categorical predictor (including a [`logical`] one), it will use the first level (or `FALSE` ) as the baseline, but if the model is without intercept, it will use all levels of the first categorical predictor. This is typically what is wanted in a linear regression, but for the `N` operator, this can be problematic if the "intercept" effect is added by a different term. A workaround is to convert the categorical predictor to dummy variables before putting it into the `lm` formula.
