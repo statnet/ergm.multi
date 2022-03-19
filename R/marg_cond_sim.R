@@ -1,6 +1,16 @@
-#' An experimental function for calculating gofN()-style Pearson residuals for arbitrary statistics.
+#' Calculate gofN()-style Pearson residuals for arbitrary statistics
 #'
-#' It should probably be moved to `ergm`, perhaps integrated into the `simulate` methods.
+#' This function is to be considered experimental. Do NOT rely on
+#' it. It may, eventually, be moved to `ergm`, perhaps integrated into
+#' the `simulate` methods.
+#'
+#' @param object an [`ergm`] object.
+#' @param nsim number of realizations.
+#' @param obs.twostage,GOF,save_stats see [gofN()].
+#' @param control a control list returned by [control.simulate.ergm()].
+#' @param ... additional arguments to [ergm_model()], [simulate.ergm()], and [summary.ergm_model()].
+#'
+#' @return an object of similar structure as that returned by [gofN()].
 #' @export
 marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.simulate.ergm(), save_stats=FALSE, ...){
   check.control.class(c("simulate.ergm"), "marg_cond_sim")

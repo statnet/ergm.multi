@@ -2,7 +2,7 @@
 % Please edit documentation in R/marg_cond_sim.R
 \name{marg_cond_sim}
 \alias{marg_cond_sim}
-\title{An experimental function for calculating gofN()-style Pearson residuals for arbitrary statistics.}
+\title{Calculate gofN()-style Pearson residuals for arbitrary statistics}
 \usage{
 marg_cond_sim(
   object,
@@ -14,6 +14,22 @@ marg_cond_sim(
   ...
 )
 }
+\arguments{
+\item{object}{an \code{\link{ergm}} object.}
+
+\item{nsim}{number of realizations.}
+
+\item{obs.twostage, GOF, save_stats}{see \code{\link[=gofN]{gofN()}}.}
+
+\item{control}{a control list returned by \code{\link[=control.simulate.ergm]{control.simulate.ergm()}}.}
+
+\item{...}{additional arguments to \code{\link[=ergm_model]{ergm_model()}}, \code{\link[=simulate.ergm]{simulate.ergm()}}, and \code{\link[=summary.ergm_model]{summary.ergm_model()}}.}
+}
+\value{
+an object of similar structure as that returned by \code{\link[=gofN]{gofN()}}.
+}
 \description{
-It should probably be moved to \code{ergm}, perhaps integrated into the \code{simulate} methods.
+This function is to be considered experimental. Do NOT rely on
+it. It may, eventually, be moved to \code{ergm}, perhaps integrated into
+the \code{simulate} methods.
 }
