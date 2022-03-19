@@ -621,7 +621,7 @@ lm.gofN <- function(formula, data, ...){
 
   lapply(lhsl, function(lhs, ...){
     formula[[2]] <- as.name(lhs)
-    data.all$.weights <- ws[[lhs]]
+    .weights <- data.all$.weights <- ws[[lhs]]
     lm(formula, data=data.all, weights=.weights, ...)
   }, ...) %>% set_names(lhsl)
 }
