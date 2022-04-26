@@ -30,7 +30,8 @@ gofN(
   id.n = 3,
   main = "{type} for {sQuote(name)}",
   xlab = NULL,
-  ylim = NULL
+  ylim = NULL,
+  cex.id = 0.75
 )
 
 \method{summary}{gofN}(object, by = NULL, ...)
@@ -76,6 +77,8 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 \item{xlab}{Horizontal axis label; defaults to a character representation of \code{against}.}
 
 \item{ylim}{Vertical range for the plots, interpreted as in \code{\link[graphics:plot.default]{graphics::plot()}}; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the \verb{which=} argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.}
+
+\item{cex.id}{Scaling factor for characters used to label extreme points; see \code{\link[=plot.lm]{plot.lm()}}.}
 
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }

@@ -345,6 +345,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @param main A template for the plots' titles; these use [glue()]'s templating, with `{type}` replaced with the type of plot and `{name}` replaced with the statistic.
 #' @param xlab Horizontal axis label; defaults to a character representation of `against`.
 #' @param ylim Vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
+#' @param cex.id Scaling factor for characters used to label extreme points; see [plot.lm()].
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage
 #' @importFrom graphics abline panel.smooth plot text
@@ -353,7 +354,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #'
 #' @seealso [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters
 #' @export
-plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL){
+plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
   if(ask){
     prev.ask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(prev.ask))
@@ -402,7 +403,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], summ$pearson[csel], col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel]*cex.id, ...)
       }
       abline(h=0, lty=3, col="gray")
     }
@@ -412,7 +413,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
       for(c in unique(col)){
         csel <- col==c
         panel.smooth(NVL(againstval,summ$fitted)[csel], sqrt(abs(summ$pearson[csel])), col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel], ...)
+        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel]*cex.id, ...)
       }
       abline(h=0, lty=3, col="gray")
     }
