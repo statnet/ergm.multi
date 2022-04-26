@@ -10,7 +10,7 @@
 #' @import ergm
 #' @import network
 #' @import statnet.common
-#' @rawNamespace import(stats, except=c(var))
+#' @import stats
 ## #' @import rlang
 
 .onAttach <- function(libname, pkgname){

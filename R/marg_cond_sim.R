@@ -113,14 +113,14 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
   }
 
   # Calculate variances for each network and statistic.
-  v <- var(SST)
+  v <- SST$vars
   vo <- if(control$obs.twostage) MV else .col_var(sim.obs)
   # If any statistic for the network has negative variance estimate, stop with an error.
   remain <- any(v>0 & v-vo<=0)
   if(any(remain))
     stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
-  m <- mean(SST)
+  m <- SST$means
   mo <- colMeans(sim.obs)
 
   suppressWarnings(rm(sim, sim.obs))

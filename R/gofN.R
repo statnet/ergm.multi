@@ -182,9 +182,8 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
     SST.obs <- attr(sim.obs, "SST")
     if(!save_stats) rm(sim.obs)
   }else{
-    SST.obs <- list(0, summary(pernet.m, object$network, ...))
-    SST.obs[[3]] <- numeric(length(SST.obs[[2]]))
-    if(save_stats) sim.obs <- matrix(SST.obs[[2]], control$nsim, nparam(pernet.m, canonical=TRUE), byrow=TRUE)
+    SST.obs <- Welford(2, summary(pernet.m, object$network, ...), numeric(nparam(pernet.m, canonical=TRUE)))
+    if(save_stats) sim.obs <- matrix(SST.obs$means, control$nsim, nparam(pernet.m, canonical=TRUE), byrow=TRUE)
     suppressWarnings(rm(pernet.m))
   }
   message("Collating the simulations.")
@@ -197,15 +196,15 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   }
 
   # Calculate variances for each network and statistic.
-  v <- SST[[3]]/(SST[[1]]-1)
-  vo <- if(control$obs.twostage) MV else SST.obs[[3]]/(SST.obs[[1]]-1)
+  v <- SST$vars
+  vo <- if(control$obs.twostage) MV else SST.obs$vars
   # If any statistic for the network has negative variance estimate, stop with an error.
   remain <- v>0 & v-vo<=0
   if(any(remain))
     stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
 
-  m <- SST[[2]]
-  mo <- SST.obs[[2]]
+  m <- SST$means
+  mo <- SST.obs$means
 
   suppressWarnings(rm(sim, sim.obs))
 
