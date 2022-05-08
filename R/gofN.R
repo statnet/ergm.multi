@@ -337,8 +337,8 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @describeIn gofN A plotting method, making residual and scale-location plots.
 #'
 #' @param x a [`gofN`] object.
-#' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values. The formula may also contain a `.fitted` variable which will be substituted with the fitted values.
-#' @param col,pch,cex vector of values (wrapped in [I()]), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.
+#' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values. The formula may also contain a `.fitted` variable which will be substituted with the fitted values. Factor values are visualised using boxplots.
+#' @param col,pch,cex,bg vector of values (wrapped in [I()]), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.
 #' @param which which to plot (`1` for residuals plot, `2` for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and `3` for normal quantile-quantile plot).
 #' @param ask whether the user should be prompted between the plots.
 #' @param id.n Number of extreme points to label explicitly.
@@ -354,7 +354,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #'
 #' @seealso [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters
 #' @export
-plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
+plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
   if(ask){
     prev.ask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(prev.ask))
@@ -375,7 +375,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
                      despace(deparse(substitute(against),width.cutoff=500L))))
 
   np <- sum(attr(x,"subset"))
-  for(gpar in c("col", "pch", "cex")){
+  for(gpar in c("col", "bg", "pch", "cex")){
     a <- get(gpar)
     a <- switch(class(a),
                 AsIs = a,
@@ -386,36 +386,75 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, ..., ask 
     assign(gpar, a)
   }
 
+  add.multismooth <- function(x, y, w, col, n){
+    for(c in unique(col)){
+      csel <- col == c
+      lofit <- suppressWarnings(loess(y~x, weights=w, subset=csel, ...))
+      xnew <- seq(from=min(x[csel],na.rm=TRUE), to=max(x[csel],na.rm=TRUE), length.out=ceiling(n*diff(range(x[csel],na.rm=TRUE))/diff(range(x,na.rm=TRUE))))
+      lines(xnew, predict(lofit, newdata=data.frame(x=xnew)), col=c)
+    }
+  }
+
+  points.smooth <- function(x, y, w, col, bg, pch, cex, cex.id, main, xlab, ylab, ylim, col.smooth=col, id=NA, n=101, ...){
+    id <- rep_len(id, length(x))
+    toID <- !is.na(id)
+    col <- rep_len(col, length(x))
+    plot(x, y, pch=pch, col=ifelse(toID, NA, col), bg=bg, cex=cex, main=main, xlab=xlab, ylab=ylab, ylim=ylim, type="p", ...)
+    if(any(toID)) text(x[toID], y[toID], col=col[toID], label=id[toID], cex=cex[toID]*cex.id, ...)
+
+    add.multismooth(x, y, w, col.smooth, n)
+
+    abline(h=0, lty=3, col="gray")
+  }
+
+  boxplot.smooth <- function(x, y, w, col, bg, pch, cex, cex.id, main, xlab, ylab, ylim, col.bp=unique(col), id=NA, n=101, ...){
+    id <- rep_len(id, length(x))
+    toID <- !is.na(id)
+    col <- rep_len(col, length(x))
+    colID <- match(col, col.bp)
+    nc <- length(col.bp)
+    nx <- length(unique(x))
+    ys <- split(y, list(colID,x))
+    ymap <- as.numeric(interaction(list(colID,x)))
+    xs <- rep(seq_len(nx)-1, each=nc) * (nc*1.5) + rep(seq_len(nc), nx)
+    boxplot(ys, varwidth=TRUE, border=rep_len(col.bp, length(ys)), lty=1, col=rep_len(adjustcolor(col.bp,alpha.f=0.5), length(ys)), pch=pch, at=xs, main=main, xlab=xlab, ylab=ylab, ylim=ylim, xaxt="n")
+    axis(1, at=tapply(xs, rep(seq_len(nx), each=nc), mean), labels=levels(x))
+
+    if(any(toID)){
+      # Ugly hack: overplot the points with white before adding text.
+      points(xs[ymap[toID]], y[toID], col="white", pch=19, cex=1.1)
+      text(xs[ymap[toID]], y[toID], col=col[toID], label=id[toID], cex=cex[toID]*cex.id)
+    }
+
+    xscl <- tapply(xs, rep(seq_len(nx), each=nc), mean)[match(x, sort(unique(x)))]
+    add.multismooth(xscl, y, w, col, n)
+
+    abline(h=0, lty=3, col="gray")
+  }
+
   for(name in names(x)){
     summ <- x[[name]]
     againstval <- switch(class(against),
+                         AsIs = {nattrs$.fitted <- summ$fitted; against},
                          character = {nattrs$.fitted <- summ$fitted; nattrs[[against]]},
                          formula = {nattrs$.fitted <- summ$fitted; eval(ult(against), envir = nattrs, enclos = environment(against))},
                          against)
 
-    
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
 
+    NVL(againstval) <- summ$fitted
+    resid.plotter <- if(is.factor(againstval)) boxplot.smooth else points.smooth
+
+    w <- 1/(summ$var - summ$var.obs)
+
     if(1L %in% which){
-      plot(NVL(againstval,summ$fitted), summ$pearson, col=col, pch=pch, cex=cex,..., main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.",type="n", ylim=ylim[[1L]])
-      for(c in unique(col)){
-        csel <- col==c
-        panel.smooth(NVL(againstval,summ$fitted)[csel], summ$pearson[csel], col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], summ$pearson[ei&csel], col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel]*cex.id, ...)
-      }
-      abline(h=0, lty=3, col="gray")
+      resid.plotter(againstval, summ$pearson, w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, seq_along(summ$pearson), NA), main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.", ylim=ylim[[1L]], ...)
     }
     
     if(2L %in% which){
-      plot(NVL(againstval,summ$fitted), sqrt(abs(summ$pearson)), col=col, pch=pch, cex=cex,..., main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), type="n", ylim=ylim[[2L]])
-      for(c in unique(col)){
-        csel <- col==c
-        panel.smooth(NVL(againstval,summ$fitted)[csel], sqrt(abs(summ$pearson[csel])), col=col[csel], col.smooth=c, pch=ifelse(ei, NA, pch)[csel], cex=cex[csel], ...)
-        if(any(ei&csel)) text(NVL(againstval,summ$fitted)[ei&csel], sqrt(abs(summ$pearson[ei&csel])), col=col[ei&csel], label=seq_along(summ$pearson)[ei&csel], cex=cex[ei&csel]*cex.id, ...)
-      }
-      abline(h=0, lty=3, col="gray")
+      resid.plotter(againstval, sqrt(abs(summ$pearson)), w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, seq_along(summ$pearson), NA), main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), ylim=ylim[[2L]], ...)
     }
 
     if(3L %in% which){

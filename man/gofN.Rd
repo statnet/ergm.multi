@@ -25,6 +25,7 @@ gofN(
   col = 1,
   pch = 1,
   cex = 1,
+  bg = 0,
   ...,
   ask = length(which) > 1 && dev.interactive(TRUE),
   id.n = 3,
@@ -62,11 +63,11 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 
 \item{drop}{whether the indexing operator should drop attributes and return simply a list.}
 
-\item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values. The formula may also contain a \code{.fitted} variable which will be substituted with the fitted values.}
+\item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values. The formula may also contain a \code{.fitted} variable which will be substituted with the fitted values. Factor values are visualised using boxplots.}
 
 \item{which}{which to plot (\code{1} for residuals plot, \code{2} for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and \code{3} for normal quantile-quantile plot).}
 
-\item{col, pch, cex}{vector of values (wrapped in \code{\link[=I]{I()}}), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.}
+\item{col, pch, cex, bg}{vector of values (wrapped in \code{\link[=I]{I()}}), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.}
 
 \item{ask}{whether the user should be prompted between the plots.}
 
