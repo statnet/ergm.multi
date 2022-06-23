@@ -483,6 +483,56 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
   }
 }
 
+
+autoplot.gofN <- function(x, against=.fitted, which=1:2, mapping=aes(), id.n=3, main="{type} for {sQuote(name)}"){
+  against <- substitute(against)
+  nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
+
+  xlab <- substitute(against)
+  xlab <- deparse1(do.call(substitute, list(xlab, list(.fitted=as.name("Fitted values")))))
+
+  np <- sum(attr(x,"subset"))
+
+  for(name in names(x)){
+    summ <- x[[name]]
+    nattrs$.fitted <- summ$fitted
+    nattrs$.pearson <- summ$pearson
+    nattrs$.observed <- summ$observed
+    nattrs$.var <- summ$var
+    nattrs$.var.obs <- summ$var.obs
+
+    nn <- sum(!is.na(summ$pearson))
+    ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
+    ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
+
+    w <- 1/(summ$var - summ$var.obs)
+
+    againstval <- eval(against, envir = nattrs, enclos = parent.frame())
+
+    plots <- list()
+
+    if(1L %in% which){
+      o <- ggplot(nattrs, modifyList(eval(substitute(aes(x=.against, y=.pearson), list(.against=against))), mapping))
+      if(is.factor(againstval)) o <- o + geom_boxplot()
+      else o <- o + geom_point() + geom_smooth()
+      o <- o + xlab(xlab) + ylab("Std. Pearson resid.")
+      o <- o + geom_text_repel(aes(label=ifelse(ei, seq_along(ei), "")))
+      plots <- c(plots, list(o))
+    }
+
+    if(2L %in% which){
+      o <- ggplot(nattrs, modifyList(eval(substitute(aes(x=.against, y=sqrt(abs(.pearson))), list(.against=against))), mapping))
+      if(is.factor(againstval)) o <- o + geom_boxplot()
+      else o <- o + geom_point() + geom_smooth()
+      o <- o + xlab(xlab) + ylab(expression(sqrt(abs("Std. Pearson resid."))))
+      o <- o + geom_text_repel(aes(label=ifelse(ei, seq_along(ei), "")))
+      plots <- c(plots, list(o))
+    }
+  }
+  if(length(plots)>1) new("ggmultiplot", plots = plots) else plots[[1]]
+}
+
+
 #' @describeIn gofN A simple summary function.
 #' @param by a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.
 #' @export
