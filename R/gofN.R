@@ -347,8 +347,8 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @param ylim Vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
 #' @param cex.id Scaling factor for characters used to label extreme points; see [plot.lm()].
 #' 
-#' @importFrom grDevices dev.interactive devAskNewPage
-#' @importFrom graphics abline panel.smooth plot text
+#' @importFrom grDevices dev.interactive devAskNewPage adjustcolor
+#' @importFrom graphics abline panel.smooth plot text axis boxplot lines points
 #' @importFrom methods is
 #' @importFrom glue glue
 #'
