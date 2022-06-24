@@ -10,8 +10,8 @@
 #'
 #' @return A network object with multinetwork metadata.
 #'
-#' @seealso [Help on model specification][ergm-terms] for specific terms.
-#' 
+#' @seealso [Help on model specification][ergmTerm] for specific terms
+#' @seealso `vignette("Goeyvaerts_reproduction")` for a demonstration
 #' @examples
 #'
 #' data(samplk)
@@ -49,15 +49,6 @@ Networks <- function(...){
 
   nw
 }
-
-## InitErgmTerm..layer.nets <- function(nw, arglist, ...){
-##   a <- check.ErgmTerm(nw, arglist,
-##                       varnames = c(),
-##                       vartypes = c(),
-##                       defaultvalues = list(),
-##                       required = c())
-##   list(name="_layer_nets", coef.names=c(), inputs=unlist(.layer_vertexmap(nw)), dependence=FALSE)
-## }
 
 InitErgmTerm..subnets <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,

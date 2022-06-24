@@ -3,12 +3,13 @@ Version: 0.9-4058
 Date: 2022-06-24
 Title: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 Authors@R: c(person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")))
-Depends: ergm (>= 4.2), network (>= 1.17)
+Depends: R (>= 3.5.0), ergm (>= 4.2), network (>= 1.17)
 Imports: statnet.common (>= 4.6.0), rlang, purrr (>= 0.2.4), tibble (>= 1.4.2), Matrix, methods, parallel, glue, rle
 LinkingTo: ergm
 Suggests: 
     rmarkdown,
     knitr,
+    dplyr,
     testthat
 BugReports: https://github.com/statnet/ergm.multi/issues
 Description: A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm' is a part of the Statnet suite of packages for network analysis.
