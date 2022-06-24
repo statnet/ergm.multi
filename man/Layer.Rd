@@ -44,7 +44,7 @@ a.k.a. multirelational, a.k.a. multivariate) ERGM.
 The resulting network will be the "least common denominator"
 network: if not all layers have the same bipartedness, all layers
 will appear as unipartite to the statistics, and if any are
-directed, all will be. However, \link[=ergm-terms]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
+directed, all will be. However, \link[=ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 }

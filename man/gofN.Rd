@@ -44,7 +44,7 @@ gofN(
 statistics whose goodness of fit to test, or \code{\link{NULL}}; if \code{NULL},
 uses the original model.}
 
-\item{subset}{argument for the \code{\link[=ergm-terms]{N}} term.}
+\item{subset}{argument for the \code{\link[=N-ergmTerm]{N}} term.}
 
 \item{control}{See \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}.}
 

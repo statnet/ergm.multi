@@ -5,7 +5,7 @@
 \alias{InitErgmConstraint.blockdiag}
 \title{Block-diagonal structure constraint}
 \usage{
-# blockdiag(attrname)
+# blockdiag(attr)
 }
 \arguments{
 \item{attr}{quantitative attribute (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
@@ -13,7 +13,7 @@
 \description{
 Force a block-diagonal structure (and its bipartite analogue) on
 the network. Only dyads \eqn{(i,j)} for which
-\code{attrname(i)==attrname(j)} can have edges.
+\code{attr(i)==attr(j)} can have edges.
 
 Note that the current implementation requires that blocks be
 contiguous for unipartite graphs, and for bipartite
@@ -23,7 +23,9 @@ require that all blocks be represented in both partitions, but
 those that overlap must have the same order.)
 
 If multiple block-diagonal constraints are given, or if
-\code{attrname} is a vector with multiple attribute names, blocks
+\code{attr} is a vector with multiple attribute names, blocks
 will be constructed on all attributes matching.
 }
+\concept{directed}
 \concept{dyad-independent}
+\concept{undirected}
