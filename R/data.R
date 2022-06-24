@@ -48,3 +48,83 @@
 #' @seealso `vignette("Goeyvaerts_reproduction")` for a vignette reproducing the Goeyvaerts analysis and performing diagnostics
 #' @keywords datasets
 "Goeyvaerts"
+
+
+#' A network of advice, collaboration, and friendship in a law firm
+#'
+#' This dataset contains a [`network`] of relations of various types
+#' among 71 lawyers (partners and associates) in a New England
+#' (Northeastern US) corporate law firm referred to as \dQuote{SG&R}
+#' collected 1988--1991 by Lazega (2001).
+#'
+#' All relations are directed.
+#'
+#' @section Nonstandard Vertex Attributes: \describe{
+#'
+#' \item{`age`}{(numeric) the lawyer's age.}
+#'
+#' \item{`gender`}{(character) the lawyer's gender (`"man"`/`"woman"`).}
+#'
+#' \item{`office`}{(character) in which of the firm's three offices the lawyer is based (`"Boston"`/`"Hartford"`/`"Providence"`).}
+#'
+#' \item{`practice`}{(character) which area of law the lawyer practices (`"corporate"`/`"litigation"`).}
+#'
+#' \item{`school`}{(character) from which law school the lawyer graduated (`"Harvard/Yale"`/`"UConnecticut"`/`"other"`).}
+#'
+#' \item{`seniority`}{(numeric) the lawyer's seniority rank in the firm (1 = high).}
+#'
+#' \item{`status`}{(character) the lawyer's status in the firm (`"associate"`/`"partner"`).}
+#'
+#' \item{`yrs_frm`}{(numeric) the number of years the lawyer has been with the firm.}
+#'
+#' }
+#'
+#' @section Nonstandard Edge Attributes: Each directed edge
+#'   \eqn{i\rightarrow j}{i -> j} has the following attributes:
+#'   \describe{
+#'
+#' \item{`advice`}{(logical) whether \eqn{i} has reported receiving advice from \eqn{j}. (Note that as defined, advice flows from head of the directed edge to the tail.)}
+#'
+#' \item{`coworker`}{(logical) whether \eqn{i} has reported receiving \eqn{j}'s assistance in preparing documents. (Note that as defined, assistance flows from head of the directed edge to the tail.)}
+#'
+#' \item{`friendship`}{(logical) whether \eqn{i} considers {j} a friend outside of work.}
+#'
+#' }
+#'
+#' @usage data(Lazega)
+#' @docType data
+#' @section Licenses and Citation: When publishing results obtained
+#'   using this data set, the original author (Lazega 2001) should be
+#'   cited, along with this \R package.
+#' @references
+#'
+#' Pavel N. Krivitsky, Laura M. Koehly, and Christopher Steven Marcum
+#' (2020) Exponential-family Random Graph Models for Multi-layer
+#' Networks. *Psychometrika*, 85(3):
+#' 630-659. \doi{10.1007/s11336-020-09720-7}
+#'
+#' Emmanuel Lazega (2001). *The collegial phenomenon: The social
+#' mechanisms of cooperation among peers in a corporate law
+#' partnership.* New York: Oxford University Press.
+#'
+#' @source This version of the dataset was retrieved from the [RSiena
+#'   web site](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm)
+#'   and was compiled by Christopher Steven Marcum and Pavel
+#'   N. Krivitsky for Krivitsky et al. (2020).
+#'
+#' @examples
+#' \donttest{
+#' data(Lazega)
+#' # Construct a multilayer network for ergm(). (See `?Layer` for syntax.)
+#' LLazega <- Layer(Lazega, c("advice", "coworker", "friendship"))
+#' # Specify a layer logic model.
+#' efit <- ergm(LLazega ~ L(~edges + mutual, ~advice) +
+#'                        L(~edges + mutual, ~coworker) +
+#'                        L(~edges + mutual, ~friendship) +
+#'                        L(~edges + mutual, ~advice&coworker) +
+#'                        L(~edges + mutual, ~advice&friendship) +
+#'                        L(~edges + mutual, ~coworker&friendship))
+#' summary(efit)
+#' }
+#' @keywords datasets
+"Lazega"
