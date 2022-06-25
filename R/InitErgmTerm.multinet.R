@@ -163,6 +163,8 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #' @template ergmTerm-general
 #'
 #' @concept operator
+#' @concept directed
+#' @concept undirected
 InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
@@ -333,6 +335,25 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   }
 }
 
+
+#' @templateVar name ByNetDStats
+#' @title Evaluate the formula on each individual network
+#' @description Evaluates the terms in `formula` on each of the
+#'   networks joined using [`Networks`] function, and returns a vector
+#'   of its statistics for each network. This term is used internally
+#'   for model diagnostics, and should not, generally, be used in models.
+#'
+#' @usage
+#' # binary: N(formula, subset=TRUE)
+#' @template ergmTerm-formula
+#' @param subset see [lm()].
+#'
+#' @template ergmTerm-general
+#'
+#' @concept operator
+#' @concept directed
+#' @concept undirected
+#' @noRd
 InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "subset"),

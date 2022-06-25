@@ -43,4 +43,6 @@ the term.
 \note{
 Care should be taken to avoid multicollinearity when using this operator. When \code{lm} is given a model with intercept and a categorical predictor (including a \code{\link{logical}} one), it will use the first level (or \code{FALSE} ) as the baseline, but if the model is without intercept, it will use all levels of the first categorical predictor. This is typically what is wanted in a linear regression, but for the \code{N} operator, this can be problematic if the "intercept" effect is added by a different term. A workaround is to convert the categorical predictor to dummy variables before putting it into the \code{lm} formula.
 }
+\concept{directed}
 \concept{operator}
+\concept{undirected}
