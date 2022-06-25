@@ -54,7 +54,7 @@ different term. A workaround is to convert the categorical
 predictor to dummy variables before putting it into the \code{lm}
 formula.
 }
-\section{Fixing parameters}{
+\section{Offsets and fixing parameters}{
 
 
 By an \code{N(formula, lm)} term will add \eqn{p \times q}{p*q} free

@@ -180,7 +180,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   parameters to help identify the term (which may have similar
 #'   predictors but, say, a different network subset) in the output.
 #'
-#' @section Fixing parameters:
+#' @section Offsets and fixing parameters:
 #'
 #' By an `N(formula, lm)` term will add \eqn{p \times q}{p*q} free
 #' parameters, where \eqn{p} is the number of free parameters
@@ -267,6 +267,10 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   parnames <- colnames(xm)
   parnames <- ifelse(parnames=="(Intercept)", "1", parnames)
   names(params) <- ergm_mk_std_op_namewrap('N',a$label)(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)),parnames)
+  if(any(ms[[1]]$etamap$offsettheta))
+    ergm_Init_abort("The ERGM ", sQuote("formula="), " argument of an ", sQuote("N()"),
+                    " operator may not have offsets. See ", sQuote("ergmTerm?N"),
+                    " section on fixing parameters for details.")
   if(with(ms[[1]]$etamap,
           any(mintheta[!offsettheta]!=-Inf) || any(maxtheta[!offsettheta]!=+Inf))){
     warning("Submodel specified to N() operator with a linear model formula has parameter constraints. They will be ignored.")
