@@ -9,7 +9,9 @@
 ################################################################################
 #' A multinetwork network representation.
 #'
-#' A function for specifying the LHS of a multi-network (a.k.a. multilevel) ERGM.
+#' A function for specifying the LHS of a multi-network
+#' (a.k.a. multilevel) ERGM. Typically used in conjunction with the
+#' [`N()`][N-ergmTerm] term operator.
 #'
 #' @param ... network specification, in one of two formats:
 #' 
@@ -144,25 +146,27 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #' @title Evaluation on multiple networks
 #' @description Evaluates the terms in `formula` on each of the networks joined
 #'   using [`Networks`] function, and returns either a weighted
-#'   sum or an [`lm`] -style linear model for the ERGM
-#'   coefficients. Its syntax follows that of [`lm`] closely,
-#'   with sensible defaults. The default formula ( `~1` ) sums the
-#'   specified network statistics. If `lm` refers to any
-#'   network attributes for which some networks have missing values, the
-#'   term will stop with an error. This can be avoided by pre-filtering
-#'   with `subset`, which controls which networks are affected by
-#'   the term.
+#'   sum or an [`lm`]-style linear model for the ERGM
+#'   coefficients \insertCite{KrCo22t}{ergm.multi}. Its syntax follows that of [`lm`] closely,
+#'   with sensible defaults.
+#'
+#'
+#' The default formula (`~1`) sums the specified network
+#' statistics. If `lm` refers to any network attributes for which some
+#' networks have missing values, the term will stop with an
+#' error. This can be avoided by pre-filtering with `subset`, which
+#' controls which networks are affected by the term.
 #'
 #' @note Care should be taken to avoid multicollinearity when using
 #'   this operator. As with the [lm()] function, `lm` formulas have an
 #'   implicit intercept, which can be suppressed by specifying `~ 0 +
 #'   ...` or `~ -1 + ...` on the formula. When `lm` is given a model
 #'   with intercept and a categorical predictor (including a
-#'   [`logical`] one), it will use the first level (or `FALSE` ) as
-#'   the baseline, but if the model is without intercept, it will use
-#'   all levels of the first categorical predictor. This is typically
-#'   what is wanted in a linear regression, but for the `N` operator,
-#'   this can be problematic if the "intercept" effect is added by a
+#'   [`logical`] one), it will use the first level (or `FALSE`) as the
+#'   baseline, but if the model is without intercept, it will use all
+#'   levels of the first categorical predictor. This is typically what
+#'   is wanted in a linear regression, but for the `N` operator, this
+#'   can be problematic if the "intercept" effect is added by a
 #'   different term. A workaround is to convert the categorical
 #'   predictor to dummy variables before putting it into the `lm`
 #'   formula.
@@ -214,6 +218,8 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #' Then, setting the corresponding `offset.coef = 0` will fix the
 #' coefficient of `log(n)` for the decay parameter at 0, while
 #' allowing a constant decay parameter to be estimated.
+#'
+#' @references \insertAllCited{}
 #'
 #' @template ergmTerm-general
 #'

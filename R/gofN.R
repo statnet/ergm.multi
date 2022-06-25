@@ -22,6 +22,11 @@
 
 #' Linear model diagnostics for multinetwork linear models
 #'
+#' [gofN()] performs a simulation to obtain Pearson residuals for the
+#' multivariate linear model for ERGM parameters, which can then be
+#' used for a variety of diagnostics and diagnostic plots developed by
+#' \insertCite{KrCo22t;textual}{ergm.multi}.
+#'
 #' @param object an [`ergm`] object.
 #' @param GOF a one-sided [`ergm`] formula specifying network
 #'   statistics whose goodness of fit to test, or [`NULL`]; if `NULL`,
@@ -61,7 +66,9 @@
 #' 
 #' \item{control}{Control parameters passed.}
 #'
-#' @seealso [ergm::gof()] for single-network goodness-of-fit simulations in \pkg{ergm}
+#' @seealso [ergm::gof()] for single-network goodness-of-fit simulations in \CRANpkg{ergm}
+#'
+#' @references \insertAllCited{}
 #'
 #' @examples
 #' data(samplk)

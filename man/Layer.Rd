@@ -37,8 +37,9 @@ list will be recycled up to the number of layers.}
 A network object with layer metadata.
 }
 \description{
-A function for specifying the LHS of a multilayer (a.k.a. multiplex,
-a.k.a. multirelational, a.k.a. multivariate) ERGM.
+A function for specifying the LHS of a multilayer
+(a.k.a. multiplex, a.k.a. multirelational, a.k.a. multivariate)
+ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 }
 \note{
 The resulting network will be the "least common denominator"
@@ -75,7 +76,7 @@ Layer specification documentation follows.
 
 Each formula's right-hand side describes an observed layer \emph{or} some
 "logical" layer, whose ties are a function of corresponding ties in
-observed layers.
+observed layers. \insertCite{KrKo20e}{ergm.multi}
 
 The observed layers can be referenced either by name or by number (i.e.,
 order in which they were passed to \code{\link{Layer}}). When referencing by
@@ -193,6 +194,9 @@ summary(lnw~triangles)
 # view:
 summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
 
+}
+\references{
+\insertAllCited{}
 }
 \seealso{
 \link[=ergmTerm]{Help on model specification} for specific terms.

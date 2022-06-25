@@ -17,7 +17,9 @@ Networks(...)
 A network object with multinetwork metadata.
 }
 \description{
-A function for specifying the LHS of a multi-network (a.k.a. multilevel) ERGM.
+A function for specifying the LHS of a multi-network
+(a.k.a. multilevel) ERGM. Typically used in conjunction with the
+\code{\link[=N-ergmTerm]{N()}} term operator.
 }
 \examples{
 

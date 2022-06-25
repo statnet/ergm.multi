@@ -112,7 +112,10 @@ In addition, the following \code{\link{attr}}-style attributes are included:
 \item{control}{Control parameters passed.}
 }
 \description{
-Linear model diagnostics for multinetwork linear models
+\code{\link[=gofN]{gofN()}} performs a simulation to obtain Pearson residuals for the
+multivariate linear model for ERGM parameters, which can then be
+used for a variety of diagnostics and diagnostic plots developed by
+\insertCite{KrCo22t;textual}{ergm.multi}.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -152,8 +155,11 @@ fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
 }
 
 }
+\references{
+\insertAllCited{}
+}
 \seealso{
-\code{\link[ergm:gof]{ergm::gof()}} for single-network goodness-of-fit simulations in \pkg{ergm}
+\code{\link[ergm:gof]{ergm::gof()}} for single-network goodness-of-fit simulations in \CRANpkg{ergm}
 
 \code{\link[=plot.lm]{plot.lm()}}, \code{\link[graphics:plot.default]{graphics::plot()}} for regression diagnostic plots and their parameters
 }

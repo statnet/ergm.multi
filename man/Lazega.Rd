@@ -10,7 +10,7 @@ An object of class \code{network} of length 5.
 \source{
 This version of the dataset was retrieved from the \href{https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm}{RSiena web site}
 and was compiled by Christopher Steven Marcum and Pavel
-N. Krivitsky for Krivitsky et al. (2020).
+N. Krivitsky for \insertCite{KrKo20e;textual}{ergm.multi}.
 }
 \usage{
 data(Lazega)
@@ -19,7 +19,7 @@ data(Lazega)
 This dataset contains a \code{\link{network}} of relations of various types
 among 71 lawyers (partners and associates) in a New England
 (Northeastern US) corporate law firm referred to as \dQuote{SG&R}
-collected 1988--1991 by Lazega (2001).
+collected 1988--1991 by \insertCite{La01c;textual}{ergm.multi}.
 }
 \details{
 All relations are directed.
@@ -62,8 +62,9 @@ All relations are directed.
 
 \section{Licenses and Citation}{
  When publishing results obtained
-using this data set, the original author (Lazega 2001) should be
-cited, along with this \R package.
+using this data set, the original author
+\insertCite{La01c}{ergm.multi} should be cited, along with this
+\R package.
 }
 
 \examples{
@@ -82,13 +83,6 @@ summary(efit)
 }
 }
 \references{
-Pavel N. Krivitsky, Laura M. Koehly, and Christopher Steven Marcum
-(2020) Exponential-family Random Graph Models for Multi-layer
-Networks. \emph{Psychometrika}, 85(3):
-630-659. \doi{10.1007/s11336-020-09720-7}
-
-Emmanuel Lazega (2001). \emph{The collegial phenomenon: The social
-mechanisms of cooperation among peers in a corporate law
-partnership.} New York: Oxford University Press.
+\insertAllCited{}
 }
 \keyword{datasets}

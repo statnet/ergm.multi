@@ -10,9 +10,9 @@
 #' A sample of within-household contact networks in Flanders and Brussels
 #'
 #' This is a list of 318 [`network`] objects derived from contact
-#' diary data collected by by Goeyvaerts et al. (2018). The study
-#' recruited households in Flanders and Brussels-Capital region with
-#' at least one child 12 or under. The networks are symmetrized.
+#' diary data collected by by \insertCite{GoSa18h;textual}{ergm.multi}. The
+#' study recruited households in Flanders and Brussels-Capital region
+#' with at least one child 12 or under. The networks are symmetrized.
 #'
 #' @section Nonstandard Network Attributes: \describe{
 #'
@@ -36,22 +36,15 @@
 #' }
 #'
 #'
-#' @usage
-#' data(Goeyvaerts)
+#' @usage data(Goeyvaerts)
 #' @docType data
-#' @section Licenses and Citation: When publishing results obtained using this
-#' data set, the original authors (Goeyvaerts et al., 2018)
-#' should be cited, along with this \R package.
-#' @references
+#' @section Licenses and Citation: When publishing results obtained
+#'   using this data set, the original authors
+#'   \insertCite{GoSa18h}{ergm.multi} should be cited, along with this
+#'   \R package.
+#' @references \insertAllCited{}
 #'
-#' Nele Goeyvaerts, Eva Santermans, Gail Potter, Andrea Torneri, Kim
-#' V. Kerckhove, Lander Willem, Marc Aerts, Philippe Beutels & Niel
-#' Hens (2018) Household Members Do Not Contact Each Other at Random:
-#' Implications for Infectious Disease Modelling. *Proceedings of the
-#' Royal Society B: Biological Sciences*, 285(1893):
-#' 20182201. \doi{10.1098/rspb.2018.2201}
-#'
-#' @source The data were collected and by Goeyvaerts et al. and
+#' @source The data were collected and by \insertCite{GoSa18h;textual}{ergm.multi} and
 #'   curated by Pietro Coletti.
 #'
 #' @seealso `vignette("Goeyvaerts_reproduction")` for a vignette reproducing the Goeyvaerts analysis and performing diagnostics
@@ -64,7 +57,7 @@
 #' This dataset contains a [`network`] of relations of various types
 #' among 71 lawyers (partners and associates) in a New England
 #' (Northeastern US) corporate law firm referred to as \dQuote{SG&R}
-#' collected 1988--1991 by Lazega (2001).
+#' collected 1988--1991 by \insertCite{La01c;textual}{ergm.multi}.
 #'
 #' All relations are directed.
 #'
@@ -103,23 +96,15 @@
 #' @usage data(Lazega)
 #' @docType data
 #' @section Licenses and Citation: When publishing results obtained
-#'   using this data set, the original author (Lazega 2001) should be
-#'   cited, along with this \R package.
-#' @references
-#'
-#' Pavel N. Krivitsky, Laura M. Koehly, and Christopher Steven Marcum
-#' (2020) Exponential-family Random Graph Models for Multi-layer
-#' Networks. *Psychometrika*, 85(3):
-#' 630-659. \doi{10.1007/s11336-020-09720-7}
-#'
-#' Emmanuel Lazega (2001). *The collegial phenomenon: The social
-#' mechanisms of cooperation among peers in a corporate law
-#' partnership.* New York: Oxford University Press.
+#'   using this data set, the original author
+#'   \insertCite{La01c}{ergm.multi} should be cited, along with this
+#'   \R package.
+#' @references \insertAllCited{}
 #'
 #' @source This version of the dataset was retrieved from the [RSiena
 #'   web site](https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm)
 #'   and was compiled by Christopher Steven Marcum and Pavel
-#'   N. Krivitsky for Krivitsky et al. (2020).
+#'   N. Krivitsky for \insertCite{KrKo20e;textual}{ergm.multi}.
 #'
 #' @examples
 #' \donttest{

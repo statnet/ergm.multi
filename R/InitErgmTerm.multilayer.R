@@ -199,8 +199,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 
 #' A multilayer network representation.
 #'
-#' A function for specifying the LHS of a multilayer (a.k.a. multiplex,
-#' a.k.a. multirelational, a.k.a. multivariate) ERGM.
+#' A function for specifying the LHS of a multilayer
+#' (a.k.a. multiplex, a.k.a. multirelational, a.k.a. multivariate)
+#' ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 #'
 #' @param ... layer specification, in one of three formats:
 #' 
@@ -264,7 +265,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' Each formula's right-hand side describes an observed layer *or* some
 #' "logical" layer, whose ties are a function of corresponding ties in
-#' observed layers.
+#' observed layers. \insertCite{KrKo20e}{ergm.multi}
 #'
 #' The observed layers can be referenced either by name or by number (i.e.,
 #' order in which they were passed to [`Layer`]). When referencing by
@@ -305,6 +306,8 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' edges in layer 2 but not in layer 1.
 #'
 #' @seealso [Help on model specification][ergmTerm] for specific terms.
+#'
+#' @references \insertAllCited{}
 #' 
 #' @examples
 #'

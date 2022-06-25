@@ -11,6 +11,7 @@
 #' @import network
 #' @import statnet.common
 #' @import stats
+#' @importFrom Rdpack reprompt
 ## #' @import rlang
 
 .onAttach <- function(libname, pkgname){

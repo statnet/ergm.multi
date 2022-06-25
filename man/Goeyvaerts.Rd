@@ -8,7 +8,7 @@
 An object of class \code{list} of length 318.
 }
 \source{
-The data were collected and by Goeyvaerts et al. and
+The data were collected and by \insertCite{GoSa18h;textual}{ergm.multi} and
 curated by Pietro Coletti.
 }
 \usage{
@@ -16,9 +16,9 @@ data(Goeyvaerts)
 }
 \description{
 This is a list of 318 \code{\link{network}} objects derived from contact
-diary data collected by by Goeyvaerts et al. (2018). The study
-recruited households in Flanders and Brussels-Capital region with
-at least one child 12 or under. The networks are symmetrized.
+diary data collected by by \insertCite{GoSa18h;textual}{ergm.multi}. The
+study recruited households in Flanders and Brussels-Capital region
+with at least one child 12 or under. The networks are symmetrized.
 }
 \section{Nonstandard Network Attributes}{
  \describe{
@@ -46,18 +46,14 @@ weekend.}
 }
 
 \section{Licenses and Citation}{
- When publishing results obtained using this
-data set, the original authors (Goeyvaerts et al., 2018)
-should be cited, along with this \R package.
+ When publishing results obtained
+using this data set, the original authors
+\insertCite{GoSa18h}{ergm.multi} should be cited, along with this
+\R package.
 }
 
 \references{
-Nele Goeyvaerts, Eva Santermans, Gail Potter, Andrea Torneri, Kim
-V. Kerckhove, Lander Willem, Marc Aerts, Philippe Beutels & Niel
-Hens (2018) Household Members Do Not Contact Each Other at Random:
-Implications for Infectious Disease Modelling. \emph{Proceedings of the
-Royal Society B: Biological Sciences}, 285(1893):
-20182201. \doi{10.1098/rspb.2018.2201}
+\insertAllCited{}
 }
 \seealso{
 \code{vignette("Goeyvaerts_reproduction")} for a vignette reproducing the Goeyvaerts analysis and performing diagnostics
