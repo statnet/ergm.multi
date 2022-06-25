@@ -153,7 +153,19 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   with `subset`, which controls which networks are affected by
 #'   the term.
 #'
-#' @note Care should be taken to avoid multicollinearity when using this operator. When `lm` is given a model with intercept and a categorical predictor (including a [`logical`] one), it will use the first level (or `FALSE` ) as the baseline, but if the model is without intercept, it will use all levels of the first categorical predictor. This is typically what is wanted in a linear regression, but for the `N` operator, this can be problematic if the "intercept" effect is added by a different term. A workaround is to convert the categorical predictor to dummy variables before putting it into the `lm` formula.
+#' @note Care should be taken to avoid multicollinearity when using
+#'   this operator. As with the [lm()] function, `lm` formulas have an
+#'   implicit intercept, which can be suppressed by specifying `~ 0 +
+#'   ...` or `~ -1 + ...` on the formula. When `lm` is given a model
+#'   with intercept and a categorical predictor (including a
+#'   [`logical`] one), it will use the first level (or `FALSE` ) as
+#'   the baseline, but if the model is without intercept, it will use
+#'   all levels of the first categorical predictor. This is typically
+#'   what is wanted in a linear regression, but for the `N` operator,
+#'   this can be problematic if the "intercept" effect is added by a
+#'   different term. A workaround is to convert the categorical
+#'   predictor to dummy variables before putting it into the `lm`
+#'   formula.
 #'
 #' @usage
 #' # binary: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
@@ -168,6 +180,40 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   parameters to help identify the term (which may have similar
 #'   predictors but, say, a different network subset) in the output.
 #'
+#' @section Fixing parameters:
+#'
+#' By an `N(formula, lm)` term will add \eqn{p \times q}{p*q} free
+#' parameters, where \eqn{p} is the number of free parameters
+#' (possibly curved) of the ERGM specified by `formula`, and \eqn{q}
+#' is the number of parameters specified by the `lm` formula. That is,
+#' there would be one parameter for each combination of an ERGM
+#' parameter and a linear model parameter, in an ERGM-major order
+#' (i.e., for each ERGM parameter, the linear model parameters will be
+#' enumerated). For example, the term `gwesp()` has two free
+#' parameters: its coefficient and its decay rate. We can specify a
+#' model in which they depend on \eqn{\log(n)} as `N(~gwesp,
+#' ~log(n))`, resulting in the following 4 parameters, with the
+#' intercept for the linear model being implicit:
+#' ```{r, echo=FALSE, warning=FALSE}
+#' data(florentine)
+#' param_names(ergm_model(Networks(flomarriage,flobusiness) ~ N(~gwesp, ~log(n))))
+#' ```
+#'
+#' If a different linear model is desired for different ERGM terms
+#' (e.g., some are to be affected by network size while others are
+#' not), multiple `N()` terms can be specified. This covers most such
+#' cases, but not all. For example, suppose that for the above model,
+#' we wish for its coefficient to depend on `log(n)` but for the decay
+#' parameter not to. In this case, one can use the `offset()`
+#' decorator with partial offsetting. Then, specifying
+#' `offset(N(~gwesp(), ~log(n)), 4)`, we get:
+#' ```{r, echo=FALSE, warning=FALSE}
+#' data(florentine)
+#' param_names(ergm_model(Networks(flomarriage,flobusiness) ~ offset(N(~gwesp(), ~log(n)), 4)))
+#' ```
+#' Then, setting the corresponding `offset.coef = 0` will fix the
+#' coefficient of `log(n)` for the decay parameter at 0, while
+#' allowing a constant decay parameter to be estimated.
 #'
 #' @template ergmTerm-general
 #'
