@@ -3,6 +3,7 @@ title: "Reproducing Goeyvaerts et al. (2018) using `ergm.multi`"
 author: "Pavel N. Krivitsky"
 date: "`ergm.multi` version `r packageVersion('ergm.multi')` (`r Sys.Date()`)"
 output: rmarkdown::html_vignette
+bibliography: ../inst/REFERENCES.bib
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
@@ -33,7 +34,7 @@ library(tibble)
 
 # Obtaining data
 
-The list of networks studied by Goeyvaerts et al. (2018) is included in this package:
+The list of networks studied by @GoSa18h is included in this package:
 ```{r}
 data(Goeyvaerts)
 length(Goeyvaerts)
@@ -50,7 +51,7 @@ G <- Goeyvaerts %>% keep(`%n%`, "included")
 
 # Data summaries
 
-Obtain weekday, network size, and density for each network, and summarize them as in Goeyvaerts et al. (2018) Table 1:
+Obtain weekday, network size, and density for each network, and summarize them as in @GoSa18h Table 1:
 ```{r}
 G %>% map(~list(weekday = . %n% "weekday",
                 n = network.size(.),
@@ -135,7 +136,7 @@ summary(fit.we)
 
 # Diagnostics
 
-Perform diagnostic simulation, summarize the residuals, and make residuals vs. fitted and scale-location plots:
+Perform diagnostic simulation [@KrCo22t], summarize the residuals, and make residuals vs. fitted and scale-location plots:
 ```{r}
 gof.wd <- gofN(fit.wd, GOF = ~ edges + kstar(2) + triangles)
 summary(gof.wd)
@@ -159,6 +160,3 @@ plot(gof.wd, against=~factor(n))
 It looks like network-size effects are probably accounted for.
 
 # References
-
-
-Nele Goeyvaerts, Eva Santermans, Gail Potter, Andrea Torneri, Kim V. Kerckhove, Lander Willem, Marc Aerts, Philippe Beutels, and Niel Hens (2018) Household Members Do Not Contact Each Other at Random: Implications for Infectious Disease Modelling. *Proceedings of the Royal Society B: Biological Sciences*, 285(1893): 20182201. [`doi:10.1098/rspb.2018.2201`](https://doi.org/10.1098/rspb.2018.2201)
