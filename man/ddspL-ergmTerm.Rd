@@ -34,6 +34,9 @@ implementation will cache the number of shared partners for each dyad
 in the network. This has a memory cost but may significuantly speed
 up calculation, particularly for denser networks.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

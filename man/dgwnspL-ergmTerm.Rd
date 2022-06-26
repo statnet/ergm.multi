@@ -30,6 +30,9 @@ This term is just like gwesp and gwdsp except it adds a statistic equal to the g
 
 See term \code{desp} for layer specification information.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

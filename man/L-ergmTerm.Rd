@@ -17,5 +17,8 @@ Evaluates the terms in \code{formula} on an observed or
 logical layers specified in formula \code{Ls} and sums the results
 elementwise.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{layer-aware}
 \concept{operator}

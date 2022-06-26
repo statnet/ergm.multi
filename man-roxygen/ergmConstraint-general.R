@@ -8,4 +8,4 @@
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
 #' @name <%= name %>-ergmConstraint
-
+#' @seealso [`ergmConstraint`] for index of constraints and hints currently visible to the package.

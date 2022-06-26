@@ -95,6 +95,9 @@ allowing a constant decay parameter to be estimated.
 \references{
 \insertAllCited{}
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{operator}
 \concept{undirected}

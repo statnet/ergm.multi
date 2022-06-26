@@ -30,6 +30,9 @@ This term adds a statistic equal to the geometrically weighted edgewise (not dya
 
 See term \code{desp} for layer specification information.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

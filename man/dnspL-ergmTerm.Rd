@@ -27,6 +27,9 @@ This term adds one network statistic to the model for each element in \code{d} w
 
 See term \code{desp} for layer specification information.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

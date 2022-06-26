@@ -24,6 +24,9 @@ dyad and \eqn{R} being the total number of layers in \code{Ls} .
 A positive coefficient induces positive dependence and a negative
 one induces negative dependence.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

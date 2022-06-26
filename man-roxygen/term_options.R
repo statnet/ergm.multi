@@ -7,4 +7,4 @@
 #
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
-#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
+#' @param term.options A list of additional arguments to be passed to term initializers. See [`? term.options`][term.options].

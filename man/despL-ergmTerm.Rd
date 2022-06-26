@@ -25,6 +25,9 @@ provided there is exactly one of each. (For types \code{"OSP"} and \code{"ISP"} 
 \description{
 This term adds one network statistic to the model for each element in \code{d} where the \eqn{i} th such statistic equals the number of edges in the network with exactly \code{d[i]} shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{directed}
 \concept{layer-aware}
 \concept{undirected}

@@ -28,6 +28,9 @@ is sometimes known as the "actor" mode.
 
 This term can only be used with undirected bipartite networks.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{bipartite}
 \concept{categorical nodal attribute}
 \concept{frequently-used}

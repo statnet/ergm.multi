@@ -7,4 +7,4 @@
 #
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
-#' @param formula a one-sided [ergm()]-style formula with the terms to be evaluated
+#' @param formula a one-sided [ergm()]-style formula with the terms to be evaluated 

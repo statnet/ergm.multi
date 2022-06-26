@@ -26,6 +26,9 @@ blacklisted in a way that will survive even network manipulations
 such as subgraph extraction and combining into block-diagonal
 using \code{\link[=combine_networks]{combine_networks()}}.
 }
+\seealso{
+\code{\link{ergmConstraint}} for index of constraints and hints currently visible to the package.
+}
 \concept{directed}
 \concept{dyad-independent}
 \concept{undirected}

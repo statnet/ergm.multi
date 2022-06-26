@@ -8,4 +8,4 @@
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
 #' @name <%= name %>-ergmReference
-
+#' @seealso [`ergmReference`] for index of reference distributions currently visible to the package.

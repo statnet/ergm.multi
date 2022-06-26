@@ -39,6 +39,9 @@ If a list of layer specifications is given, degree of a node
 \code{i} is considered to be the number of edges in all layers,
 combined.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{categorical nodal attribute}
 \concept{directed}
 \concept{frequently-used}

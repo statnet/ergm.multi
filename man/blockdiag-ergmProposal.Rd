@@ -14,3 +14,4 @@ block for the toggle proposal.
 \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsText(ergm:::.buildProposalsList(proposal="blockdiag"))}}
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="blockdiag"))}}
 }
+\keyword{internal}

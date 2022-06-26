@@ -16,5 +16,8 @@ For a directed network, only dyads \eqn{(i,j)} for
 which \eqn{i < j} may be toggled. Optional argument \code{attr}
 controls which subgraphs are thus restricted.
 }
+\seealso{
+\code{\link{ergmConstraint}} for index of constraints and hints currently visible to the package.
+}
 \concept{directed}
 \concept{dyad-independent}
