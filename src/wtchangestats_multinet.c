@@ -204,3 +204,40 @@ WtF_CHANGESTAT_FN(f_wtMultiNets){
   }
 }
 
+// wtByNetDStats
+
+WtI_CHANGESTAT_FN(i_wtByNetDStats){
+  WtModel *m = STORAGE = WtModelInitialize(getListElement(mtp->R, "submodel"), NULL, nwp, FALSE);
+  WtDELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+  WtDELETE_IF_UNUSED_IN_SUBMODEL(z_func, m);
+}
+
+WtC_CHANGESTAT_FN(c_wtByNetDStats){
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
+  GET_STORAGE(WtModel, m);
+
+  unsigned int i = MN_SID_TAIL(sn, tail);
+  if(pos[i-1]!=pos[i]){
+    WtChangeStats1(tail, head, weight, nwp, m, edgestate);
+    memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
+  }
+}
+
+WtZ_CHANGESTAT_FN(z_wtByNetDStats){
+  unsigned int *pos = (unsigned int *) IINPUT_PARAM; // Starting positions of subnetworks' statistics.
+  GET_AUX_STORAGE(StoreWtSubnets, sn);
+  GET_STORAGE(WtModel, m);
+
+  for(unsigned int i=1; i<=sn->ns; i++)
+    if(pos[i-1]!=pos[i]){
+      WtZStats(nwp, m, FALSE);
+      memcpy(CHANGE_STAT + (unsigned int)pos[i], m->workspace, m->n_stats*sizeof(double));
+    }
+}
+
+WtF_CHANGESTAT_FN(f_wtByNetDStats){
+  GET_STORAGE(WtModel, m);
+  WtModelDestroy(nwp, m);
+  STORAGE = NULL;
+}
