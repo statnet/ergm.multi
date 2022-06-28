@@ -7,7 +7,7 @@ bibliography: ../inst/REFERENCES.bib
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteIndexEntry{Replication of Goeyvaerts et al. (2018) using ergm.multi}
+  %\VignetteIndexEntry{Reproducing Goeyvaerts et al. (2018) using ergm.multi}
 ---
 
 ```{css, echo=FALSE}
