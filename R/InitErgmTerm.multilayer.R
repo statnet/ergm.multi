@@ -241,9 +241,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' @section Specifying models for multilayer network:
 #' In order to fit a model for multilayer
 #' networks, first use [`Layer`] construct an LHS network that
-#' [`ergm`] will understand as multilayered.
+#' [ergm()] will understand as multilayered.
 #'
-#' Used in the formula directly, most, but not all, `ergm` terms will
+#' Used in the formula directly, most, but not all, \pkg{ergm} terms will
 #' sum their statistics over the observed layers.
 #'
 #' Some terms are *layer-aware*, however. By convention, layer-aware

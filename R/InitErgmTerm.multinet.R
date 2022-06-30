@@ -223,6 +223,8 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'
 #' @template ergmTerm-general
 #'
+#' @seealso `vignette("Goeyvaerts_reproduction")` for a demonstration.
+#'
 #' @concept operator
 #' @concept directed
 #' @concept undirected

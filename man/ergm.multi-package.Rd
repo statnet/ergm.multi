@@ -5,17 +5,17 @@
 \alias{ergm.multi-package}
 \title{\pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks}
 \description{
-The \pkg{ergm.multi} is a collection of extensions and
-utilities for package \CRANpkg{ergm'} to facilitate modeling of
+\pkg{ergm.multi} is a collection of extensions and
+utilities for package \CRANpkg{ergm} to facilitate modeling of
 multilayer and multi-network models; some experimental support
 for multimode networks is also implemented.
 }
-\section{Multilayer networks}{
+\section{Multilayer network models}{
  Also known as multiplex,
-multirelational, and multivariate, a multilayer network pair of
-actors to have multiple relations of different types. For
-example, in the \link{Lazega} lawyer data set included with this
-package, each pair of lawyers in the firm can have an advice
+multirelational, and multivariate, in a multilayer network a pair
+of actors can have multiple simultaneous relations of different
+types. For example, in the \link{Lazega} lawyer data set included with
+this package, each pair of lawyers in the firm can have an advice
 relationship, a coworking relationship, a friendship
 relationship, or any combination thereof. Application of ERGMs to
 multilayer networks has a fairly long history
@@ -30,7 +30,8 @@ cross-layer specifications. Its features include:
 \describe{
 
 \item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multilayer
-specification is contained entirely in the formula.}
+specification is contained entirely in the formula and can be
+nested with any other terms, including dynamic and multi-network.}
 
 \item{unlimited layers:}{The number of layers in the modeled
 network is limited only by computing power.}
@@ -42,9 +43,10 @@ using simple term operators.}
 \item{heterogeneous layers:}{A network can have directed and
 undirected layers, which can be modeled jointly.}
 
-\item{multimode/multilevel support (experimental):}{With some care, it is possible to
-specify both non-overlapping unipartite and bipartie layers,
-which can be used to specify multimode models.}
+\item{multimode/multilevel support (experimental):}{With some
+care, it is possible to specify models for unipartite and
+bipartie layers over different subsets of actors, which can be
+used to specify multimode models.}
 
 }
 
@@ -54,8 +56,8 @@ See \code{\link[=Layer]{Layer()}} and \code{\link[=L-ergmTerm]{ergmTerm?L}} for 
 \section{Multi-network models}{
  Joint modeling of independent
 samples of networks on disjoint sets of actors have a long
-history as well \insertCite{@ZiVa06m, @SlKo16m, @StSc19m, and
-@VeSl21e, for example}{ergm.multi}. \pkg{ergm.multi} facilitates
+history as well \insertCite{@ZiVa06m, @SlKo16m, @StSc19m, and @VeSl21e, for example}{ergm.multi}.
+\pkg{ergm.multi} facilitates
 fixed-effect models for samples of networks (possibly
 heterogeneous in size and composition), using a multivariate
 linear model for each network's ERGM parameters, with
@@ -68,7 +70,8 @@ Its features include:
 \describe{
 
 \item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multi-network model
-specification is contained entirely in the formula.}
+specification is contained entirely in the formula and can be
+nested with any other terms, including dynamic and multilayer.}
 
 \item{flexibility and simplicity:}{\emph{Any} valid binary or valued
 ERGM can be specified for the networks, using simple term

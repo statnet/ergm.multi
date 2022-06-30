@@ -53,9 +53,9 @@ change directedness.
 
 In order to fit a model for multilayer
 networks, first use \code{\link{Layer}} construct an LHS network that
-\code{\link{ergm}} will understand as multilayered.
+\code{\link[=ergm]{ergm()}} will understand as multilayered.
 
-Used in the formula directly, most, but not all, \code{ergm} terms will
+Used in the formula directly, most, but not all, \pkg{ergm} terms will
 sum their statistics over the observed layers.
 
 Some terms are \emph{layer-aware}, however. By convention, layer-aware
