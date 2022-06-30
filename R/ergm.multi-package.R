@@ -1,3 +1,12 @@
+#  File R/ergm.multi-package.R in package ergm.multi, part of the
+#  Statnet suite of packages for network analysis, https://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  https://statnet.org/attribution .
+#
+#  Copyright 2003-2022 Statnet Commons
+################################################################################
 #' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 #'
 #' @description \pkg{ergm.multi} is a collection of extensions and
