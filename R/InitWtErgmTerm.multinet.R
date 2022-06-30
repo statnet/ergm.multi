@@ -37,7 +37,7 @@ InitWtErgmTerm.N <- function(...){
 #' @usage
 #' # valued: ByNetDStats(formula, subset=TRUE)
 #' @noRd
-InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
+InitWtErgmTerm.ByNetDStats <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "subset"),
                       vartypes = c("formula","formula,logical,numeric,expression,call"),
