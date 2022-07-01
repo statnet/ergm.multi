@@ -3,33 +3,78 @@
 \name{dgwdspL-ergmTerm}
 \alias{dgwdspL-ergmTerm}
 \alias{InitErgmTerm.dgwdspL}
-\title{Geometrically weighted dyadwise shared partner distribution}
+\alias{InitErgmTerm.gwdspL}
+\alias{gwdspL-ergmTerm}
+\title{Geometrically weighted dyadwise shared partner distribution on layers}
 \usage{
 # binary: dgwdspL(decay, fixed=FALSE, cutoff=30, type="OTP",
 #                 Ls.path=NULL, L.in_order=FALSE)
+
+# binary: gwdspL(decay, fixed=FALSE, cutoff=30, type="OTP",
+#                Ls.path=NULL, L.in_order=FALSE)
 }
 \arguments{
-\item{decay}{non-negative model parameter (this parameter was called \code{alpha} prior to \verb{ergm 3.7} ).}
+\item{decay}{nonnegative decay parameter for the shared partner or selected directed analogue count; required if \code{fixed=TRUE} and ignored with a warning otherwise.}
 
-\item{fixed}{logical to specify if \code{decay} should be fixed (if \code{fixed=TRUE} ), or it may be used instead as the starting value for the estimation of \code{decay} in a curved exponential family model (when \code{fixed=FALSE} , the default) (see Hunter and Handcock, 2006).}
+\item{fixed}{optional argument indicating
+whether the \code{decay} parameter is fixed at the given value, or is to be fit as a curved
+exponential-family model (see Hunter and Handcock, 2006). The
+default is \code{FALSE} , which means the scale parameter is not
+fixed and thus the model is a curved exponential family.}
 
-\item{cutoff}{optional argument to set the number of underlying DSP terms to use in computing the statistics to reduce the computational burden. Its default value can also be controlled by the \code{gw.cutoff} term option control parameter. (See \code{\link{control.ergm}} .)}
+\item{cutoff}{This optional argument sets the number of underlying DSP terms
+to use in computing the statistics when \code{fixed=FALSE}, in order to reduce
+the computational burden.  Its default value can also be controlled by the
+\code{gw.cutoff} term option control parameter. (See \code{?control.ergm}.)}
 
-\item{type}{select the type of shared partner to be counted (see \code{ddsp} for type codes). By default, outgoing two-paths are employed.}
+\item{type}{A string indicating the type of shared partner or path to be considered for directed networks: \code{"OTP"} (default for directed), \code{"ITP"}, \code{"RTP"}, \code{"OSP"}, and \code{"ISP"}; has no effect for undirected. See the section below on Shared partner types for details.}
 
-\item{Ls.path, L.in_order}{a vector of one or two formulas
-\code{Ls.path} provides the layer specifications for the ties of the
-2-path or the shared partnership. (If only one formula is given the
-layers are assumed to be the same.) If \code{L.in_order==TRUE} , the
-first tie of the two-path must be the first element of \code{Ls.path}
-and the second must be the second; otherwise, any ordering counts,
-provided there is exactly one of each. (For types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the one incident on the tail of the base tie.)}
+\item{Ls.path, L.in_order}{a vector of one or two formulas \code{Ls.path}
+provides the Layer Logic (c.f. Layer Logic section in the
+\code{\link[=Layer]{Layer()}} documentation) specifications for the ties of the
+2-path or the shared partnership. (If only one formula is given
+the layers are assumed to be the same.) If \code{L.in_order==TRUE} ,
+the first tie of the two-path must be the first element of
+\code{Ls.path} and the second must be the second; otherwise, any
+ordering counts, provided there is exactly one of each. (For
+types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the
+one incident on the tail of the base tie.)}
 }
 \description{
-This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the \code{type} argument may be used to select the type of shared partner to employ (see \code{ddsp} for definitions). By default, outgoing two-paths are employed.
+This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible.
 
-See term \code{ddsp} for layer specification information.
+\code{gdwdspL} and \code{dgwdspL} are aliases for consistency with \pkg{ergm}.
 }
+\note{
+This term takes an additional term option (see
+\code{\link[=ergm-options]{options?ergm}}), \code{cache.sp}, controlling whether
+the implementation will cache the number of shared partners for
+each dyad in the network; this is usually enabled by default.
+}
+\section{Shared partner types}{
+ While there is only one shared partner configuration in the undirected
+case, nine distinct configurations are possible for directed graphs, selected
+using the \code{type} argument. Currently, terms may be defined with respect to
+five of these configurations; they are defined here as follows (using
+terminology from Butts (2008) and the \code{relevent} package):
+\itemize{
+\item Outgoing Two-path (\code{"OTP"}): vertex \eqn{k} is an OTP shared partner of ordered
+pair \eqn{(i,j)} iff \eqn{i \to k \to j}{i->k->j}. Also known as "transitive
+shared partner".
+\item Incoming Two-path (\code{"ITP"}): vertex \eqn{k} is an ITP shared partner of ordered
+pair \eqn{(i,j)} iff \eqn{j \to k \to i}{j->k->i}. Also known as "cyclical shared
+partner"
+\item Reciprocated Two-path (\code{"RTP"}): vertex \eqn{k} is an RTP shared partner of ordered
+pair \eqn{(i,j)} iff \eqn{i \leftrightarrow k \leftrightarrow j}{i<->k<->j}.
+\item Outgoing Shared Partner (\code{"OSP"}): vertex \eqn{k} is an OSP shared partner of
+ordered pair \eqn{(i,j)} iff \eqn{i \to k, j \to k}{i->k, j->k}.
+\item Incoming Shared Partner (\code{"ISP"}): vertex \eqn{k} is an ISP shared partner of ordered
+pair \eqn{(i,j)} iff \eqn{k \to i, k \to j}{k->i, k->j}.
+By default, outgoing two-paths (\code{"OTP"}) are calculated. Note that Robins et al. (2009)
+define closely related statistics to several of the above, using slightly different terminology.
+}
+}
+
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
 }
