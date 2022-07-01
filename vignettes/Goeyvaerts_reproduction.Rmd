@@ -96,10 +96,16 @@ f.wd <- Networks(G.wd) ~
     # Firstly, mixing among household roles, including only
     # father-mother, father-child, and mother-child relationship
     # counts.
+    #
+    # Notic that since in an undirected network, tail < head, in the
+    # levels2 specification, it is important that the tail levels are rows
+    # and head levels are columns. In this case, "Child" comes before
+    # "Father" which comes before "Mother" in alphabetical order, and so
+    # which category is row= and which is col= is sorted accordingly.
     ~mm("role", levels = I(roleset),
         levels2=~.%in%list(list(row="Father",col="Mother"),
-                           list(row="Father",col="Child"),
-                           list(row="Mother",col="Child"))) +
+                           list(row="Child",col="Father"),
+                           list(row="Child",col="Mother"))) +
       # Secondly, the nodal covariate effect of age, but only for
       # edges between children.
       F(~nodecov("age"), ~nodematch("role", levels=I("Child"))) +
@@ -127,8 +133,8 @@ fit.we <- ergm(Networks(G.we) ~
                  N(~edges +
                      mm("role", levels=I(roleset),
                         levels2=~.%in%list(list(row="Father",col="Mother"),
-                                           list(row="Father",col="Child"),
-                                           list(row="Mother",col="Child"))) +
+                                           list(row="Child",col="Father"),
+                                           list(row="Child",col="Mother"))) +
                      F(~nodecov("age"), ~nodematch("role", levels=I("Child"))) +
                      kstar(2) +
                      triangles))
