@@ -2,17 +2,17 @@
 #'
 #' @description \pkg{ergm.multi} is a collection of extensions and
 #'   utilities for package \CRANpkg{ergm} to facilitate modeling of
-#'   multilayer and multi-network models; some experimental support
+#'   multilayer and multi-network models. Some experimental support
 #'   for multimode networks is also implemented.
 #'
 #' @section Multilayer network models: Also known as multiplex,
-#'   multirelational, and multivariate, in a multilayer network a pair
+#'   multirelational, or multivariate networks, in a multilayer network a pair
 #'   of actors can have multiple simultaneous relations of different
 #'   types. For example, in the [Lazega] lawyer data set included with
 #'   this package, each pair of lawyers in the firm can have an advice
 #'   relationship, a coworking relationship, a friendship
 #'   relationship, or any combination thereof. Application of ERGMs to
-#'   multilayer networks has a fairly long history
+#'   multilayer networks has a long history
 #'   \insertCite{PaWa99l,LaPa99m}{ergm.multi}, and a number of \R
 #'   packages exist for analysing and estimating them.
 #'
@@ -24,8 +24,8 @@
 #'   \describe{
 #'
 #'   \item{seamless integration with [ergm()]:}{Multilayer
-#'     specification is contained entirely in the formula and can be
-#'     nested with any other terms, including dynamic and multi-network.}
+#'     specification is contained entirely in an ergm formula and can be
+#'     nested with any other ergm terms, including dynamic and multi-network.}
 #'
 #'   \item{unlimited layers:}{The number of layers in the modeled
 #'     network is limited only by computing power.}
