@@ -16,12 +16,12 @@
 #' @param object an [`ergm`] object.
 #' @param nsim number of realizations.
 #' @param obs.twostage,GOF,save_stats see [gofN()].
-#' @param control a control list returned by [control.simulate.ergm()].
+#' @param control a control list returned by [control.gofN.ergm()]; note that `nsim` and `obs.twostage` parameters in the control list are ignored in favor of those passed to the function directly.
 #' @param ... additional arguments to [ergm_model()], [simulate.ergm()], and [summary.ergm_model()].
 #'
 #' @return an object of similar structure as that returned by [gofN()].
 #' @export
-marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.simulate.ergm(), save_stats=FALSE, ...){
+marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.gofN.ergm(), save_stats=FALSE, ...){
   check.control.class(c("simulate.ergm"), "marg_cond_sim")
   control$obs.twostage <- obs.twostage
   control$nsim <- nsim
@@ -45,10 +45,10 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=control$obs.simulate, basis=nw, output="stats", ..., return.args="ergm_model")
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=control$simulate, basis=nw, output="stats", ..., return.args="ergm_model")
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula

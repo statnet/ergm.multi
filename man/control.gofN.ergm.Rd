@@ -9,15 +9,8 @@ control.gofN.ergm(
   nsim = 100,
   obs.twostage = nsim/2,
   array.max = 128,
-  MCMC.burnin = NULL,
-  MCMC.interval = NULL,
-  MCMC.prop.weights = NULL,
-  MCMC.prop.args = NULL,
-  MCMC.init.maxedges = NULL,
-  MCMC.packagenames = NULL,
-  MCMC.runtime.traceplot = FALSE,
-  network.output = "network",
-  seed = NULL,
+  simulate = control.simulate.ergm(),
+  obs.simulate = control.simulate.ergm(),
   parallel = 0,
   parallel.type = NULL,
   parallel.version.check = TRUE,
@@ -28,15 +21,8 @@ control.gofN(
   nsim = 100,
   obs.twostage = nsim/2,
   array.max = 128,
-  MCMC.burnin = NULL,
-  MCMC.interval = NULL,
-  MCMC.prop.weights = NULL,
-  MCMC.prop.args = NULL,
-  MCMC.init.maxedges = NULL,
-  MCMC.packagenames = NULL,
-  MCMC.runtime.traceplot = FALSE,
-  network.output = "network",
-  seed = NULL,
+  simulate = control.simulate.ergm(),
+  obs.simulate = control.simulate.ergm(),
   parallel = 0,
   parallel.type = NULL,
   parallel.version.check = TRUE,
@@ -73,42 +59,10 @@ to simulate from, which should divide the \code{\link[=control.gofN.ergm]{contro
 \item{array.max}{Try to avoid creating arrays larger in size (in
 megabytes) than this. Is ignored if \code{save_stats} is passed.}
 
-\item{MCMC.burnin}{Number of proposals before any MCMC sampling is done. It
-typically is set to a fairly large number.}
-
-\item{MCMC.interval}{Number of proposals between sampled statistics.}
-
-\item{MCMC.prop.weights}{Specifies the proposal distribution used in the
-MCMC Metropolis-Hastings algorithm.  Possible choices are \code{"TNT"} or
-\code{"random"}; the \code{"default"} is one of these two, depending on the
-constraints in place (as defined by the \code{constraints} argument of the
-\code{\link{ergm}} function), though not all weights may be used with all
-constraints.  The \code{TNT} (tie / no tie) option puts roughly equal weight
-on selecting a dyad with or without a tie as a candidate for toggling,
-whereas the \code{random} option puts equal weight on all possible dyads,
-though the interpretation of \code{random} may change according to the
-constraints in place.  When no constraints are in place, the default is TNT,
-which appears to improve Markov chain mixing particularly for networks with
-a low edge density, as is typical of many realistic social networks.}
-
-\item{MCMC.prop.args}{An alternative, direct way of specifying additional
-arguments to proposal.}
-
-\item{MCMC.init.maxedges}{Maximum number of edges expected in network.}
-
-\item{MCMC.packagenames}{Names of packages in which to look for change
-statistic functions in addition to those autodetected. This argument should
-not be needed outside of very strange setups.}
-
-\item{MCMC.runtime.traceplot}{Logical: If TRUE, plot traceplots of the MCMC
-sample after every MCMC MLE iteration.}
-
-\item{network.output}{R class with which to output networks. The options are
-"network" (default) and "edgelist.compressed" (which saves space but only
-supports networks without vertex attributes)}
-
-\item{seed}{Seed value (integer) for the random number generator.  See
-\code{\link[base]{set.seed}}.}
+\item{simulate, obs.simulate}{Control lists produced by
+\code{\link[=control.simulate.ergm]{control.simulate.ergm()}} or equivalent for unconstrained and
+constrained simulation, respectively. Parameters are inherited
+from the model fit and can be overridden here.}
 
 \item{parallel}{Number of threads in which to run the sampling. Defaults to
 0 (no parallelism). See the entry on \link[=ergm-parallel]{parallel processing}

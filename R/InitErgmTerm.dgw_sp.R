@@ -196,22 +196,18 @@ no_layer_err <- function(instead){
 #
 
 #' @templateVar name despL
-#' @title Directed edgewise shared partners
-#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible.
+#' @title Edgewise shared partners on layers
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of edges in the network with exactly `d[i]` shared partners. For a directed network, multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: despL(d, type="OTP", L.base=NULL, Ls.path=NULL, L.in_order=FALSE)
 #' @param d a vector of distinct integers
-#' @param type select the type of shared partner to be counted (see `ddsp` for type codes). By default, outgoing two-paths are employed.
-#' @param L.base the layer specification for the base
-#' @param Ls.path,L.in_order a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts,
-#'   provided there is exactly one of each. (For types `"OSP"` and `"ISP"` , the first tie is considered to be the one incident on the tail of the base tie.)
+#' @template ergmTerm-sp-type
+#' @template ergmTerm-L-base
+#' @template ergmTerm-Ls-path
 #'
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
@@ -237,7 +233,6 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
     typecode<-which(type==type.vec)
     dname <- "desp"
   }else{
-    message("Use the ergm term 'esp' for undirected networks.")
     dname <- "desp"
     conam<-"esp"
     type<-"UTP"
@@ -250,6 +245,12 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("desp()")
 }
 
+#' @rdname despL-ergmTerm
+#' @aliases espL-ergmTerm
+#' @description `espL` and `despL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: espL(d, type="OTP", L.base=NULL, Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.espL <- InitErgmTerm.despL
 
 ################################################################################
 #Geometrically weighted edgewise shared partner term, where shared partners
@@ -271,26 +272,22 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
 #
 
 #' @templateVar name dgwespL
-#' @title Geometrically weighted edgewise shared partner distribution
+#' @title Geometrically weighted edgewise shared partner distribution on layers
 #' @description This term adds a statistic equal to the geometrically weighted edgewise (not dyadwise) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
-#'
-#'   See term `desp` for layer specification information.
 #'
 #' @usage
 #' # binary: dgwespL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
 #' #                 Ls.path=NULL, L.in_order=FALSE)
-#' @param decay non-negative model parameter (this parameter was called `alpha` prior to `ergm 3.7` ).
-#' @param fixed logical to specify if `decay` should be fixed (if `fixed=TRUE` ), or it may be used instead as the starting value for the estimation of `decay` in a curved exponential family model (when `fixed=FALSE` , the default) (see Hunter and Handcock, 2006).
-#' @param cutoff optional argument to set the number of underlying DSP terms to use in computing the statistics to reduce the computational burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
-#' @param type select the type of shared partner to be counted (see `ddsp` for type codes). By default, outgoing two-paths are employed.
-#' @param Ls.path,L.in_order a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts,
-#'   provided there is exactly one of each. (For types `"OSP"` and `"ISP"` , the first tie is considered to be the one incident on the tail of the base tie.)
+#' @templateVar multiplicand shared partner or selected directed analogue count
+#' @template ergmTerm-gw-decay-fixed
+#' @templateVar underlying ESP
+#' @template ergmTerm-gw-cutoff
+#' @template ergmTerm-sp-type
+#' @template ergmTerm-L-base
+#' @template ergmTerm-Ls-path
 #'
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
@@ -355,6 +352,13 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   }
 }
 
+#' @rdname dgwespL-ergmTerm
+#' @aliases gwespL-ergmTerm
+#' @description `gdwespL` and `dgwespL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: gwespL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
+#' #                Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.gwespL <- InitErgmTerm.dgwespL
 
 
 #Term to count DSP statistics, where the shared partners may be any of
@@ -376,33 +380,15 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 #
 
 #' @templateVar name ddspL
-#' @title Directed dyadwise shared partners
-#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of dyads in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to be counted (see below for type codes). By default, outgoing two-paths are employed.
-#'
-#' @details While there is only one shared partner configuration in the undirected case, nine distinct configurations are possible for directed graphs. Currently, edgewise shared partner terms may be defined with respect to five of these configurations; they are defined here as follows (using terminology from Butts (2008) and the `relevent` package):
-#'   1) *Outgoing Two-path (OTP)* vertex \eqn{k} is an OTP shared partner of ordered pair \eqn{(i,j)} iff \eqn{i \to k \to j}{i->k->j}. Also known as "transitive shared partner".
-#'   2) *Incoming Two-path (ITP)* vertex \eqn{k} is an ITP shared partner of ordered pair \eqn{(i,j)} iff \eqn{j \to k \to i}{j->k->i}. Also known as "cyclical shared partner"
-#'   3) *Outgoing Shared Partner (OSP)* vertex \eqn{k} is an OSP shared partner of ordered pair \eqn{(i,j)} iff \eqn{i \to k, j \to k}{i->k, j->k}.
-#'   4) *Incoming Shared Partner (ISP)* vertex \eqn{k} is an ISP shared partner of ordered pair \eqn{(i,j)} iff \eqn{k \to i, k \to j}{k->i, k->j}.
-#'
-#'   Note that Robins et al. (2009) define closely related statistics to several of the above, using slightly different terminology.
-#'
-#'   For a multilayer network, a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts, provided there is exactly one of each.
-#'
-#'   This and related terms take an additional term option (via the
-#'   `control$term.option` list), `cache.sp` controlling whether the
-#'   implementation will cache the number of shared partners for each dyad
-#'   in the network. This has a memory cost but may significuantly speed
-#'   up calculation, particularly for denser networks.
+#' @title Dyadwise shared partners on layers
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of dyads in the network with exactly `d[i]` shared partners. For a directed network, multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: ddspL(d, type="OTP", Ls.path=NULL, L.in_order=FALSE)
 #'
+#' @template ergmTerm-Ls-path
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
@@ -428,7 +414,6 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
     typecode<-which(type==type.vec)
     dname <- "ddsp"
   }else{
-    message("Use the ergm term 'dsp' for undirected networks.")
     conam <- paste("dsp",sep=".")
     type<-"UTP"
     typecode<-0
@@ -454,40 +439,37 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("ddsp()")
 }
 
-
+#' @rdname ddspL-ergmTerm
+#' @aliases dspL-ergmTerm
+#' @description `dspL` and `ddspL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: dspL(d, type="OTP", Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.dspL <- InitErgmTerm.ddspL
 
 ################################################################################
 
 #' @templateVar name dgwdspL
-#' @title Geometrically weighted dyadwise shared partner distribution
-#' @description This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible; the `type` argument may be used to select the type of shared partner to employ (see `ddsp` for definitions). By default, outgoing two-paths are employed.
-#'
-#'   See term `ddsp` for layer specification information.
+#' @title Geometrically weighted dyadwise shared partner distribution on layers
+#' @description This term adds one network statistic to the model equal to the geometrically weighted dyadwise shared partner distribution with decay parameter. Note that the GWDSP statistic is equal to the sum of GWNSP plus GWESP. For a directed network, multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: dgwdspL(decay, fixed=FALSE, cutoff=30, type="OTP",
 #' #                 Ls.path=NULL, L.in_order=FALSE)
-#' @param decay non-negative model parameter (this parameter was called `alpha` prior to `ergm 3.7` ).
-#' @param fixed logical to specify if `decay` should be fixed (if `fixed=TRUE` ), or it may be used instead as the starting value for the estimation of `decay` in a curved exponential family model (when `fixed=FALSE` , the default) (see Hunter and Handcock, 2006).
-#' @param cutoff optional argument to set the number of underlying DSP terms to use in computing the statistics to reduce the computational burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
-#' @param type select the type of shared partner to be counted (see `ddsp` for type codes). By default, outgoing two-paths are employed.
-#' @param Ls.path,L.in_order a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts,
-#'   provided there is exactly one of each. (For types `"OSP"` and `"ISP"` , the first tie is considered to be the one incident on the tail of the base tie.)
+#' @templateVar multiplicand shared partner or selected directed analogue count
+#' @template ergmTerm-gw-decay-fixed
+#' @templateVar underlying DSP
+#' @template ergmTerm-gw-cutoff
+#' @template ergmTerm-sp-type
+#' @template ergmTerm-Ls-path
 #'
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
 InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
-  # the following line was commented out in <InitErgm.gwdsp>:
-  #    ergm.checkdirected("gwdsp", is.directed(nw), requirement=FALSE)
-  # so, I've not passed 'directed=FALSE' to <check.ErgmTerm>  
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","Ls.path","L.in_order"),
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula,list","logical"),
@@ -508,7 +490,6 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   dname<-"ddsp"
   
   if(!is.directed(nw)){  
-    message("Use the gwdsp term for undirected networks.")
     type <- "UTP"
     basenam<-"gwdsp"
     typecode<-0
@@ -551,6 +532,13 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   }
 }
 
+#' @rdname dgwdspL-ergmTerm
+#' @aliases gwdspL-ergmTerm 
+#' @description `gdwdspL` and `dgwdspL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: gwdspL(decay, fixed=FALSE, cutoff=30, type="OTP",
+#' #                Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.gwdspL <- InitErgmTerm.dgwdspL
 
 #Term to count NSP statistics, where the shared partners may be any of
 #several distinct types.
@@ -571,24 +559,18 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 #
 
 #' @templateVar name dnspL
-#' @title Directed non-edgewise shared partners
-#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly `d[i]` shared partners. This term can only be used with directed networks. Multiple shared partner definitions are possibl.
-#'
-#'   See term `desp` for layer specification information.
+#' @title Non-edgewise shared partners and paths on layers
+#' @description This term adds one network statistic to the model for each element in `d` where the \eqn{i} th such statistic equals the number of non-edges in the network with exactly `d[i]` shared partners. For a directed network, multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: dnspL(d, type="OTP", L.base=NULL, Ls.path=NULL, L.in_order=FALSE)
 #' @param d a vector of distinct integers
-#' @param type select the type of shared partner to be counted (see `ddsp` for type codes). By default, outgoing two-paths are employed.
-#' @param L.base the layer specification for the base
-#' @param Ls.path,L.in_order a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts,
-#'   provided there is exactly one of each. (For types `"OSP"` and `"ISP"` , the first tie is considered to be the one incident on the tail of the base tie.)
+#' @template ergmTerm-sp-type
+#' @template ergmTerm-L-base
+#' @template ergmTerm-Ls-path
 #'
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
@@ -613,7 +595,6 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
     conam <- paste("nsp",type,sep=".")
     typecode<-which(type==type.vec)
   }else{
-    message("Use the ergm term 'nsp' for undirected networks.")
     conam<-"nsp"
     type<-"UTP"
     typecode<-0
@@ -638,39 +619,38 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("dnspL()")
 }
 
+#' @rdname dnspL-ergmTerm
+#' @aliases nspL-ergmTerm
+#' @description `nspL` and `dnspL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: nspL(d, type="OTP", L.base=NULL, Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.nspL <- InitErgmTerm.dnspL
 
 ################################################################################
 
 #' @templateVar name dgwnspL
-#' @title Geometrically weighted non-edgewise shared partner distribution
-#' @description This term is just like gwesp and gwdsp except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
-#'
-#'   See term `desp` for layer specification information.
+#' @title Geometrically weighted non-edgewise shared partner distribution on layers
+#' @description This term is just like [`gwespL`][gwespL-ergmTerm] and [`gwdspL`][gwdspL-ergmTerm] except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
 #'
 #' @usage
 #' # binary: dgwnspL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
 #' #                 Ls.path=NULL, L.in_order=FALSE)
-#' @param decay non-negative model parameter (this parameter was called `alpha` prior to `ergm 3.7` ).
-#' @param fixed logical to specify if `decay` should be fixed (if `fixed=TRUE` ), or it may be used instead as the starting value for the estimation of `decay` in a curved exponential family model (when `fixed=FALSE` , the default) (see Hunter and Handcock, 2006).
-#' @param cutoff optional argument to set the number of underlying DSP terms to use in computing the statistics to reduce the computational burden. Its default value can also be controlled by the `gw.cutoff` term option control parameter. (See [`control.ergm`] .)
-#' @param type select the type of shared partner to be counted (see `ddsp` for type codes). By default, outgoing two-paths are employed.
-#' @param Ls.path,L.in_order a vector of one or two formulas
-#'   `Ls.path` provides the layer specifications for the ties of the
-#'   2-path or the shared partnership. (If only one formula is given the
-#'   layers are assumed to be the same.) If `L.in_order==TRUE` , the
-#'   first tie of the two-path must be the first element of `Ls.path`
-#'   and the second must be the second; otherwise, any ordering counts,
-#'   provided there is exactly one of each. (For types `"OSP"` and `"ISP"` , the first tie is considered to be the one incident on the tail of the base tie.)
+#' @templateVar multiplicand shared partner or selected directed analogue count
+#' @template ergmTerm-gw-decay-fixed
+#' @templateVar underlying NSP
+#' @template ergmTerm-gw-cutoff
+#' @template ergmTerm-sp-type
+#' @template ergmTerm-L-base
+#' @template ergmTerm-Ls-path
 #'
+#' @template ergmTerm-sp-types
+#' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
 #'
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
 InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
-  # the following line was commented out in <InitErgm.gwnsp>:
-  #    ergm.checkdirected("gwnsp", is.directed(nw), requirement=FALSE)
-  # so, I've not passed 'directed=FALSE' to <check.ErgmTerm>  
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
@@ -691,7 +671,6 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   dname<-"dnsp"
   
   if(!is.directed(nw)){  
-    message("Use the gwnsp term for undirected networks.")
     type <- "UTP"
     basenam<-"gwdsp"
     typecode<-0
@@ -733,3 +712,11 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
     else no_layer_err("dgwnspL()")
   }
 }
+
+#' @rdname dgwnspL-ergmTerm
+#' @aliases gwnspL-ergmTerm
+#' @description `gdwnspL` and `dgwnspL` are aliases for consistency with \pkg{ergm}.
+#' @usage
+#' # binary: gwnspL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
+#' #                Ls.path=NULL, L.in_order=FALSE)
+InitErgmTerm.gwnspL <- InitErgmTerm.dgwnspL

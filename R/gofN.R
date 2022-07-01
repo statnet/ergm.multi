@@ -126,10 +126,10 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=control$obs.simulate, basis=nw, output="stats", ..., return.args="ergm_model")
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=set.control.class("control.simulate.ergm",control), basis=nw, output="stats", ..., return.args="ergm_model")
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=control$simulate, basis=nw, output="stats", ..., return.args="ergm_model")
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
@@ -545,32 +545,12 @@ summary.gofN <- function(object, by=NULL, ...){
 #' @param array.max Try to avoid creating arrays larger in size (in
 #'   megabytes) than this. Is ignored if `save_stats` is passed.
 #'
-#' @param MCMC.burnin Number of proposals before any MCMC sampling is done. It
-#' typically is set to a fairly large number.
-#' @param MCMC.interval Number of proposals between sampled statistics.
-#' @param MCMC.prop.weights Specifies the proposal distribution used in the
-#' MCMC Metropolis-Hastings algorithm.  Possible choices are \code{"TNT"} or
-#' \code{"random"}; the \code{"default"} is one of these two, depending on the
-#' constraints in place (as defined by the \code{constraints} argument of the
-#' \code{\link{ergm}} function), though not all weights may be used with all
-#' constraints.  The \code{TNT} (tie / no tie) option puts roughly equal weight
-#' on selecting a dyad with or without a tie as a candidate for toggling,
-#' whereas the \code{random} option puts equal weight on all possible dyads,
-#' though the interpretation of \code{random} may change according to the
-#' constraints in place.  When no constraints are in place, the default is TNT,
-#' which appears to improve Markov chain mixing particularly for networks with
-#' a low edge density, as is typical of many realistic social networks.
-#' @param MCMC.prop.args An alternative, direct way of specifying additional
-#' arguments to proposal.
-#' @param MCMC.init.maxedges Maximum number of edges expected in network.
-#' @param MCMC.runtime.traceplot Logical: If TRUE, plot traceplots of the MCMC
-#' sample after every MCMC MLE iteration.
-#' @param network.output R class with which to output networks. The options are
-#' "network" (default) and "edgelist.compressed" (which saves space but only
-#' supports networks without vertex attributes)
+#' @param simulate,obs.simulate Control lists produced by
+#'   [control.simulate.ergm()] or equivalent for unconstrained and
+#'   constrained simulation, respectively. Parameters are inherited
+#'   from the model fit and can be overridden here.
+#'
 #' @template control_MCMC_parallel
-#' @template seed
-#' @template control_MCMC_packagenames
 #' 
 #' @description `control.gofN.ergm` (or its alias, `control.gofN`) is
 #'   intended to be used with [gofN()] specifically and will "inherit"
@@ -581,22 +561,13 @@ control.gofN.ergm<-function(nsim=100,
                             obs.twostage=nsim/2,
                             array.max=128,
 
-                       MCMC.burnin=NULL,
-                       MCMC.interval=NULL,
-                       MCMC.prop.weights=NULL,
-                       MCMC.prop.args=NULL,
-                       
-                       MCMC.init.maxedges=NULL,
-                       MCMC.packagenames=NULL,
-                       
-                       MCMC.runtime.traceplot=FALSE,
-                       network.output="network",
-                       
-                       seed=NULL,
-                       parallel=0,
-                       parallel.type=NULL,
-                       parallel.version.check=TRUE,
-                       parallel.inherit.MT=FALSE){
+                            simulate = control.simulate.ergm(),
+                            obs.simulate = control.simulate.ergm(),
+
+                            parallel=0,
+                            parallel.type=NULL,
+                            parallel.version.check=TRUE,
+                            parallel.inherit.MT=FALSE){
   control<-list()
   for(arg in names(formals(sys.function())))
     control[arg]<-list(get(arg))
