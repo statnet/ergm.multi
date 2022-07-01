@@ -58,7 +58,7 @@
 #'
 #' @section Multi-network models: Joint modeling of independent
 #'   samples of networks on disjoint sets of actors have a long
-#'   history as well \insertCite{@ZiVa06m, @SlKo16m, @StSc19m, and @VeSl21e, for example}{ergm.multi}.
+#'   history as well \insertCite{@@@ZiVa06m, @SlKo16m, @StSc19m, and @VeSl21e, for example}{ergm.multi}.
 #'   \pkg{ergm.multi} facilitates
 #'   fixed-effect models for samples of networks (possibly
 #'   heterogeneous in size and composition), using a multivariate

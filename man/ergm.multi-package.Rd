@@ -7,18 +7,18 @@
 \description{
 \pkg{ergm.multi} is a collection of extensions and
 utilities for package \CRANpkg{ergm} to facilitate modeling of
-multilayer and multi-network models; some experimental support
+multilayer and multi-network models. Some experimental support
 for multimode networks is also implemented.
 }
 \section{Multilayer network models}{
  Also known as multiplex,
-multirelational, and multivariate, in a multilayer network a pair
+multirelational, or multivariate networks, in a multilayer network a pair
 of actors can have multiple simultaneous relations of different
 types. For example, in the \link{Lazega} lawyer data set included with
 this package, each pair of lawyers in the firm can have an advice
 relationship, a coworking relationship, a friendship
 relationship, or any combination thereof. Application of ERGMs to
-multilayer networks has a fairly long history
+multilayer networks has a long history
 \insertCite{PaWa99l,LaPa99m}{ergm.multi}, and a number of \R
 packages exist for analysing and estimating them.
 
@@ -30,8 +30,8 @@ cross-layer specifications. Its features include:
 \describe{
 
 \item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multilayer
-specification is contained entirely in the formula and can be
-nested with any other terms, including dynamic and multi-network.}
+specification is contained entirely in an \code{\link[=ergm]{ergm()}}-style formula and can be
+nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and multi-network.}
 
 \item{unlimited layers:}{The number of layers in the modeled
 network is limited only by computing power.}
@@ -56,7 +56,7 @@ See \code{\link[=Layer]{Layer()}} and \code{\link[=L-ergmTerm]{ergmTerm?L}} for 
 \section{Multi-network models}{
  Joint modeling of independent
 samples of networks on disjoint sets of actors have a long
-history as well \insertCite{@ZiVa06m, @SlKo16m, @StSc19m, and @VeSl21e, for example}{ergm.multi}.
+history as well \insertCite{@@ZiVa06m, @SlKo16m, @StSc19m, and @VeSl21e, for example}{ergm.multi}.
 \pkg{ergm.multi} facilitates
 fixed-effect models for samples of networks (possibly
 heterogeneous in size and composition), using a multivariate
@@ -70,12 +70,12 @@ Its features include:
 \describe{
 
 \item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multi-network model
-specification is contained entirely in the formula and can be
-nested with any other terms, including dynamic and multilayer.}
+specification is contained entirely in an \code{\link[=ergm]{ergm()}}-style formula and can be
+nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and multilayer.}
 
 \item{flexibility and simplicity:}{\emph{Any} valid binary or valued
 ERGM can be specified for the networks, using simple term
-operators; and the network-level specification with an
+operators and the network-level specification with an
 \code{\link[=lm]{lm()}}-style formula.}
 
 }
