@@ -33,8 +33,8 @@
 #'   \describe{
 #'
 #'   \item{seamless integration with [ergm()]:}{Multilayer
-#'     specification is contained entirely in an ergm formula and can be
-#'     nested with any other ergm terms, including dynamic and multi-network.}
+#'     specification is contained entirely in an [ergm()]-style formula and can be
+#'     nested with any other [ergm()] terms, including dynamic and multi-network.}
 #'
 #'   \item{unlimited layers:}{The number of layers in the modeled
 #'     network is limited only by computing power.}
@@ -72,12 +72,12 @@
 #'   \describe{
 #'
 #'   \item{seamless integration with [ergm()]:}{Multi-network model
-#'     specification is contained entirely in the formula and can be
-#'     nested with any other terms, including dynamic and multilayer.}
+#'     specification is contained entirely in an [ergm()]-style formula and can be
+#'     nested with any other [ergm()] terms, including dynamic and multilayer.}
 #'
 #'   \item{flexibility and simplicity:}{*Any* valid binary or valued
 #'     ERGM can be specified for the networks, using simple term
-#'     operators; and the network-level specification with an
+#'     operators and the network-level specification with an
 #'     [lm()]-style formula.}
 #'
 #'   }
