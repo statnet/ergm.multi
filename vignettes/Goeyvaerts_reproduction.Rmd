@@ -39,6 +39,8 @@ The list of networks studied by @GoSa18h is included in this package:
 data(Goeyvaerts)
 length(Goeyvaerts)
 ```
+An explanation of the networks, including a list of their
+network (`%n%`) and vertex (`%v%`) attributes, can be obtained via `?Goeyvaerts`.
 A total of `r length(Goeyvaerts)` complete networks were collected, then two more excluded due to "nonstandard" family composition:
 ```{r}
 Goeyvaerts %>% discard(`%n%`, "included") %>% map(as_tibble, unit="vertices")
@@ -51,7 +53,7 @@ G <- Goeyvaerts %>% keep(`%n%`, "included")
 
 # Data summaries
 
-Obtain weekday, network size, and density for each network, and summarize them as in @GoSa18h Table 1:
+Obtain weekday indicator, network size, and density for each network, and summarize them as in @GoSa18h Table 1:
 ```{r}
 G %>% map(~list(weekday = . %n% "weekday",
                 n = network.size(.),
@@ -65,6 +67,7 @@ G %>% map(~list(weekday = . %n% "weekday",
 We now reproduce the ERGM fits. First, we extract the weekday networks:
 ```{r}
 G.wd <- G %>% keep(`%n%`, "weekday")
+length(G.wd)
 ```
 
 Next, we specify the multi-network model using the `N(formula, lm)` operator. This operator will evaluate the `ergm` formula `formula` on each network, weighted by the predictors passed in the one-sided `lm` formula, which is interpreted the same way as that passed to the built-in `lm()` function, with its "`data`" being the table of network attributes.
