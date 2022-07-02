@@ -77,7 +77,7 @@ Since different networks may have different compositions, to have a consistent m
 roleset <- sort(unique(unlist(lapply(G.wd, `%v%`, "role"))))
 ```
 
-We now construct the formula, which will be passed directly to `ergm()`:
+We now construct the formula object, which will be passed directly to `ergm()`:
 ```{r}
 # Networks() function tells ergm() to model these networks jointly.
 f.wd <- Networks(G.wd) ~
@@ -88,34 +88,32 @@ f.wd <- Networks(G.wd) ~
       I(n>=5) # one total for only large households.
     ) +
 
-  # This N() construct simply evaluates each of the following terms in
-  # it on each network, and sums each statistic up over the networks:
+  # This N() construct evaluates each of its terms on each network,
+  # then sums each statistic over the networks:
   N(
-    # Firstly, mixing among household roles, including only
-    # father-mother, father-child, and mother-child relationship
-    # counts.
-    #
-    # Notic that since in an undirected network, tail < head, in the
-    # levels2 specification, it is important that the tail levels are rows
-    # and head levels are columns. In this case, "Child" comes before
-    # "Father" which comes before "Mother" in alphabetical order, and so
-    # which category is row= and which is col= is sorted accordingly.
+      # First, mixing statistics among household roles, including only
+      # father-mother, father-child, and mother-child counts.
+      # Since tail < head in an undirected network, in the
+      # levels2 specification, it is important that tail levels (rows)
+      # come before head levels (columns). In this case, since
+      # "Child" < "Father" < "Mother" in alphabetical order, the
+      # row= and col= categories must be sorted accordingly.
     ~mm("role", levels = I(roleset),
         levels2=~.%in%list(list(row="Father",col="Mother"),
                            list(row="Child",col="Father"),
                            list(row="Child",col="Mother"))) +
-      # Secondly, the nodal covariate effect of age, but only for
+      # Second, the nodal covariate effect of age, but only for
       # edges between children.
       F(~nodecov("age"), ~nodematch("role", levels=I("Child"))) +
-      # Thirdly, 2-stars.
+      # Third, 2-stars.
       kstar(2)
   ) +
-  # As with the first N(), this one adds the number of triangles
-  # totalled over all households and that only for those with at least 6
-  # members.
+  
+  # This N() adds one triangle count, totalled over all households
+  # with at least 6 members.
   N(~triangles, ~I(n>=6))
 ```
-See `ergmTerm?mm` for documentation on the `mm` term.
+See `ergmTerm?mm` for documentation on the `mm` term used above.
 Now, we can fit the model:
 ```{r}
 fit.wd <- ergm(f.wd)
@@ -125,7 +123,8 @@ summary(fit.wd)
 ```
 
 
-Similarly, we can extract the weekend network, and fit it to a smaller model. We only need one `N()` operator, since all `lm` are the same (i.e., just the intercept).
+Similarly, we can extract the weekend network, and fit it to a smaller model. We only need one `N()` operator, since all statistics are applied to the same set
+of networks, namely, all of them.
 ```{r}
 G.we <- G %>% discard(`%n%`, "weekday")
 fit.we <- ergm(Networks(G.we) ~
