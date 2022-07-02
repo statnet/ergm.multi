@@ -72,14 +72,12 @@ length(G.wd)
 
 Next, we specify the multi-network model using the `N(formula, lm)` operator. This operator will evaluate the `ergm` formula `formula` on each network, weighted by the predictors passed in the one-sided `lm` formula, which is interpreted the same way as that passed to the built-in `lm()` function, with its "`data`" being the table of network attributes.
 
-Since different networks may have different compositions, to have a consistent model, we specify a consistent list of family roles. (See `ergmTerm?mm` for the term documentation.)
-
+Since different networks may have different compositions, to have a consistent model, we specify a consistent list of family roles.
 ```{r}
-(roleset <- sort(unique(unlist(lapply(G.wd, `%v%`, "role")))) )
+roleset <- sort(unique(unlist(lapply(G.wd, `%v%`, "role"))))
 ```
 
-We now construct the formula. Note that although it is assigned to a variable here, it can be passed directly to `ergm()`:
-
+We now construct the formula, which will be passed directly to `ergm()`:
 ```{r}
 # Networks() function tells ergm() to model these networks jointly.
 f.wd <- Networks(G.wd) ~
@@ -117,6 +115,7 @@ f.wd <- Networks(G.wd) ~
   # members.
   N(~triangles, ~I(n>=6))
 ```
+See `ergmTerm?mm` for documentation on the `mm` term.
 Now, we can fit the model:
 ```{r}
 fit.wd <- ergm(f.wd)
