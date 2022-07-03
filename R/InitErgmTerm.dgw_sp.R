@@ -312,7 +312,6 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
     stop("Illegal type code for gwesp; valid types are:",paste(type.vec, collapse=","))
   dname<-"desp"
   if(!is.directed(nw)){  
-    message("Use the gwesp term for undirected networks.")
     type <- "UTP"
     typecode<-0
     basenam<-paste("gwesp",sep=".")
