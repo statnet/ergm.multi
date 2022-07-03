@@ -116,7 +116,8 @@ f.wd <- Networks(G.wd) ~
 See `ergmTerm?mm` for documentation on the `mm` term used above.
 Now, we can fit the model:
 ```{r}
-fit.wd <- ergm(f.wd)
+# (Set seed for predictable run time.)
+fit.wd <- ergm(f.wd, control=snctrl(seed=123))
 ```
 ```{r}
 summary(fit.wd)
@@ -135,7 +136,7 @@ fit.we <- ergm(Networks(G.we) ~
                                            list(row="Child",col="Mother"))) +
                      F(~nodecov("age"), ~nodematch("role", levels=I("Child"))) +
                      kstar(2) +
-                     triangles))
+                     triangles), control=snctrl(seed=123))
 ```
 ```{r}
 summary(fit.we)
