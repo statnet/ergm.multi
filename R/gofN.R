@@ -81,6 +81,7 @@
 #' summary(fit.gof)
 #' plot(fit.gof)
 #'
+#' \donttest{
 #' samplk1[1,]<-NA
 #' samplk2[,2]<-NA
 #' monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
@@ -92,7 +93,8 @@
 #' summary(fit.gof)
 #' plot(fit.gof)
 #' plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
-#' 
+#' }
+#'
 #' # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
 #' \dontrun{
 #' fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
