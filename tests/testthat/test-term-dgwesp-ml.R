@@ -7,9 +7,6 @@
 #
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
-library(testthat)
-context("test-term-dgwesp-ml.R")
-
 # "Correct" transitivity calculators
 
 dediag <- function(m, x=0) {diag(m) <- x; m}
@@ -118,7 +115,6 @@ gwnspL <- function(decay, n, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   sum(w*sp)
 }
 
-library(ergm)
 library(purrr)
 n <- 5
 
@@ -171,12 +167,12 @@ for(cache.sp in c(FALSE,TRUE)){
   sptxt <- if(cache.sp) "with shared partner caching" else "without shared partner caching"
 
 
-### Directed.
-nw1 <- nw2 <- nw3 <- network.initialize(n,dir=TRUE)
-lnw <- Layer(nw1,nw2,nw3)
+  ### Directed.
+  nw1 <- nw2 <- nw3 <- network.initialize(n,dir=TRUE)
+  lnw <- Layer(nw1,nw2,nw3)
 
 test_that(paste("Multilayer dgw*sp statistics for homogeneously directed networks",sptxt), {
-  sim <- suppressWarnings(simulate(lnw~
+  sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
                     despL(0:n,type="ITP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -346,9 +342,9 @@ test_that(paste("Multilayer dgw*sp statistics for homogeneously directed network
                     ## dgwnspL(decay,fixed=TRUE,type="ITP",L.base=~`2`,Ls.path=c(~`2`,~`3`),L.in_order=FALSE)+
                     ## dgwnspL(decay,fixed=TRUE,type="OSP",L.base=~`2`,Ls.path=c(~`2`,~`3`))+
                     ## dgwnspL(decay,fixed=TRUE,type="ISP",L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 ,
+                 , coef = numeric(450),
                   control=ctrl,
-                  nsim=200))
+                  nsim=200)
 
   stats <- sapply(sim,
                   function(nw){
@@ -531,7 +527,7 @@ test_that(paste("Multilayer dgw*sp statistics for homogeneously directed network
                     )
                   }) %>% t()
 
-  expect_equivalent(attr(sim,"stats"), stats)
+  expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
 ### Heterogeneous directedness.
@@ -540,7 +536,7 @@ nw2 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
 test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed networks 1",sptxt), {
-  sim <- suppressWarnings(simulate(lnw~
+  sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
                     despL(0:n,type="ITP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -710,9 +706,9 @@ test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed netwo
                     ## dgwnspL(decay,fixed=TRUE,type="ITP",L.base=~`2`,Ls.path=c(~`2`,~`3`),L.in_order=FALSE)+
                     ## dgwnspL(decay,fixed=TRUE,type="OSP",L.base=~`2`,Ls.path=c(~`2`,~`3`))+
                     ## dgwnspL(decay,fixed=TRUE,type="ISP",L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 ,
+                 , coef = numeric(450),
                   control=ctrl,
-                  nsim=200))
+                  nsim=200)
 
   stats <- sapply(sim,
                   function(nw){
@@ -896,7 +892,7 @@ test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed netwo
                     )
                   }) %>% t()
 
-  expect_equivalent(attr(sim,"stats"), stats)
+  expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
 
@@ -905,7 +901,7 @@ nw1 <- nw2 <- nw3 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
 test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
-  sim <- suppressWarnings(simulate(lnw~
+  sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,L.base=~`1`,Ls.path=c(~`2`,~`3`))+
                     # ddspL distinct layers
@@ -955,9 +951,9 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
                     ## dgwdspL(decay,fixed=TRUE,Ls.path=c(~`2`,~`3`))+
                     ## # dnspL distinct base and one layer
                     ## dgwnspL(decay,fixed=TRUE,L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 ,
+                 , coef = numeric(75),
                   control=ctrl,
-                  nsim=200))
+                  nsim=200)
 
   stats <- sapply(sim,
                   function(nw){
@@ -1020,6 +1016,6 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
                     )
                   }) %>% t()
 
-  expect_equivalent(attr(sim,"stats"), stats)
+  expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 }

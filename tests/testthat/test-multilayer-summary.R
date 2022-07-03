@@ -1,9 +1,17 @@
+#  File tests/testthat/test-multilayer-summary.R in package ergm.multi, part of the
+#  Statnet suite of packages for network analysis, https://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  https://statnet.org/attribution .
+#
+#  Copyright 2003-2022 Statnet Commons
+################################################################################
 nw0 <- network.initialize(10, dir=FALSE)
 (nw1 <- simulate(nw0~edges, coef=-.5))
 (nw2 <- simulate(nw0~edges, coef=+.5))
 
 test_that("basic layer logic summary", {
-  local_edition(3)
   (layer <- summary(Layer(A=nw1, B=nw2) ~
                       L(~edges, -1.5~.) +
                       L(~edges, ~A) +

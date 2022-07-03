@@ -7,8 +7,6 @@
 #
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
-context("test-term-dgwesp-ml.R")
-
 # "Correct" transitivity calculators
 dediag <- function(m, x=0) {diag(m) <- x; m}
 
@@ -28,8 +26,6 @@ twostar <- function(m1,m2, distinct=TRUE){
   ostar(m1,m2,distinct)
 }
 
-
-library(ergm)
 library(purrr)
 n <- 5
 ctrl <- control.simulate.formula(MCMC.burnin=n^2*2, MCMC.interval=n)
@@ -65,7 +61,7 @@ test_that("twostarL statistics for directed networks", {
                     )
                   }) %>% t()
 
-  expect_equivalent(attr(sim,"stats"), stats)
+  expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
 test_that("twostarL statistics for undirected networks", {
@@ -91,7 +87,7 @@ test_that("twostarL statistics for undirected networks", {
                     )
                   }) %>% t()
 
-  expect_equivalent(attr(sim,"stats"), stats)
+  expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
 
@@ -375,8 +371,8 @@ test_that("Statistics evaluation for heterogeneously bipartite networks", {
 
   lnw <- Layer(nw1, nw12, .active=list(~mode==1,~TRUE))
 
-  expect_equivalent(summary(lnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
-                    c(85,10,75,85,0))
+  expect_equal(summary(lnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
+               c(85,10,75,85,0), ignore_attr=TRUE)
 })
 
 test_that("Statistics simulation for heterogeneously bipartite networks", {
@@ -386,6 +382,6 @@ test_that("Statistics simulation for heterogeneously bipartite networks", {
 
   simulate(lnw~edges, coef=1000) -> slnw
 
-  expect_equivalent(summary(slnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
-                    c(85,10,75,85,0))
+  expect_equal(summary(slnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
+               c(85,10,75,85,0), ignore_attr=TRUE)
 })
