@@ -81,7 +81,7 @@
 #' }
 #'
 #' Filtering arguments are specified the same way as attribute
-#' arguments, but they must be named arguments (i.e., must be passed
+#' arguments, but they must be unnamed arguments (i.e., must be passed
 #' without the `=`) and must return a logical or numeric vector
 #' suitable for indexing the edge list. Multiple filtering arguments
 #' may be specified, and the edge will be kept if it satisfies
@@ -212,7 +212,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #'   1. A single network, a character vector, and several optional
 #'      arguments. Then, the layers are values of the named edge
-#'      attributes. The optional arguments `.symmetric` and
+#'      attributes. If the vector has named elements (e.g.,
+#'      `c(a="advice", c="collaboration")`), the layers will be
+#'      renamed accordingly. The optional arguments `.symmetric` and
 #'      `.bipartite` are then interpreted as described below.
 #'
 #' @param .symmetric If the layer specification is via a single
@@ -321,11 +323,12 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' flo <- Layer(m = flomarriage, b = flobusiness)
 #' ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 #'
-#' # Method 3: edge attributes:
+#' # Method 3: edge attributes (also illustrating renaming):
 #' flo <- flomarriage | flobusiness
-#' flo[,, names.eval="m"] <- as.matrix(flomarriage)
-#' flo[,, names.eval="b"] <- as.matrix(flobusiness)
-#' flo <- Layer(flo, c("m","b"))
+#' flo[,, names.eval="marriage"] <- as.matrix(flomarriage)
+#' flo[,, names.eval="business"] <- as.matrix(flobusiness)
+#' flo # edge attributes
+#' flo <- Layer(flo, c(m="marriage", b="business"))
 #' ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 #'
 #' ### Specifying modes and mixed bipartitedness
@@ -420,7 +423,8 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
       }
     }
 
-    names(nwl) <- args[[2]]
+    # Set names: if args[[2]] is a named vector, use those where set.
+    names(nwl) <- NVL3(names(args[[2]]), ifelse(.=="", args[[2]], .), args[[2]])
 
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
@@ -578,7 +582,7 @@ LL_CONTRADICTORY <- c("!=", "xor", "<", ">")
 #' Internal representation of Layer Logic
 #'
 #' @param formula A Layer Logic formula.
-#' @param namemap A character vector giving the names, of the layers
+#' @param namemap A character vector giving the names of the layers
 #'   referenced, or `NULL`.
 #'
 #' @return A structure with nonce class

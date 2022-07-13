@@ -14,7 +14,9 @@ networks.
 \item Several networks as (optionally named) arguments.
 \item A single network, a character vector, and several optional
 arguments. Then, the layers are values of the named edge
-attributes. The optional arguments \code{.symmetric} and
+attributes. If the vector has named elements (e.g.,
+\code{c(a="advice", c="collaboration")}), the layers will be
+renamed accordingly. The optional arguments \code{.symmetric} and
 \code{.bipartite} are then interpreted as described below.
 }}
 
@@ -131,11 +133,12 @@ ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 flo <- Layer(m = flomarriage, b = flobusiness)
 ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 
-# Method 3: edge attributes:
+# Method 3: edge attributes (also illustrating renaming):
 flo <- flomarriage | flobusiness
-flo[,, names.eval="m"] <- as.matrix(flomarriage)
-flo[,, names.eval="b"] <- as.matrix(flobusiness)
-flo <- Layer(flo, c("m","b"))
+flo[,, names.eval="marriage"] <- as.matrix(flomarriage)
+flo[,, names.eval="business"] <- as.matrix(flobusiness)
+flo # edge attributes
+flo <- Layer(flo, c(m="marriage", b="business"))
 ergm(flo ~ L(~edges, ~m)+L(~edges, ~b))
 
 ### Specifying modes and mixed bipartitedness

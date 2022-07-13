@@ -15,7 +15,7 @@ ergm_LayerLogic(formula, namemap = NULL)
 \arguments{
 \item{formula}{A Layer Logic formula.}
 
-\item{namemap}{A character vector giving the names, of the layers
+\item{namemap}{A character vector giving the names of the layers
 referenced, or \code{NULL}.}
 
 \item{x}{An \code{ergm_LayerLogic} object.}

@@ -54,7 +54,7 @@ to set the edge attribute.}
 }
 
 Filtering arguments are specified the same way as attribute
-arguments, but they must be named arguments (i.e., must be passed
+arguments, but they must be unnamed arguments (i.e., must be passed
 without the \code{=}) and must return a logical or numeric vector
 suitable for indexing the edge list. Multiple filtering arguments
 may be specified, and the edge will be kept if it satisfies
