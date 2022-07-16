@@ -299,13 +299,13 @@ static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, /
     return ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2) | (ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2)<<2);
   }else{
     if(ergm_LayerLogic2(lt, lh, ttail, thead, ll, change)){
-      atails[nt] = lt;
-      aheads[nt] = lh;
+      if(atails) atails[nt] = lt;
+      if(aheads) aheads[nt] = lh;
       nt++;
     }
     if(ergm_LayerLogic2(lh, lt, ttail, thead, ll, change)){
-      atails[nt] = lh;
-      aheads[nt] = lt;
+      if(atails) atails[nt] = lh;
+      if(aheads) aheads[nt] = lt;
       nt++;
     }
   return nt;
