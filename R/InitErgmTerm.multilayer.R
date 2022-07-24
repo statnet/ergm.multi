@@ -858,15 +858,13 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   nw1 <- nwl[[1]]
   m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
 
-  inputs <- c(nltrms, w)
-
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
   wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
   wm$dependence <- wm$dependence || !is.dyad.independent(auxiliaries, basis=nw)
 
-  c(list(name="OnLayer", inputs=inputs, submodel=m, auxiliaries = auxiliaries),
+  c(list(name="OnLayer", iinputs=nltrms, inputs=w, submodel=m, auxiliaries = auxiliaries),
     wm)
 }
 
@@ -906,9 +904,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
   auxiliaries <- .mk_.layer.net_auxform(Ls)
   nltrms <- length(list_rhs.formula(auxiliaries))
 
-  inputs <- c(nltrms)
-
-  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse(Ls)),')'), inputs=inputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse(Ls)),')'), iinputs=nltrms, dependence=TRUE, auxiliaries = auxiliaries)
 }
 
 ################################################################################

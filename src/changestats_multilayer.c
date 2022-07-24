@@ -115,7 +115,7 @@ F_CHANGESTAT_FN(f__layer_net){
 
 I_CHANGESTAT_FN(i_OnLayer){
   
-  unsigned int nml = *INPUT_PARAM; // Number of layers *in the term*.
+  unsigned int nml = *IINPUT_PARAM; // Number of layers *in the term*.
 
   ALLOC_STORAGE(nml, Model*, ms);
 
@@ -129,8 +129,8 @@ I_CHANGESTAT_FN(i_OnLayer){
 
 C_CHANGESTAT_FN(c_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_PARAM;
-  double *w = INPUT_PARAM+1;
+  unsigned int nml = *IINPUT_PARAM;
+  double *w = INPUT_PARAM;
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
@@ -147,8 +147,8 @@ C_CHANGESTAT_FN(c_OnLayer){
 
 Z_CHANGESTAT_FN(z_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_PARAM;
-  double *w = INPUT_PARAM+1;
+  unsigned int nml = *IINPUT_PARAM;
+  double *w = INPUT_PARAM;
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
@@ -161,7 +161,7 @@ Z_CHANGESTAT_FN(z_OnLayer){
 
 F_CHANGESTAT_FN(f_OnLayer){
   GET_STORAGE(Model*, ms);
-  unsigned int nml = *INPUT_PARAM;
+  unsigned int nml = *IINPUT_PARAM;
   for(unsigned int ml=0; ml<nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     ModelDestroy(ll->onwp, ms[ml]);
@@ -171,7 +171,7 @@ F_CHANGESTAT_FN(f_OnLayer){
 /* layerCMB: Conway-Maxwell-Binomial for the sum of layer combinations */
 
 C_CHANGESTAT_FN(c_layerCMB){
-  unsigned int nml = *INPUT_PARAM;
+  unsigned int nml = *IINPUT_PARAM;
 
   // FIXME: Cache current values, perhaps via a valued auxiliary?
 
