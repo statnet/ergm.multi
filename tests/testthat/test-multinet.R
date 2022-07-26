@@ -67,7 +67,7 @@ for(N.compact_stats in c(FALSE,TRUE)){
     x <- as.data.frame(cbind(x,t=rep(times, nr)))
     w <- unlist(lapply(pl, `[[`, "weights"))
     glmfit <- glm(y~t*nodematch.cloisterville,data=x,weights=w,family="binomial")
-    expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE)
+    expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE, tolerance=1e-7)
   })
   
   test_that(paste("N() estimation with an LM, subsetting, and", testlab),{
@@ -84,7 +84,7 @@ for(N.compact_stats in c(FALSE,TRUE)){
     x <- as.data.frame(cbind(x,t=rep(times2, nr)))
     w <- unlist(lapply(pl2, `[[`, "weights"))
     glmfit <- glm(y~t*nodematch.cloisterville,data=x,weights=w,family="binomial")
-    expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE)
+    expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE, tolerance=1e-7)
   })
     
   test_that(paste("N() estimation with an LM, subsetting down to only 1 network, and", testlab),{
@@ -109,7 +109,7 @@ for(N.compact_stats in c(FALSE,TRUE)){
       expect_equal(na.omit(coef(glmfit)),
                         c(matrix(c(1,2,0,0,
                                    0,0,1,2),2,4,byrow=TRUE)%*%coef(ergmfit)),
-                   ignore_attr=TRUE)
+                   ignore_attr=TRUE, tolerance=1e-7)
     }
   })
 }
