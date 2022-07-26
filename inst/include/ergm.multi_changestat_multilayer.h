@@ -54,6 +54,7 @@ typedef struct {
   Vertex *lid;
   Vertex *lmap;
   int *symm;
+  Rboolean need_ht;
   double *commands;
   double *stacks;
 } StoreLayerLogic;
@@ -200,7 +201,7 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
   // What gets toggled?
   Vertex tlt = ML_IO_TAIL(ll, ttail), tlh = ML_IO_HEAD(ll, thead), tl = ML_LID_TAIL(ll, ttail);
   // Is the dyad being toggled the same one as being looked up?
-  unsigned int t_th = lt==tlt && lh==tlh, t_ht = lt==tlh && lh==tlt;
+  unsigned int t_th = lt==tlt && lh==tlh, t_ht = ll->need_ht && lt==tlh && lh==tlt;
 
   double *stack0=ll->stacks-1, // stack0 and stack1 always point to the top element (if any)
     *stack1=change && (t_th||t_ht)? ll->stacks+ncom-1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
@@ -296,14 +297,14 @@ static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, /
   unsigned int nt = 0;
   Vertex lt = ML_IO_TAIL(ll, ttail), lh = ML_IO_HEAD(ll, thead);
   if(change==2){
-    return ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2) | (ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2)<<2);
+    return ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2) | (ll->need_ht ? ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2)<<2 : 0);
   }else{
     if(ergm_LayerLogic2(lt, lh, ttail, thead, ll, change)){
       if(atails) atails[nt] = lt;
       if(aheads) aheads[nt] = lh;
       nt++;
     }
-    if(ergm_LayerLogic2(lh, lt, ttail, thead, ll, change)){
+    if(ll->need_ht && ergm_LayerLogic2(lh, lt, ttail, thead, ll, change)){
       if(atails) atails[nt] = lh;
       if(aheads) aheads[nt] = lt;
       nt++;

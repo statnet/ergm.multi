@@ -57,6 +57,20 @@ I_CHANGESTAT_FN(i__layer_net){
   ll->commands = inputs;
   ll->stacks = Calloc(2*ll->commands[0], double);
 
+  /* Figure out if this layer needs to calculate reciprocal toggles. */
+
+  ll->need_ht = FALSE;
+  if(DIRECTED){
+    for(unsigned int i=1; i<=*ll->commands; i++){
+      int com = ll->commands[i];
+      if(com == -23 || // If t() is ever used, or
+         (ll->symm && com > 0 && ll->symm[com])){ // any symmetrized layers are referenced,
+        ll->need_ht = TRUE; // then toggle (t,h) somewhere may affect dyad (h,t) in this layer.
+        break;
+      }
+    }
+  }
+
   /* Construct the output (logical layer) network: */  
 
   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, {
@@ -177,16 +191,29 @@ C_CHANGESTAT_FN(c_layerCMB){
 
   unsigned int oldct_th=0, newct_th=0,
     oldct_ht=0, newct_ht=0;
+
+  /* Determine whether we need to check the reciprocating dyads. */
+  Rboolean need_ht = FALSE;
+  for(unsigned int ml=0; ml < nml; ml++){
+    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    if(ll->need_ht){
+      need_ht = TRUE;
+      break;
+    }
+  }
+
   for(unsigned int ml=0; ml < nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
     unsigned int v = ergm_LayerLogic2(lt, lh, tail, head, ll, 2);
     if(v&1) oldct_th++; // Pre-toggle edge present.
     if(v&2) newct_th++; // Post-toggle edge present.
-    
-    v = ergm_LayerLogic2(lh, lt, tail, head, ll, 2);
-    if(v&1) oldct_ht++; // Pre-toggle edge present.
-    if(v&2) newct_ht++; // Post-toggle edge present.
+
+    if(need_ht){
+      v = ergm_LayerLogic2(lh, lt, tail, head, ll, 2);
+      if(v&1) oldct_ht++; // Pre-toggle edge present.
+      if(v&2) newct_ht++; // Post-toggle edge present.
+    }
   }
   
   CHANGE_STAT[0] =
