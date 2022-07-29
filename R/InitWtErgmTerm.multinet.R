@@ -37,12 +37,7 @@ InitWtErgmTerm.N <- function(...){
 #' @usage
 #' # valued: ByNetDStats(formula, subset=TRUE)
 #' @noRd
-InitWtErgmTerm.ByNetDStats <- function(nw, arglist, ...){
-  a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula", "subset"),
-                      vartypes = c("formula","formula,logical,numeric,expression,call"),
-                      defaultvalues = list(NULL,TRUE),
-                      required = c(TRUE,FALSE))
+InitWtErgmTerm.ByNetDStats <- function(...){
   # Rename the function to avoid the extra nesting level in the
   # diagnostic messages.
   f <- InitErgmTerm.ByNetDStats
