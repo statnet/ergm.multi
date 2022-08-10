@@ -93,6 +93,9 @@
       \item{
         A number of optimisations in multilayer ERGM code.
       }
+      \item{
+        [Layer] Logic backend now uses integer arithmetic, for a significant speed improvement, at the cost of behaviour slightly inconsistent with \R's, such as \code{/} behaving as \code{\%/\%} (integer division).
+      }
     }
   }
 }
