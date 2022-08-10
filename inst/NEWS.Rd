@@ -65,6 +65,39 @@
 %% }
 
 
+\section{Changes in version 0.1.1}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item{
+        In the \code{\link{Layer}(nw, attrlist)} specification, \code{attrlist=} can now be a named vector, in which case the layers are renamed accordingly.
+      }
+    }
+  }
+
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item{
+        Tolerance for some tests of the \code{\link{N}()} operator has been increased. This fixes a sporadic issue on M-series MacOS systems due to using a different linear algebra library.
+      }
+      \item{
+        A bug in \code{\link{gofN}()} for valued ERGMs has been fixed.
+      }
+    }
+  }
+
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item{
+        A number of optimisations in multilayer ERGM code.
+      }
+    }
+  }
+}
+
+
 \section{Changes in version 0.1.0}{
 
   \subsection{NEW FEATURES}{
