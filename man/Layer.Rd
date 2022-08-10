@@ -92,6 +92,13 @@ listed operators are implemented, as well as functions \code{\link{abs}},
 \link[base:Syntax]{operator precedence} applies, so use of parentheses is
 recommended to ensure the logical expression is what it looks like.
 
+\strong{Important:} For performance reasons, \pkg{ergm.multi}'s
+Layer Logic implementation uses integer arithmetic. This means, in
+particular, that \code{/} will round down instead of returning a
+fraction (as \code{\%/\%} does in \R), and \code{\link[=round]{round()}} function without a
+second argument (which can be negative to round to the nearest 10,
+100, etc.) is not meaningful and will be ignored.
+
 For example, if LHS is \code{Layer(A=nwA, B=nwB)}, both \code{~`2`} and
 \code{~B} refer to \code{nwB}, while \code{A&!B} refers to a
 \dQuote{logical} layer that has ties that are in \code{nwA} but not in

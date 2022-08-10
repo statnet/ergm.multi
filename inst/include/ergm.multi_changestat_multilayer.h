@@ -185,10 +185,6 @@ typedef struct {
     break;}
 
 
-#define ergm_FLOORDIV(x,y) x/y
-
-#define ergm_FROUND(x) fround(x,0)
-
 static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose value/change to evaluate within the logical layer.
 				   Vertex ttail, Vertex thead, // Dyad to toggle on LHS network.
 				   StoreLayerLogic *ll, // Layer Logic
@@ -234,11 +230,9 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
     case -16:ergm_UNOP(-)
     case -17:ergm_UNFUN(abs)
     case -18:ergm_BINFUN(pow)
-    case -19:ergm_BINFUN(ergm_FLOORDIV)
-    case -20:ergm_UNFUN(ergm_FROUND)
-    case -21:ergm_BINFUN(fround)
-    case -22:ergm_UNFUN(sign)
-    case -23:{ // Reverse direction
+    case -19:ergm_BINFUN(fround)
+    case -20:ergm_UNFUN(sign)
+    case -21:{ // Reverse direction
       Vertex l = *(commands++);
       unsigned int x0;
       // If the physical layer is symmetrized, then only look at the upper triangle.
@@ -318,6 +312,5 @@ static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, /
 #undef ergm_UNFUN
 #undef ergm_BINOP
 #undef ergm_BINFUN
-#undef ergm_FLOORDIV
 
 #endif // _ERGM_MULTI_CHANGESTAT_MULTILAYER_H_

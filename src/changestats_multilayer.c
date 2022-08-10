@@ -62,7 +62,7 @@ I_CHANGESTAT_FN(i__layer_net){
   if(DIRECTED){
     for(unsigned int i=1; i<=*ll->commands; i++){
       int com = ll->commands[i];
-      if(com == -23 || // If t() is ever used, or
+      if(com == -21 || // If t() is ever used, or
          (ll->symm && com > 0 && ll->symm[com])){ // any symmetrized layers are referenced,
         ll->need_ht = TRUE; // then toggle (t,h) somewhere may affect dyad (h,t) in this layer.
         break;

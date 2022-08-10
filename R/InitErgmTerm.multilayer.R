@@ -281,6 +281,13 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' \link[base:Syntax]{operator precedence} applies, so use of parentheses is
 #' recommended to ensure the logical expression is what it looks like.
 #'
+#' \strong{Important:} For performance reasons, \pkg{ergm.multi}'s
+#' Layer Logic implementation uses integer arithmetic. This means, in
+#' particular, that `/` will round down instead of returning a
+#' fraction (as `%/%` does in \R), and [round()] function without a
+#' second argument (which can be negative to round to the nearest 10,
+#' 100, etc.) is not meaningful and will be ignored.
+#'
 #' For example, if LHS is \code{Layer(A=nwA, B=nwB)}, both \code{~`2`} and
 #' \code{~B} refer to \code{nwB}, while \code{A&!B} refers to a
 #' \dQuote{logical} layer that has ties that are in \code{nwA} but not in
@@ -542,7 +549,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
 
 LL_PREOPMAP <- list(
     # Unary operators
-    c(`t` = -23)
+    c(`t` = -21)
   )
 LL_POSTOPMAP <- list(
     # Unary operators
@@ -551,8 +558,8 @@ LL_POSTOPMAP <- list(
       `+` = NA,
       `-` = -16,
       `abs` = -17,
-      `round` = -20,
-      `sign` = -22),
+      `round` = NA,
+      `sign` = -20),
     # Binary operators
     c(`&` = -2,
       `&&` = -2,
@@ -571,8 +578,8 @@ LL_POSTOPMAP <- list(
       `/` = -14,
       `%%` = -15,
       `^` = -18,
-      `%/%` = -19,
-      `round` = -21)
+      `%/%` = -14,
+      `round` = -19)
 )
 
 LL_IDEMPOTENT <- c("&", "&&", "|", "||")
@@ -686,9 +693,9 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
 }
 
 test_eval.LayerLogic <- function(commands, lv, lvr = lv){
-  coms <- commands[-1]
+  coms <- as.integer(commands[-1])
   lv <- rep(lv, length.out=max(coms))
-  stack <- c()
+  stack <- integer(0)
   if(sum(coms!=0 & !coms%in%unlist(LL_PREOPMAP))!=commands[1]) stop("Layer specification command vector specifies incorrect number of commands.", call.=FALSE)
   for(i in 1:commands[1]){
     com <- coms[1]
@@ -750,7 +757,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
     }else if(com==-14){
       x0 <- stack[1]; stack <- stack[-1]
       y0 <- stack[1]; stack <- stack[-1]
-      stack <- c(x0 / y0, stack)
+      stack <- c(x0 %/% y0, stack)
     }else if(com==-15){
       x0 <- stack[1]; stack <- stack[-1]
       y0 <- stack[1]; stack <- stack[-1]
@@ -764,22 +771,15 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
     }else if(com==-18){
       x0 <- stack[1]; stack <- stack[-1]
       y0 <- stack[1]; stack <- stack[-1]
-      stack <- c(x0 ^ y0, stack)
+      stack <- c(as.integer(x0 ^ y0), stack)
     }else if(com==-19){
       x0 <- stack[1]; stack <- stack[-1]
       y0 <- stack[1]; stack <- stack[-1]
-      stack <- c(x0 %/% y0, stack)
+      stack <- c(as.integer(round(x0, y0)), stack)
     }else if(com==-20){
       x0 <- stack[1]; stack <- stack[-1]
-      stack <- c(round(x0), stack)
-    }else if(com==-21){
-      x0 <- stack[1]; stack <- stack[-1]
-      y0 <- stack[1]; stack <- stack[-1]
-      stack <- c(round(x0, y0), stack)
-    }else if(com==-22){
-      x0 <- stack[1]; stack <- stack[-1]
       stack <- c(sign(x0), stack)
-    }else if(com==-23){ 
+    }else if(com==-21){ 
       coms <- coms[-1]
       x0 <- coms[1]
       stack <- c(lvr[x0], stack)
