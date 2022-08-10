@@ -70,8 +70,8 @@ parameters: its coefficient and its decay rate. We can specify a
 model in which they depend on \eqn{\log(n)} as \code{N(~gwesp, ~log(n))}, resulting in the following 4 parameters, with the
 intercept for the linear model being implicit:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] "N(1)~gwesp"            "N(log(n))~gwesp"       "N(1)~gwesp.decay"     
-## [4] "N(log(n))~gwesp.decay"
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#> [1] "N(1)~gwesp"            "N(log(n))~gwesp"       "N(1)~gwesp.decay"     
+#> [4] "N(log(n))~gwesp.decay"
 }\if{html}{\out{</div>}}
 
 If a different linear model is desired for different ERGM terms
@@ -83,8 +83,8 @@ parameter not to. In this case, one can use the \code{offset()}
 decorator with partial offsetting. Then, specifying
 \code{offset(N(~gwesp(), ~log(n)), 4)}, we get:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] "N(1)~gwesp"                    "N(log(n))~gwesp"              
-## [3] "N(1)~gwesp.decay"              "offset(N(log(n))~gwesp.decay)"
+\if{html}{\out{<div class="sourceCode">}}\preformatted{#> [1] "N(1)~gwesp"                    "N(log(n))~gwesp"              
+#> [3] "N(1)~gwesp.decay"              "offset(N(log(n))~gwesp.decay)"
 }\if{html}{\out{</div>}}
 
 Then, setting the corresponding \code{offset.coef = 0} will fix the

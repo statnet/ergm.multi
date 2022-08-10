@@ -121,11 +121,11 @@ used for a variety of diagnostics and diagnostic plots developed by
 \itemize{
 \item \code{[}: Extract a subset of statistics for which goodness-of-fit had been computed.
 
-\item \code{plot}: A plotting method, making residual and scale-location plots.
+\item \code{plot(gofN)}: A plotting method, making residual and scale-location plots.
 
-\item \code{summary}: A simple summary function.
+\item \code{summary(gofN)}: A simple summary function.
+
 }}
-
 \examples{
 data(samplk)
 monks <- Networks(samplk1, samplk2, samplk3,samplk1, samplk2, samplk3,samplk1, samplk2, samplk3)
