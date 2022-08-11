@@ -41,7 +41,7 @@ length(Goeyvaerts)
 ```
 An explanation of the networks, including a list of their
 network (`%n%`) and vertex (`%v%`) attributes, can be obtained via `?Goeyvaerts`.
-A total of `r length(Goeyvaerts)` complete networks were collected, then two more excluded due to "nonstandard" family composition:
+A total of `r length(Goeyvaerts)` complete networks were collected, then two were excluded due to "nonstandard" family composition:
 ```{r}
 Goeyvaerts %>% discard(`%n%`, "included") %>% map(as_tibble, unit="vertices")
 ```
