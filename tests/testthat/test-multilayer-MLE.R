@@ -22,16 +22,15 @@ layer_and_MLE <- function(nw1, nw2){
   log(3*ne/nd)-log(1-ne/nd)
 }
 
-layer_and_Info <- function(nw1, nw2){
-  mle <- layer_and_MLE(nw1, nw2)
-  network.dyadcount(nw1)*(3*exp(mle))/(3+exp(mle))^2
+layer_and_Info <- function(nw1, nw2, theta=layer_and_MLE(nw1, nw2)){
+  network.dyadcount(nw1)*(3*exp(theta))/(3+exp(theta))^2
 }
 
-test_that("basic layer logic summary", {
+test_that("layer logic estimation for a single AND layer", {
   layer <- ergm(Layer(nw1,nw2)~L(~edges, ~`1`&`2`))
   logic.coef <- layer_and_MLE(nw1,nw2)
-  logic.info <- layer_and_Info(nw1,nw2)
+  logic.info <- layer_and_Info(nw1,nw2, coef(layer))
 
-  expect_equal(sqrt(c(vcov(layer, sources="model"))), sqrt(1/logic.info), ignore_attr=TRUE, tolerance=0.2)
+  expect_equal(sqrt(c(vcov(layer, sources="model"))), sqrt(1/logic.info), ignore_attr=TRUE, tolerance=0.3)
   expect_lt(abs(layer_and_MLE(nw1,nw2)-coef(layer))/sqrt(vcov(layer, sources="estimation")), 4)
 })
