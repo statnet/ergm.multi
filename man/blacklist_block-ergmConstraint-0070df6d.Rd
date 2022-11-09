@@ -28,6 +28,8 @@ using \code{\link[=combine_networks]{combine_networks()}}.
 }
 \seealso{
 \code{\link{ergmConstraint}} for index of constraints and hints currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmConstraint", "blacklist_block", "subsection")}
 }
 \concept{directed}
 \concept{dyad-independent}

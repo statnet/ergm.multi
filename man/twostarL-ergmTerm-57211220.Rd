@@ -43,6 +43,8 @@ the network.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "twostarL", "subsection")}
 }
 \concept{directed}
 \concept{layer-aware}

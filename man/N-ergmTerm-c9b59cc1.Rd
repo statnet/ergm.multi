@@ -98,6 +98,8 @@ allowing a constant decay parameter to be estimated.
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
 
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "N", "subsection")}
+
 \code{vignette("Goeyvaerts_reproduction")} for a demonstration.
 }
 \concept{directed}
