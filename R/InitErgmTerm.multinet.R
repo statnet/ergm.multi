@@ -186,7 +186,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'
 #' @section Offsets and fixing parameters:
 #'
-#' By an `N(formula, lm)` term will add \eqn{p \times q}{p*q} free
+#' By default, an `N(formula, lm)` term will add \eqn{p \times q}{p*q} free
 #' parameters, where \eqn{p} is the number of free parameters
 #' (possibly curved) of the ERGM specified by `formula`, and \eqn{q}
 #' is the number of parameters specified by the `lm` formula. That is,
