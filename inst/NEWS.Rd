@@ -64,6 +64,18 @@
 
 %% }
 
+\section{Changes in version 0.1.2}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \code{\link{marg_cond_sim}()} now expects \code{\link{control.gofN}()} as its \code{control=} list.
+
+      \item Some unit test tolerances have been loosed, making false positives less likely.
+
+      \item Miscellaneous documentation fixes.
+    }
+  }
+}
+
 
 \section{Changes in version 0.1.1}{
 

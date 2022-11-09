@@ -38,6 +38,8 @@ This term can only be used with directed networks.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "mutualL", "subsection")}
 }
 \concept{directed}
 \concept{frequently-used}

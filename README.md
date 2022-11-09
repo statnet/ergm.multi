@@ -4,7 +4,7 @@
 [![cran version](https://www.r-pkg.org/badges/version/ergm.multi)](https://cran.r-project.org/package=ergm.multi)
 [![R build status](https://github.com/statnet/ergm.multi/workflows/R-CMD-check/badge.svg)](https://github.com/statnet/ergm.multi/actions)
 
-A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm' is a part of the Statnet suite of packages for network analysis.
+A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm.multi' is a part of the Statnet suite of packages for network analysis. See Krivitsky, Koehly, and Marcum (2020) <doi:10.1007/s11336-020-09720-7> and Krivitsky, Coletti, and Hens (2022) <doi:10.48550/arXiv.2202.03685>.
 
 ## Public and Private repositories
 

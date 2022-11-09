@@ -9,7 +9,7 @@ toggled}
 # upper_tri(attr = NULL)
 }
 \arguments{
-\item{attr}{quantitative attribute (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
+\item{attr}{a vertex attribute specification (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
 }
 \description{
 For a directed network, only dyads \eqn{(i,j)} for
@@ -18,6 +18,8 @@ controls which subgraphs are thus restricted.
 }
 \seealso{
 \code{\link{ergmConstraint}} for index of constraints and hints currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmConstraint", "upper_tri", "subsection")}
 }
 \concept{directed}
 \concept{dyad-independent}

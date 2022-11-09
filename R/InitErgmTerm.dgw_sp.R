@@ -245,7 +245,8 @@ InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("desp()")
 }
 
-#' @rdname despL-ergmTerm
+#' @templateVar name despL
+#' @template ergmTerm-rdname
 #' @aliases espL-ergmTerm
 #' @description `espL` and `despL` are aliases for consistency with \pkg{ergm}.
 #' @usage
@@ -351,7 +352,8 @@ InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   }
 }
 
-#' @rdname dgwespL-ergmTerm
+#' @templateVar name dgwespL
+#' @template ergmTerm-rdname
 #' @aliases gwespL-ergmTerm
 #' @description `gdwespL` and `dgwespL` are aliases for consistency with \pkg{ergm}.
 #' @usage
@@ -438,7 +440,8 @@ InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("ddsp()")
 }
 
-#' @rdname ddspL-ergmTerm
+#' @templateVar name ddspL
+#' @template ergmTerm-rdname
 #' @aliases dspL-ergmTerm
 #' @description `dspL` and `ddspL` are aliases for consistency with \pkg{ergm}.
 #' @usage
@@ -531,7 +534,8 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   }
 }
 
-#' @rdname dgwdspL-ergmTerm
+#' @templateVar name dgwdspL
+#' @template ergmTerm-rdname
 #' @aliases gwdspL-ergmTerm 
 #' @description `gdwdspL` and `dgwdspL` are aliases for consistency with \pkg{ergm}.
 #' @usage
@@ -618,7 +622,8 @@ InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
   else no_layer_err("dnspL()")
 }
 
-#' @rdname dnspL-ergmTerm
+#' @templateVar name dnspL
+#' @template ergmTerm-rdname
 #' @aliases nspL-ergmTerm
 #' @description `nspL` and `dnspL` are aliases for consistency with \pkg{ergm}.
 #' @usage
@@ -712,7 +717,8 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   }
 }
 
-#' @rdname dgwnspL-ergmTerm
+#' @templateVar name dgwnspL
+#' @template ergmTerm-rdname
 #' @aliases gwnspL-ergmTerm
 #' @description `gdwnspL` and `dgwnspL` are aliases for consistency with \pkg{ergm}.
 #' @usage

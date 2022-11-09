@@ -80,6 +80,8 @@ define closely related statistics to several of the above, using slightly differ
 
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "dgwespL", "subsection")}
 }
 \concept{directed}
 \concept{layer-aware}

@@ -22,7 +22,7 @@
 #' @return an object of similar structure as that returned by [gofN()].
 #' @export
 marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.gofN.ergm(), save_stats=FALSE, ...){
-  check.control.class(c("simulate.ergm"), "marg_cond_sim")
+  check.control.class(c("gofN.ergm"), "marg_cond_sim")
   control$obs.twostage <- obs.twostage
   control$nsim <- nsim
   if(control$obs.twostage && nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by control$obs.twostage control parameter must divide the nsim control parameter evenly.")

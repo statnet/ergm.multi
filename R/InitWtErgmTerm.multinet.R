@@ -19,7 +19,8 @@ InitWtErgmTerm..subnets <- function(...){
 
 # Arguments and outputs are identical to the binary version, except for the C routine names.
 
-#' @rdname N-ergmTerm
+#' @templateVar name N
+#' @template ergmTerm-rdname
 #' @usage
 #' # valued: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 InitWtErgmTerm.N <- function(...){
@@ -33,7 +34,8 @@ InitWtErgmTerm.N <- function(...){
   term
 }
 
-#' @rdname ByNetDStats-ergmTerm
+#' @templateVar name ByNetDStats
+#' @template ergmTerm-rdname
 #' @usage
 #' # valued: ByNetDStats(formula, subset=TRUE)
 #' @noRd
