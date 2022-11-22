@@ -110,7 +110,8 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   if(subnet.cache){
     snc <- NVL(out %n% ".subnetcache", list()) # TODO: Check that this line is necessary, since combined networks aren't supposed to have a subnet cache even if the constituent networks do.
 
-    snc[[blockID.vattr]] <- nwl
+    nwl0 <- lapply(nwl, `[<-.network`, value = 0)
+    snc[[blockID.vattr]] <- nwl0
     out %n% ".subnetcache" <- snc
   }
 
@@ -404,6 +405,10 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' @param names.vattr optional name of the vertex attribute to use as network
 #'   names in the output list.
 #'
+#' @param use.subnet.cache whether to use subnet cache if available;
+#'   this is only safe to do if the network is *not* used for its
+#'   edges but only for its vertex and network attributes.
+#'
 #' @return a list of [`network::network`]s containing subgraphs on `split.vattr`. In particular,
 #'
 #' * their basic properties (directedness and bipartednes) are the same as those of the input network;
@@ -426,12 +431,12 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' ol <- uncombine_network(o1)
 #'
 #' @export
-uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=".NetworkID", names.vattr=NULL){
+uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=".NetworkID", names.vattr=NULL, use.subnet.cache=FALSE){
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
   nwl <-
-    if(".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
+    if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
     else split(nw, f)
 
   for(a in setdiff(list.network.attributes(nw),
@@ -446,7 +451,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
 }
 
 .split_constr_network <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
-  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr")) %>% map(function(nw1){
+  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr"), use.subnet.cache=TRUE) %>% map(function(nw1){
     for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1})
 }

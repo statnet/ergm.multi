@@ -11,7 +11,8 @@ uncombine_network(
   ignore.vattr = c(),
   ignore.eattr = c(),
   split.vattr = ".NetworkID",
-  names.vattr = NULL
+  names.vattr = NULL,
+  use.subnet.cache = FALSE
 )
 }
 \arguments{
@@ -24,6 +25,10 @@ edge attributes not to be processed as described below.}
 
 \item{names.vattr}{optional name of the vertex attribute to use as network
 names in the output list.}
+
+\item{use.subnet.cache}{whether to use subnet cache if available;
+this is only safe to do if the network is \emph{not} used for its
+edges but only for its vertex and network attributes.}
 }
 \value{
 a list of \code{\link[network:network]{network::network}}s containing subgraphs on \code{split.vattr}. In particular,
