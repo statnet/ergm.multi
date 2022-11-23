@@ -450,7 +450,19 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
   nwl
 }
 
-.split_constr_network <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
+#' Obtain empty networks representing constituents of a combined network
+#'
+#' This utility uncombines a [combine_networks()] network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.
+#'
+#' @param nw,split.vattr,nams.vattr see [uncombine_network()].
+#'
+#' @param copy.ergmlhs a character vector of [`%ergmlhs%`] settings that are to be copied into the constituent networks.
+#'
+#' @return A list of [`network`]s.
+#'
+#' @keywords internal
+#' @export
+subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
   uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr"), use.subnet.cache=TRUE) %>% map(function(nw1){
     for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1})

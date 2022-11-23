@@ -535,7 +535,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
                       required = c(TRUE))
 
   
-  nwl <- .split_constr_network(nw,".LayerID",".LayerName")
+  nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
 
   ll <- to_ergm_Cdouble(.set_layer_namemap(a$L, nw))
   # Terms on this logical layer will induce dyadic independence if its
@@ -842,7 +842,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
                       defaultvalues = list(NULL, empty_env(~.)),
                       required = c(TRUE, FALSE))
 
-  nwl <- .split_constr_network(nw,".LayerID",".LayerName")
+  nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
 
   Ls <- .set_layer_namemap(a$Ls, nw)
   if(is(Ls, "formula")) Ls <- list(Ls)

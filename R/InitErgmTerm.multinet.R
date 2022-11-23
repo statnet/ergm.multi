@@ -93,7 +93,7 @@ as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertice
     if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[".NetworkID"]]
     else{
       # FIXME: Probably more efficient to use attrnames earlier, in order to save calls to get.network.attribute().
-      xl <- if(is.network(x)) .split_constr_network(x, ".NetworkID", ".NetworkName") else x
+      xl <- if(is.network(x)) subnetwork_templates(x, ".NetworkID", ".NetworkName") else x
       nattrs <- Reduce(union, lapply(xl, list.network.attributes))
       lapply(nattrs, function(nattr) lapply(xl, get.network.attribute, nattr)) %>% set_names(nattrs)
     }
@@ -237,7 +237,7 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
 
   auxiliaries <- base_env(~.subnets(".NetworkID"))
 
-  nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
+  nwl <- subnetwork_templates(nw, ".NetworkID", ".NetworkName")
   nwnames <- names(nwl)
   nn <- length(nwl)
   nattrs <- as_tibble(nw, unit="networks")
