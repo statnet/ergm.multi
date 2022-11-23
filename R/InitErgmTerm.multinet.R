@@ -81,19 +81,20 @@ InitErgmTerm..subnets <- function(nw, arglist, ...){
 #' @param x  a [`combined_networks`] (inheriting from [`network::network`]).
 #' @param attrnames a list (or a selection index) for attributes to obtain; for combined networks, defaults to all.
 #' @param unit whether to obtain edge, vertex, or network attributes.
+#' @template ergmTerm-NetworkIDName
 #' @param ... additional arguments, currently passed to unlist()].
 #'
 #' @seealso [network::as_tibble.network()]
 #' @export
-as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks")){
+as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName"){
   unit <- match.arg(unit)
   if(unit!="networks") return(NextMethod())
 
   al <-
-    if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[".NetworkID"]]
+    if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[.NetworkID]]
     else{
       # FIXME: Probably more efficient to use attrnames earlier, in order to save calls to get.network.attribute().
-      xl <- if(is.network(x)) subnetwork_templates(x, ".NetworkID", ".NetworkName") else x
+      xl <- if(is.network(x)) subnetwork_templates(x, .NetworkID, .NetworkName) else x
       nattrs <- Reduce(union, lapply(xl, list.network.attributes))
       lapply(nattrs, function(nattr) lapply(xl, get.network.attribute, nattr)) %>% set_names(nattrs)
     }
@@ -172,7 +173,8 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   formula.
 #'
 #' @usage
-#' # binary: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
+#' # binary: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL,
+#' #           .NetworkID=".NetworkID", .NetworkName=".NetworkName")
 #' @template ergmTerm-formula
 #' @param lm a one-sided [lm()]-style formula whose RHS specifies the network-level predictors for the terms in the [ergm()] formula `formula`.
 #' @param subset,contrasts see [lm()].
@@ -182,7 +184,9 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #'   networks.
 #' @param label An optional parameter which will add a label to model
 #'   parameters to help identify the term (which may have similar
-#'   predictors but, say, a different network subset) in the output.
+#'   predictors but, say, a different network subset) in the output
+#'   *or* a function that wraps the names.
+#' @template ergmTerm-NetworkIDName
 #'
 #' @section Offsets and fixing parameters:
 #'
@@ -228,19 +232,19 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 #' @concept operator
 #' @concept directed
 #' @concept undirected
-InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
+InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".NetworkID", .NetworkName=".NetworkName"){
   a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
-                      vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
-                      defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
-                      required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+                      varnames = c("formula", "lm", "subset", "weights", "contrasts", "offset", "label", ".NetworkID", ".NetworkName"),
+                      vartypes = c("formula", "formula", "formula,logical,numeric,expression,call", "formula,logical,numeric,expression,call", "list", "formula,logical,numeric,expression,call", "character,function", "character", "character"),
+                      defaultvalues = list(NULL, ~1, TRUE, 1, NULL, NULL, NULL, .NetworkID, .NetworkName),
+                      required = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
 
-  auxiliaries <- base_env(~.subnets(".NetworkID"))
+  auxiliaries <- eval(substitute(~.subnets(.NetworkID), list(.NetworkID=a$.NetworkID)), baseenv())
 
-  nwl <- subnetwork_templates(nw, ".NetworkID", ".NetworkName")
+  nwl <- subnetwork_templates(nw, a$.NetworkID, a$.NetworkName)
   nwnames <- names(nwl)
   nn <- length(nwl)
-  nattrs <- as_tibble(nw, unit="networks")
+  nattrs <- as_tibble(nw, unit="networks", .NetworkID=a$.NetworkID, .NetworkName=a$.NetworkName)
 
   lmi <- get_lminfo(nattrs, lm=a$lm, subset=a$subset, contrasts=a$contrasts, offset=a$offset, weights=a$weights)
 
@@ -274,7 +278,10 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
   params <- rep(list(NULL), nparam*ncol(xm))
   parnames <- colnames(xm)
   parnames <- ifelse(parnames=="(Intercept)", "1", parnames)
-  names(params) <- ergm_mk_std_op_namewrap('N',a$label)(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)),parnames)
+  names(params) <- (
+    if(is.function(a$label)) a$label
+    else ergm_mk_std_op_namewrap('N',a$label)
+  )(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)), parnames)
   if(any(ms[[1]]$etamap$offsettheta))
     ergm_Init_abort("The ERGM ", sQuote("formula="), " argument of an ", sQuote("N()"),
                     " operator may not have offsets. See ", sQuote("ergmTerm?N"),
@@ -421,14 +428,14 @@ InitErgmTerm.N <- function(nw, arglist, N.compact_stats=TRUE,...){
 #' @concept directed
 #' @concept undirected
 #' @noRd
-InitErgmTerm.ByNetDStats <- function(nw, arglist, ...){
+InitErgmTerm.ByNetDStats <- function(nw, arglist, ..., .NetworkID=".NetworkID"){
   a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula", "subset"),
-                      vartypes = c("formula","formula,logical,numeric,expression,call"),
-                      defaultvalues = list(NULL,TRUE),
-                      required = c(TRUE,FALSE))
+                      varnames = c("formula",  "subset", ".NetworkID"),
+                      vartypes = c("formula", "formula,logical,numeric,expression,call", "character"),
+                      defaultvalues = list(NULL, TRUE, .NetworkID),
+                      required = c(TRUE, FALSE, FALSE))
 
-  auxiliaries <- base_env(~.subnets(".NetworkID"))
+  auxiliaries <- eval(substitute(~.subnets(.NetworkID), list(.NetworkID=a$.NetworkID)), baseenv())
   nattrs <- as_tibble(nw, unit="networks")
 
   lmi <- get_lminfo(nattrs, subset=a$subset)
