@@ -443,7 +443,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
 
   nwl <-
     if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
-    else split(nw, f) %>% lapply(function(x) `class<-`(x, class(x)[-1]))
+    else split(nw, f) %>% lapply(function(x) `class<-`(x, class(x)[-seq_len(min(which(class(x)=="combined_networks")))]))
 
   if(!is.null(names.vattr)) names(nwl) <- unique(nwnames)
 
