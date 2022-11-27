@@ -32,7 +32,8 @@ networks.}
 
 \item{label}{An optional parameter which will add a label to model
 parameters to help identify the term (which may have similar
-predictors but, say, a different network subset) in the output.}
+predictors but, say, a different network subset) in the output
+\emph{or} a function that wraps the names.}
 }
 \description{
 Evaluates the terms in \code{formula} on each of the networks joined

@@ -69,7 +69,7 @@
 #'   they are combined into a single block-diagonal matrix that is
 #'   then stored as that attribute.
 #'
-#' In addition, a two new vertex attibutes, specified by
+#' In addition, two new vertex attributes, specified by
 #' `blockID.vattr` and (optionally) `blockName.vattr` contain,
 #' respectively, the index in `nwl` of the network from which that
 #' vertex came and its name, determined as follows:
@@ -82,6 +82,9 @@
 #'
 #' If `blockID.vattr` already exists on the constituent networks, the
 #' index is *prepended* to the attribute.
+#'
+#' The values of `blockID.vattr` and `blockName.vattr` are stored in
+#' network attributes `".blockID.vattr"` and `".blockName.vattr"`.
 #'
 #' @aliases combined_networks
 #' @examples
@@ -114,6 +117,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
     snc[[blockID.vattr]] <- nwl0
     out %n% ".subnetcache" <- snc
   }
+
+  out %n% ".blockID.vattr" <- blockID.vattr
+  out %n% ".blockName.vattr" <- blockName.vattr
 
   class(out) <- c("combined_networks", class(out))
   out
@@ -397,13 +403,16 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' @param ignore.nattr,ignore.vattr,ignore.eattr network, vertex, and
 #'   edge attributes not to be processed as described below.
 #'
-#' @param split.vattr name of the vertex attribute on which to split.
+#' @param split.vattr name of the vertex attribute on which to split,
+#'   defaulting to the value of the `".blockID.vattr"` network
+#'   attribute.
 #'
 ## #' @param detect.edgecov if `TRUE`, split up network attributes that
 ## #'   look like dyadic covariate ([`ergm::edgecov`][ergm::edgecov-ergmTerm]) matrices.
 #'
-#' @param names.vattr optional name of the vertex attribute to use as network
-#'   names in the output list.
+#' @param names.vattr optional name of the vertex attribute to use as
+#'   network names in the output list, defaulting to the value of the
+#'   `".blockName.vattr"` network attribute.
 #'
 #' @param use.subnet.cache whether to use subnet cache if available;
 #'   this is only safe to do if the network is *not* used for its
@@ -431,13 +440,13 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' ol <- uncombine_network(o1)
 #'
 #' @export
-uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=".NetworkID", names.vattr=NULL, use.subnet.cache=FALSE){
+uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=nw %n% ".blockID.vattr", names.vattr=nw %n% ".blockName.vattr", use.subnet.cache=FALSE){
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
   nwl <-
     if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
-    else split(nw, f)
+    else split(nw, f) %>% lapply(function(x) `class<-`(x, class(x)[-1]))
 
   for(a in setdiff(list.network.attributes(nw),
                    ignore.nattr)){ # I.e., iterate through common attributes.
@@ -487,7 +496,7 @@ subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".Net
 #' vertex's within-block ID.}
 #'
 #' @noRd
-.block_vertexmap <- function(nw, by=".NetworkID", same_dim=FALSE){
+.block_vertexmap <- function(nw, by=nw %n% ".blockID.vattr", same_dim=FALSE){
   a <- .peek_vattrv(nw, by)
   n <- length(a)
   bip <- nw %n% "bipartite"

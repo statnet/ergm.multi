@@ -10,8 +10,8 @@ uncombine_network(
     ".subnetcache"),
   ignore.vattr = c(),
   ignore.eattr = c(),
-  split.vattr = ".NetworkID",
-  names.vattr = NULL,
+  split.vattr = nw \%n\% ".blockID.vattr",
+  names.vattr = nw \%n\% ".blockName.vattr",
   use.subnet.cache = FALSE
 )
 }
@@ -21,10 +21,13 @@ uncombine_network(
 \item{ignore.nattr, ignore.vattr, ignore.eattr}{network, vertex, and
 edge attributes not to be processed as described below.}
 
-\item{split.vattr}{name of the vertex attribute on which to split.}
+\item{split.vattr}{name of the vertex attribute on which to split,
+defaulting to the value of the \code{".blockID.vattr"} network
+attribute.}
 
-\item{names.vattr}{optional name of the vertex attribute to use as network
-names in the output list.}
+\item{names.vattr}{optional name of the vertex attribute to use as
+network names in the output list, defaulting to the value of the
+\code{".blockName.vattr"} network attribute.}
 
 \item{use.subnet.cache}{whether to use subnet cache if available;
 this is only safe to do if the network is \emph{not} used for its

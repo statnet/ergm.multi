@@ -83,7 +83,7 @@ they are combined into a single block-diagonal matrix that is
 then stored as that attribute.
 }
 
-In addition, a two new vertex attibutes, specified by
+In addition, two new vertex attributes, specified by
 \code{blockID.vattr} and (optionally) \code{blockName.vattr} contain,
 respectively, the index in \code{nwl} of the network from which that
 vertex came and its name, determined as follows:
@@ -95,6 +95,9 @@ vertex came and its name, determined as follows:
 
 If \code{blockID.vattr} already exists on the constituent networks, the
 index is \emph{prepended} to the attribute.
+
+The values of \code{blockID.vattr} and \code{blockName.vattr} are stored in
+network attributes \code{".blockID.vattr"} and \code{".blockName.vattr"}.
 }
 \description{
 Given a list of compatible networks, the \code{\link[=combine_networks]{combine_networks()}} returns a single
