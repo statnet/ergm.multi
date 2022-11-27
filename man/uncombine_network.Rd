@@ -6,10 +6,6 @@
 \usage{
 uncombine_network(
   nw,
-  ignore.nattr = c("bipartite", "directed", "hyper", "loops", "mnext", "multiple", "n",
-    ".subnetcache"),
-  ignore.vattr = c(),
-  ignore.eattr = c(),
   split.vattr = nw \%n\% ".blockID.vattr",
   names.vattr = nw \%n\% ".blockName.vattr",
   use.subnet.cache = FALSE
@@ -17,9 +13,6 @@ uncombine_network(
 }
 \arguments{
 \item{nw}{a \code{\link[network:network]{network::network}} created by \code{\link[=combine_networks]{combine_networks()}}.}
-
-\item{ignore.nattr, ignore.vattr, ignore.eattr}{network, vertex, and
-edge attributes not to be processed as described below.}
 
 \item{split.vattr}{name of the vertex attribute on which to split,
 defaulting to the value of the \code{".blockID.vattr"} network

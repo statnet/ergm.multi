@@ -400,9 +400,6 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #'
 #' @param nw a [`network::network`] created by [combine_networks()].
 #'
-#' @param ignore.nattr,ignore.vattr,ignore.eattr network, vertex, and
-#'   edge attributes not to be processed as described below.
-#'
 #' @param split.vattr name of the vertex attribute on which to split,
 #'   defaulting to the value of the `".blockID.vattr"` network
 #'   attribute.
@@ -440,18 +437,13 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' ol <- uncombine_network(o1)
 #'
 #' @export
-uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=nw %n% ".blockID.vattr", names.vattr=nw %n% ".blockName.vattr", use.subnet.cache=FALSE){
+uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vattr=nw %n% ".blockName.vattr", use.subnet.cache=FALSE){
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
   nwl <-
     if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
     else split(nw, f) %>% lapply(function(x) `class<-`(x, class(x)[-1]))
-
-  for(a in setdiff(list.network.attributes(nw),
-                   ignore.nattr)){ # I.e., iterate through common attributes.
-    nwl <- mapply(set.network.attribute, x=nwl, value=get.network.attribute(nw, a, unlist=FALSE), MoreArgs=list(attrname=a), SIMPLIFY=FALSE)
-  }
 
   if(!is.null(names.vattr)) names(nwl) <- unique(nwnames)
 
@@ -472,7 +464,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
 #' @keywords internal
 #' @export
 subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
-  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr"), use.subnet.cache=TRUE) %>% map(function(nw1){
+  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, use.subnet.cache=TRUE) %>% map(function(nw1){
     for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1})
 }
