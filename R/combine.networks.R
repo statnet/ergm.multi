@@ -353,7 +353,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   av <- get.vertex.attribute(nw, vattr, unlist=FALSE)
   a <- sapply(av, "[", 1)
   rest <- lapply(av, "[", -1)
-  nw <- set.vertex.attribute(nw, vattr, rest)
+
+  if(all(lengths(rest)==0)) delete.vertex.attribute(nw, vattr)
+  else set.vertex.attribute(nw, vattr, rest)
 
   list(nw = nw, vattr = a)
 }
@@ -441,9 +443,20 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
-  nwl <-
-    if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
-    else split(nw, f) %>% lapply(function(x) `class<-`(x, class(x)[-seq_len(min(which(class(x)=="combined_networks")))]))
+  if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr)
+    nwl <- (nw%n%".subnetcache")[[split.vattr]]
+  else{
+    sna <- (nw %n% ".subnetattr")[[split.vattr]]
+    nwl <- split(nw, f)
+
+    for(i in seq_along(nwl)){
+      class(nwl[[i]]) <- class(nwl[[i]])[-seq_len(min(which(class(nwl[[i]])=="combined_networks")))]
+      for(nattr in c(".subnetattr", ".subnetcache", ".blockID.vattr", ".blockName.vattr"))
+        delete.network.attribute(nwl[[i]], nattr)
+      for(nattr in names(sna))
+        nwl[[i]] %n% nattr <- sna[[nattr]][[i]]
+    }
+  }
 
   if(!is.null(names.vattr)) names(nwl) <- unique(nwnames)
 
