@@ -1,11 +1,11 @@
-#  File R/print.combined_networks.R in package tergm, part of the
+#  File R/print.combined_networks.R in package ergm.multi, part of the
 #  Statnet suite of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2022 Statnet Commons
+#  Copyright 2003-2022 Statnet Commons
 ################################################################################
 
 .print_combined_networks_info <- function(x, ...){
