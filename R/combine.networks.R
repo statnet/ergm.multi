@@ -28,9 +28,9 @@
 #' @param blockName.vattr if not `NULL`, the name of the vertex
 #'   attribute into which to store the name of the network to which
 #'   that vertex originally belonged.
-#' 
+#'
 #' @param detect.edgecov if `TRUE`, combine network attributes that
-#'   look like dyadic covariate ([`edgecov-ergmTerm`]) matrices into a
+#'   look like dyadic covariate ([`ergm::edgecov`][ergm::edgecov-ergmTerm]) matrices into a
 #'   block-diagonal matrix.
 #'
 #' @param keep.unshared.attr whether to keep those network, vertex,
@@ -51,7 +51,7 @@
 #'   particular,
 #'
 #' * the returned network's size is the sum of the input networks';
-#' 
+#'
 #' * its basic properties (directedness and bipartednes) are the same;
 #'
 #' * the input networks' sociomatrices (both edge presence and edge
@@ -69,25 +69,28 @@
 #'   they are combined into a single block-diagonal matrix that is
 #'   then stored as that attribute.
 #'
-#' In addition, a two new vertex attibutes, specified by
+#' In addition, two new vertex attributes, specified by
 #' `blockID.vattr` and (optionally) `blockName.vattr` contain,
 #' respectively, the index in `nwl` of the network from which that
 #' vertex came and its name, determined as follows:
-#' 
+#'
 #' 1. If `nwl` is a named list, names from the list are used.
 #'
 #' 2. If not 1, but the network has an attribute `title`, it is used.
-#' 
+#'
 #' 3. Otherwise, a numerical index is used.
-#' 
+#'
 #' If `blockID.vattr` already exists on the constituent networks, the
 #' index is *prepended* to the attribute.
+#'
+#' The values of `blockID.vattr` and `blockName.vattr` are stored in
+#' network attributes `".blockID.vattr"` and `".blockName.vattr"`.
 #'
 #' @aliases combined_networks
 #' @examples
 #'
 #' data(samplk)
-#' 
+#'
 #' o1 <- combine_networks(list(samplk1, samplk2, samplk3))
 #' image(as.matrix(o1))
 #' head(get.vertex.attribute(o1, ".NetworkID"))
@@ -109,10 +112,14 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
   if(subnet.cache){
     snc <- NVL(out %n% ".subnetcache", list()) # TODO: Check that this line is necessary, since combined networks aren't supposed to have a subnet cache even if the constituent networks do.
-    
-    snc[[blockID.vattr]] <- nwl
+
+    nwl0 <- lapply(nwl, `[<-.network`, value = 0)
+    snc[[blockID.vattr]] <- nwl0
     out %n% ".subnetcache" <- snc
   }
+
+  out %n% ".blockID.vattr" <- blockID.vattr
+  out %n% ".blockName.vattr" <- blockName.vattr
 
   class(out) <- c("combined_networks", class(out))
   out
@@ -123,7 +130,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
   if(keep.unshared.attr && detect.edgecov) stop("Detection of edge covariates is not compatible with retaining unshared attributes.")
   attrset <- if(keep.unshared.attr) union else intersect
-  
+
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
@@ -133,7 +140,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   # Concatenate network attributes. If you run into what looks like a covariate matrix, combine it correctly.
   sna <- list()
   sna[[blockID.vattr]] <- list()
-  
+
   for(a in setdiff(Reduce(attrset,lapply(nwl, list.network.attributes)),
                           ignore.nattr)){ # I.e., iterate through common attributes.
     sna[[blockID.vattr]][[a]] <- vl <- lapply(nwl, get.network.attribute, a, unlist=FALSE)
@@ -160,7 +167,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       dummyval <- if(0 %in% dummyvals) 0 else min(dummyvals)
       m <- matrix(dummyval, sum(ns), sum(ns))
       mode(m) <- mode(vl[[1]])
-      
+
       for(b in seq_along(vl)){
         inds <- blks[b]+seq_len(ns[b])
         m[inds, inds] <- vl[[b]]
@@ -173,7 +180,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   out %n% ".subnetattr" <- sna
 
   # Concatenate vertex attributes.
-  
+
   for(a in setdiff(Reduce(attrset,lapply(nwl, list.vertex.attributes)),
                           ignore.vattr)){ # I.e., iterate through common attributes.
     out <- set.vertex.attribute(out, a,
@@ -208,7 +215,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
     bn <-
       if(!is.null(names(nwl))) names(nwl)
       else if("title" %in% list.network.attributes(out)) out %v% "title"
-      else seq_along(ns)  
+      else seq_along(ns)
     b <- rep(bn,ns)
     if(blockName.vattr %in% list.vertex.attributes(out)){ # blockID.vattr already exists
       b <- mapply(c, # Concatenate
@@ -218,7 +225,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
     }
     out <- set.vertex.attribute(out, blockName.vattr, b)
   }
-  
+
   out
 }
 
@@ -240,7 +247,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   # Concatenate network attributes. If you run into what looks like a covariate matrix, combine it correctly.
   sna <- list()
   sna[[blockID.vattr]] <- list()
-  
+
   for(a in setdiff(Reduce(attrset,lapply(nwl, list.network.attributes)),
                           ignore.nattr)){ # I.e., iterate through common attributes.
     sna[[blockID.vattr]][[a]] <- vl <- lapply(nwl, get.network.attribute, a, unlist=FALSE)
@@ -262,7 +269,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       dummyval <- if(0 %in% dummyvals) 0 else min(dummyvals)
       m <- matrix(dummyval, sum(es), sum(ns-es))
       mode(m) <- mode(vl[[1]])
-      
+
       for(b in seq_along(vl)){
         einds <- eblks[b]+seq_len(es[b])
         ainds <- ablks[b]+seq_len(ns[b]-es[b])
@@ -271,12 +278,12 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
       vl <- m
       out <- set.network.attribute(out, a, vl)
-    }    
+    }
   }
   out %n% ".subnetattr" <- sna
 
   # Concatenate vertex attributes.
-  
+
   for(a in setdiff(Reduce(attrset,lapply(nwl, list.vertex.attributes)),
                    ignore.vattr)){ # I.e., iterate through common attributes.
     vl <- lapply(nwl, get.vertex.attribute, a, unlist=FALSE)
@@ -288,7 +295,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
         v[einds] <- vl[[b]][seq_len(es[b])]
         v[ainds] <- vl[[b]][es[b]+seq_len(ns[b]-es[b])]
     }
-    
+
     out <- set.vertex.attribute(out, a, v)
   }
 
@@ -329,7 +336,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
     }
     out <- set.vertex.attribute(out, blockName.vattr, b)
   }
-  
+
   out
 }
 
@@ -346,8 +353,10 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   av <- get.vertex.attribute(nw, vattr, unlist=FALSE)
   a <- sapply(av, "[", 1)
   rest <- lapply(av, "[", -1)
-  nw <- set.vertex.attribute(nw, vattr, rest)
-  
+
+  if(all(lengths(rest)==0)) delete.vertex.attribute(nw, vattr)
+  else set.vertex.attribute(nw, vattr, rest)
+
   list(nw = nw, vattr = a)
 }
 
@@ -365,22 +374,22 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 #' @return A [`network.list`] containing the networks. These networks
 #'   will inherit all vertex and edge attributes, as well as relevant
 #'   network attributes.
-#' 
+#'
 #' @seealso [network::get.inducedSubgraph()]
 #' @export
-split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...) 
+split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 {
   ### NOTE: This is taken from the split.default() implementation, but is trivial.
-  if(!missing(...)) 
+  if(!missing(...))
     .NotYetUsed(deparse(...), error = FALSE)
-  if(is.list(f)) 
+  if(is.list(f))
     f <- interaction(f, drop = drop, sep = sep, lex.order = lex.order)
-  else if (!is.factor(f)) 
+  else if (!is.factor(f))
     f <- as.factor(f)
-  else if (drop) 
+  else if (drop)
     f <- factor(f)
   ### END Taken from split.default().
-  
+
   o <- lapply(levels(f), function(l) network::get.inducedSubgraph(x, which(f==l)))
   class(o) <- c("network.list", class(o))
   o
@@ -393,16 +402,20 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #'
 #' @param nw a [`network::network`] created by [combine_networks()].
 #'
-#' @param ignore.nattr,ignore.vattr,ignore.eattr network, vertex, and
-#'   edge attributes not to be processed as described below.
-#'
-#' @param split.vattr name of the vertex attribute on which to split.
+#' @param split.vattr name of the vertex attribute on which to split,
+#'   defaulting to the value of the `".blockID.vattr"` network
+#'   attribute.
 #'
 ## #' @param detect.edgecov if `TRUE`, split up network attributes that
-## #'   look like dyadic covariate ([`edgecov-ergmTerm`]) matrices.
+## #'   look like dyadic covariate ([`ergm::edgecov`][ergm::edgecov-ergmTerm]) matrices.
 #'
-#' @param names.vattr optional name of the vertex attribute to use as network
-#'   names in the output list.
+#' @param names.vattr optional name of the vertex attribute to use as
+#'   network names in the output list, defaulting to the value of the
+#'   `".blockName.vattr"` network attribute.
+#'
+#' @param use.subnet.cache whether to use subnet cache if available;
+#'   this is only safe to do if the network is *not* used for its
+#'   edges but only for its vertex and network attributes.
 #'
 #' @return a list of [`network::network`]s containing subgraphs on `split.vattr`. In particular,
 #'
@@ -419,34 +432,52 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #' @examples
 #'
 #' data(samplk)
-#' 
+#'
 #' o1 <- combine_networks(list(samplk1, samplk2, samplk3))
 #' image(as.matrix(o1))
 #'
 #' ol <- uncombine_network(o1)
 #'
 #' @export
-uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n",".subnetcache"), ignore.vattr=c(), ignore.eattr=c(), split.vattr=".NetworkID", names.vattr=NULL){
+uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vattr=nw %n% ".blockName.vattr", use.subnet.cache=FALSE){
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
-  nwl <-
-    if(".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr) (nw%n%".subnetcache")[[split.vattr]]
-    else split(nw, f)
+  if(use.subnet.cache && ".subnetcache" %in% list.network.attributes(nw) && names(nw%n%".subnetcache")==split.vattr)
+    nwl <- (nw%n%".subnetcache")[[split.vattr]]
+  else{
+    sna <- (nw %n% ".subnetattr")[[split.vattr]]
+    nwl <- split(nw, f)
 
-  for(a in setdiff(list.network.attributes(nw),
-                   ignore.nattr)){ # I.e., iterate through common attributes.
-    nwl <- mapply(set.network.attribute, x=nwl, value=get.network.attribute(nw, a, unlist=FALSE), MoreArgs=list(attrname=a), SIMPLIFY=FALSE)
+    for(i in seq_along(nwl)){
+      class(nwl[[i]]) <- class(nwl[[i]])[-seq_len(min(which(class(nwl[[i]])=="combined_networks")))]
+      for(nattr in c(".subnetattr", ".subnetcache", ".blockID.vattr", ".blockName.vattr"))
+        delete.network.attribute(nwl[[i]], nattr)
+      for(nattr in names(sna))
+        nwl[[i]] %n% nattr <- sna[[nattr]][[i]]
+    }
   }
 
   if(!is.null(names.vattr)) names(nwl) <- unique(nwnames)
-  
+
   class(nwl) <- c("network.list", class(nwl))
   nwl
 }
 
-.split_constr_network <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
-  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, ignore.nattr = c(eval(formals(uncombine_network)$ignore.nattr), "constraints", "obs.constraints", "ergm",".subnetattr")) %>% map(function(nw1){
+#' Obtain empty networks representing constituents of a combined network
+#'
+#' This utility uncombines a [combine_networks()] network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.
+#'
+#' @param nw,split.vattr,nams.vattr see [uncombine_network()].
+#'
+#' @param copy.ergmlhs a character vector of [`%ergmlhs%`] settings that are to be copied into the constituent networks.
+#'
+#' @return A list of [`network`]s.
+#'
+#' @keywords internal
+#' @export
+subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
+  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, use.subnet.cache=TRUE) %>% map(function(nw1){
     for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1})
 }
@@ -470,7 +501,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
 #' vertex's within-block ID.}
 #'
 #' @noRd
-.block_vertexmap <- function(nw, by=".NetworkID", same_dim=FALSE){
+.block_vertexmap <- function(nw, by=nw %n% ".blockID.vattr", same_dim=FALSE){
   a <- .peek_vattrv(nw, by)
   n <- length(a)
   bip <- nw %n% "bipartite"
@@ -483,7 +514,7 @@ uncombine_network <- function(nw, ignore.nattr=c("bipartite","directed","hyper",
 
     eoff <- rep(cumsum(c(0,el[-length(el)])), el)
     aoff <- rep(cumsum(c(0,al[-length(al)]))-el, al) + sum(el)
-    
+
     o <- list(nb = length(el), bids = a, bmap = seq_len(n) - c(eoff,aoff), ns = rbind(el,al))
   }else{
     l <- rle(a)$lengths

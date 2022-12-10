@@ -22,7 +22,8 @@ InitWtErgmTerm..subnets <- function(...){
 #' @templateVar name N
 #' @template ergmTerm-rdname
 #' @usage
-#' # valued: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
+#' # valued: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL,
+#' #           .NetworkID=".NetworkID", .NetworkName=".NetworkName")
 InitWtErgmTerm.N <- function(...){
   # Rename the function to avoid the extra nesting level in the
   # diagnostic messages.

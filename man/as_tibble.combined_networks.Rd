@@ -8,7 +8,9 @@
   x,
   attrnames = (match.arg(unit) \%in\% c("vertices", "networks")),
   ...,
-  unit = c("edges", "vertices", "networks")
+  unit = c("edges", "vertices", "networks"),
+  .NetworkID = ".NetworkID",
+  .NetworkName = ".NetworkName"
 )
 }
 \arguments{
@@ -19,6 +21,10 @@
 \item{...}{additional arguments, currently passed to unlist()].}
 
 \item{unit}{whether to obtain edge, vertex, or network attributes.}
+
+\item{.NetworkID, .NetworkName}{Optional strings indicating the
+vertex attributes used to distinguish and name the networks;
+intended to be used by term developers.}
 }
 \description{
 A method to obtain a network attribute table from a
