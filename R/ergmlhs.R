@@ -7,7 +7,24 @@
 #
 #  Copyright 2003-2022 Statnet Commons
 ################################################################################
-.combine_ergmlhs <- function(nwl, ignore.settings=c()){
+
+#' Combine the [`%ergmlhs%`] settings of a list of networks
+#'
+#' This is a helper function to go through the [`network`] objects in the list
+#' and accumulate their [`%ergmlhs%`] settings, printing a message if
+#' the settings clash. Later networks' settings overwrite the earlier.
+#'
+#' @param nwl a [`list`] of [`network`] objects whose settings are to
+#'   be combined.
+#' @param ignore.settings a [`character`] vector of setting names to
+#'   be ignored.
+#'
+#' @return A [`list`] of settings, suitable for being assigned as the
+#'   `ergm` network attribute.
+#'
+#' @keywords internal
+#' @export
+combine_ergmlhs <- function(nwl, ignore.settings=c()){
   ergml <- nwl %>% map(`%n%`, "ergm") %>% map(NVL, list())
   l <- ergml[[1]]
 

@@ -494,7 +494,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   
   nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
-  nw %n% "ergm" <- .combine_ergmlhs(nwl)
+  nw %n% "ergm" <- combine_ergmlhs(nwl)
 
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))

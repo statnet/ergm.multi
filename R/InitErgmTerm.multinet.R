@@ -49,7 +49,7 @@ Networks <- function(...){
   
   nw <- combine_networks(nwl, blockID.vattr=".NetworkID", blockName.vattr=".NetworkName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
-  nw %n% "ergm" <- .combine_ergmlhs(nwl)
+  nw %n% "ergm" <- combine_ergmlhs(nwl)
 
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
