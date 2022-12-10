@@ -74,6 +74,12 @@
       \item Miscellaneous documentation fixes.
     }
   }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item Tweaks to the \code{\link{combine_networks}()} API to make it more robust, space-efficient, and flexible; in particular to make it possible for \CRANpkg{tergm} to depend on it rather than maintaining its own copy.
+    }
+  }
 }
 
 
