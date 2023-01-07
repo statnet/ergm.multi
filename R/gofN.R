@@ -118,7 +118,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   nthreads <- nthreads(control) # Fix this, so as not to become confused inside a clusterCall().
 
   message("Constructing simulation model(s).")
-  if(!is.null(object$constrained.obs)){
+  if(is.na(object)){
 
     # First, make sure that the sample size is a multiple of the number of threads.
     if(control$obs.twostage && control$obs.twostage%%nthreads!=0){
@@ -158,7 +158,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
 
   # TODO: Make this adaptive: start with a small simulation,
   # increase on fail; or perhaps use a pilot sample.
-  if(!is.null(object$constrained.obs)){
+  if(is.na(object)){
 
     # Construct a simulate.ergm_state() call list for constrained simulation.
     args <- .update.list(sim.m.obs_settings,
