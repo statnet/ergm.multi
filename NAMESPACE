@@ -2,6 +2,7 @@
 
 S3method("[",gofN)
 S3method(as_tibble,combined_networks)
+S3method(ggplot2::autoplot, gofN)
 S3method(plot,gofN)
 S3method(print,combined_networks)
 S3method(print,summary.combined_networks)

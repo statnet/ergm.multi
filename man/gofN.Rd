@@ -4,6 +4,7 @@
 \alias{gofN}
 \alias{[.gofN}
 \alias{plot.gofN}
+\alias{autoplot.gofN}
 \alias{summary.gofN}
 \title{Linear model diagnostics for multinetwork linear models}
 \usage{
@@ -33,6 +34,15 @@ gofN(
   xlab = NULL,
   ylim = NULL,
   cex.id = 0.75
+)
+
+\method{autoplot}{gofN}(
+  x,
+  against = .fitted,
+  which = 1:2,
+  mapping = ggplot2::aes(),
+  id.n = 3,
+  main = "{type} for {sQuote(name)}"
 )
 
 \method{summary}{gofN}(object, by = NULL, ...)
@@ -81,6 +91,8 @@ and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor,
 
 \item{cex.id}{Scaling factor for characters used to label extreme points; see \code{\link[=plot.lm]{plot.lm()}}.}
 
+\item{mapping}{a list of mappings constructed by \code{\link[ggplot2:aes]{ggplot2::aes()}} overriding the defaults.}
+
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }
 \value{
@@ -121,7 +133,9 @@ used for a variety of diagnostics and diagnostic plots developed by
 \itemize{
 \item \code{[}: Extract a subset of statistics for which goodness-of-fit had been computed.
 
-\item \code{plot(gofN)}: A plotting method, making residual and scale-location plots.
+\item \code{plot(gofN)}: A plotting method using base \R graphics, making residual and scale-location plots.
+
+\item \code{autoplot(gofN)}: A plotting method using \CRANpkg{ggplot2} and \CRANpkg{ggrepel}, making residual and scale-location plots.
 
 \item \code{summary(gofN)}: A simple summary function.
 
@@ -154,6 +168,12 @@ plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
 # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
 \dontrun{
 fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
+}
+
+
+### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
+if(require("ggplot2") && requireNamespace("ggrepel")){
+  autoplot(fit.gof)
 }
 
 }

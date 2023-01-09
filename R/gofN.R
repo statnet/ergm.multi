@@ -352,7 +352,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
   }
 }
 
-#' @describeIn gofN A plotting method, making residual and scale-location plots.
+#' @describeIn gofN A plotting method using base \R graphics, making residual and scale-location plots.
 #'
 #' @param x a [`gofN`] object.
 #' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values. The formula may also contain a `.fitted` variable which will be substituted with the fitted values. Factor values are visualised using boxplots.
@@ -484,7 +484,22 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
 }
 
 
-autoplot.gofN <- function(x, against=.fitted, which=1:2, mapping=aes(), id.n=3, main="{type} for {sQuote(name)}"){
+#' @describeIn gofN A plotting method using \CRANpkg{ggplot2} and \CRANpkg{ggrepel}, making residual and scale-location plots.
+#'
+#' @param mapping a list of mappings constructed by [ggplot2::aes()] overriding the defaults.
+#'
+#' @examples
+#'
+#' ### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
+#' if(require("ggplot2") && requireNamespace("ggrepel")){
+#'   autoplot(fit.gof)
+#' }
+#'
+#' @method autoplot gofN
+#' @rawNamespace S3method(ggplot2::autoplot, gofN)
+autoplot.gofN <- function(x, against=.fitted, which=1:2, mapping=ggplot2::aes(), id.n=3, main="{type} for {sQuote(name)}"){
+  if(!requireNamespace("ggplot2") || !requireNamespace("ggrepel")) stop(sQuote("autoplot()"), " method for ", sQuote("gofN"), " objects requires packages ", paste.and(sQuote(c("ggplot2", "ggrepel"))), ".")
+
   against <- substitute(against)
   nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
 
@@ -500,36 +515,36 @@ autoplot.gofN <- function(x, against=.fitted, which=1:2, mapping=aes(), id.n=3, 
     nattrs$.observed <- summ$observed
     nattrs$.var <- summ$var
     nattrs$.var.obs <- summ$var.obs
+    nattrs$.weight <- 1/(summ$var - summ$var.obs)
 
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
-
-    w <- 1/(summ$var - summ$var.obs)
 
     againstval <- eval(against, envir = nattrs, enclos = parent.frame())
 
     plots <- list()
 
     if(1L %in% which){
-      o <- ggplot(nattrs, modifyList(eval(substitute(aes(x=.against, y=.pearson), list(.against=against))), mapping))
-      if(is.factor(againstval)) o <- o + geom_boxplot()
-      else o <- o + geom_point() + geom_smooth()
-      o <- o + xlab(xlab) + ylab("Std. Pearson resid.")
-      o <- o + geom_text_repel(aes(label=ifelse(ei, seq_along(ei), "")))
+      o <- ggplot2::ggplot(nattrs, modifyList(eval(substitute(ggplot2::aes(x=.against, y=.pearson, weight=.weight), list(.against=against))), mapping))
+      if(is.factor(againstval)) o <- o + ggplot2::geom_boxplot()
+      else o <- o + ggplot2::geom_point() + ggplot2::geom_smooth(se=FALSE)
+      o <- o + ggplot2::xlab(xlab) + ggplot2::ylab("Std. Pearson resid.")
+      o <- o + ggrepel::geom_text_repel(ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
       plots <- c(plots, list(o))
     }
 
     if(2L %in% which){
-      o <- ggplot(nattrs, modifyList(eval(substitute(aes(x=.against, y=sqrt(abs(.pearson))), list(.against=against))), mapping))
-      if(is.factor(againstval)) o <- o + geom_boxplot()
-      else o <- o + geom_point() + geom_smooth()
-      o <- o + xlab(xlab) + ylab(expression(sqrt(abs("Std. Pearson resid."))))
-      o <- o + geom_text_repel(aes(label=ifelse(ei, seq_along(ei), "")))
+      o <- ggplot2::ggplot(nattrs, modifyList(eval(substitute(ggplot2::aes(x=.against, y=sqrt(abs(.pearson)), weight=.weight), list(.against=against))), mapping))
+      if(is.factor(againstval)) o <- o + ggplot2::geom_boxplot()
+      else o <- o + ggplot2::geom_point() + ggplot2::geom_smooth(se=FALSE)
+      o <- o + ggplot2::xlab(xlab) + ggplot2::ylab(expression(sqrt(abs("Std. Pearson resid."))))
+      o <- o + ggrepel::geom_text_repel(ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
       plots <- c(plots, list(o))
     }
   }
-  if(length(plots)>1) new("ggmultiplot", plots = plots) else plots[[1]]
+
+  if(length(plots)==1) plots[[1]] else plots
 }
 
 
