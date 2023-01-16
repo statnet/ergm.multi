@@ -28,13 +28,13 @@
 #' \insertCite{KrCo22t;textual}{ergm.multi}.
 #'
 #' @param object an [`ergm`] object.
+#' @param x a `gofN` object.
 #' @param GOF a one-sided [`ergm`] formula specifying network
 #'   statistics whose goodness of fit to test, or [`NULL`]; if `NULL`,
 #'   uses the original model.
 #' @param subset argument for the [`N`][N-ergmTerm] term.
 #' @param \dots additional arguments to functions ([simulate.ergm()]
-#'   and [summary.ergm_model()] for the constructor, [plot()],
-#'   [qqnorm()], and [qqline()] for the plotting method).
+#'   and [summary.ergm_model()]) for the constructor.
 #' @param control See [control.gofN.ergm()].
 #' @param save_stats If `TRUE`, save the simulated network statistics;
 #'   defaults to `FALSE` to save memory and disk space.
@@ -66,7 +66,9 @@
 #' 
 #' \item{control}{Control parameters passed.}
 #'
-#' @seealso [ergm::gof()] for single-network goodness-of-fit simulations in \CRANpkg{ergm}
+#' @seealso [plot.gofN()] and [autoplot.gofN()] for plotting `gofN`
+#'   objects to make residual plots; [ergm::gof()] for single-network
+#'   goodness-of-fit simulations in \CRANpkg{ergm}
 #'
 #' @references \insertAllCited{}
 #'
@@ -93,6 +95,11 @@
 #' summary(fit.gof)
 #' plot(fit.gof)
 #' plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
+#' }
+#'
+#' ### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
+#' if(require("ggplot2") && requireNamespace("ggrepel")){
+#'   autoplot(fit.gof)
 #' }
 #'
 #' # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
@@ -352,25 +359,30 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
   }
 }
 
-#' @describeIn gofN A plotting method using base \R graphics, making residual and scale-location plots.
+#' Plotting methods for [`gofN`], making residual and scale-location plots.
+#'
+#' The [plot()] method uses \R graphics.
 #'
 #' @param x a [`gofN`] object.
-#' @param against vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if `NULL` (default), plots against fitted values. The formula may also contain a `.fitted` variable which will be substituted with the fitted values. Factor values are visualised using boxplots.
+#' @param against what the residuals should be plotted against. Note that different methods use different formats: see Details. Categorical ([`factor`] and [`ordered`]) values are visualised using boxplots, with [`ordered`] values also adding a smoothing line like the quantitative. Defaults to the fitted values.
 #' @param col,pch,cex,bg vector of values (wrapped in [I()]), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.
 #' @param which which to plot (`1` for residuals plot, `2` for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and `3` for normal quantile-quantile plot).
+#' @param ... additional arguments to [plot()], [qqnorm()], and [qqline()], and others.
 #' @param ask whether the user should be prompted between the plots.
-#' @param id.n Number of extreme points to label explicitly.
-#' @param main A template for the plots' titles; these use [glue()]'s templating, with `{type}` replaced with the type of plot and `{name}` replaced with the statistic.
-#' @param xlab Horizontal axis label; defaults to a character representation of `against`.
-#' @param ylim Vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
-#' @param cex.id Scaling factor for characters used to label extreme points; see [plot.lm()].
+#' @param id.n number of extreme points to label explicitly.
+#' @param main a template for the plots' titles; these use [glue()]'s templating, with `{type}` replaced with the type of plot and `{name}` replaced with the statistic.
+#' @param xlab horizontal axis label; defaults to a character representation of `against`.
+#' @param ylim vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
+#' @param cex.id scaling factor for characters used to label extreme points; see [plot.lm()].
+#'
+#' @details For the `plot()` method, `against` can be a vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against. The formula may also contain a `.fitted` variable which will be substituted with the fitted values.
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage adjustcolor
 #' @importFrom graphics abline panel.smooth plot text axis boxplot lines points
 #' @importFrom methods is
 #' @importFrom glue glue
 #'
-#' @seealso [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters
+#' @seealso [gofN()] for examples, [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters.
 #' @export
 plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
   if(ask){
@@ -484,67 +496,137 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
 }
 
 
-#' @describeIn gofN A plotting method using \CRANpkg{ggplot2} and \CRANpkg{ggrepel}, making residual and scale-location plots.
+#' @rdname plot.gofN
 #'
-#' @param mapping a list of mappings constructed by [ggplot2::aes()] overriding the defaults.
+#' @description The [ggplot2::autoplot()] method uses \CRANpkg{ggplot2} and \CRANpkg{ggrepel}.
 #'
-#' @examples
+#' @param mappings a named list of lists of mappings constructed by [ggplot2::aes()] overriding the defaults. See Details below.
+#' @param geom_args a named list of lists of arguments overriding the defaults for the individual geoms. See Details below.
 #'
-#' ### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
-#' if(require("ggplot2") && requireNamespace("ggrepel")){
-#'   autoplot(fit.gof)
-#' }
+#' @details For `autoplot.gofN()`, `against` is interpreted as an
+#'   expression in terms of network attributes and values generated by
+#'   [augment.gofN()], included `.fitted` for the fitted values.
+#'
+#' @section Customising `autoplot.gofN()`:
+#'
+#' `autoplot.gofN()` constructs the plots out of [ggplot2::ggplot()],
+#' [ggplot2::geom_point()] (for numeric `against`), [ggplot2::geom_boxplot()] for
+#' categorical or ordinal `against`), and [ggplot2::geom_smooth()] (for numeric
+#' or ordinal `against`), and [ggrepel::geom_text_repel()]. Mappings and
+#' arguments passed through `mappings` and `geom_args` override the
+#' respective defaults. They may have elements `default` (for
+#' `ggplot()`), `point` (for `geom_point()` and `geom_boxplot()`),
+#' `smooth` (for `geom_smooth`), and `text` (for `geom_text_repel()`).
+#'
+#' @return `autoplot.gofN()` returns a list of `ggplot` objects that
+#'   if printed render to diagnostic plots. If there is only one, the
+#'   object itself is returned.
 #'
 #' @method autoplot gofN
 #' @rawNamespace S3method(ggplot2::autoplot, gofN)
-autoplot.gofN <- function(x, against=.fitted, which=1:2, mapping=ggplot2::aes(), id.n=3, main="{type} for {sQuote(name)}"){
+autoplot.gofN <- function(x, against=.fitted, which=1:2,
+                          mappings=list(),
+                          geom_args=list(),
+                          id.n=3, main="{type} for {sQuote(name)}"){
   if(!requireNamespace("ggplot2") || !requireNamespace("ggrepel")) stop(sQuote("autoplot()"), " method for ", sQuote("gofN"), " objects requires packages ", paste.and(sQuote(c("ggplot2", "ggrepel"))), ".")
 
   against <- substitute(against)
-  nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
+  nattrs <- generics::augment(x)
 
-  xlab <- substitute(against)
-  xlab <- deparse1(do.call(substitute, list(xlab, list(.fitted=as.name("Fitted values")))))
+  xlab <- deparse1(do.call(substitute, list(against, list(.fitted=as.name("Fitted values")))))
 
   np <- sum(attr(x,"subset"))
 
+  plots <- list()
+
   for(name in names(x)){
-    summ <- x[[name]]
-    nattrs$.fitted <- summ$fitted
-    nattrs$.pearson <- summ$pearson
-    nattrs$.observed <- summ$observed
-    nattrs$.var <- summ$var
-    nattrs$.var.obs <- summ$var.obs
-    nattrs$.weight <- 1/(summ$var - summ$var.obs)
+    a <- nattrs[nattrs$.stat_name==name,]
 
-    nn <- sum(!is.na(summ$pearson))
+    nn <- sum(!is.na(a$.pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
-    ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
+    ei <- !is.na(a$.pearson) & rank(-abs(a$.pearson), ties.method="min")<=id.n & abs(a$.pearson)>ez
 
-    againstval <- eval(against, envir = nattrs, enclos = parent.frame())
+    againstval <- eval(against, envir = a, enclos = parent.frame())
 
-    plots <- list()
+    mode_call <- function(f, custom_map, custom_args, def_map=ggplot2::aes(), def_args=list())
+      do.call(f, c(list(mapping=modifyList(def_map, as.list(custom_map))), modifyList(def_args, as.list(custom_args))))
+
+    resid_plot <- function(mapping, ylab){
+      o <- mode_call(ggplot2::ggplot, mappings$default, geom_args$default, mapping, list(data=a))
+      if(is.factor(againstval)){
+        o <- o + mode_call(ggplot2::geom_boxplot, mappings$point, geom_args$point)
+        if(is.ordered(againstval)) o <- o +  mode_call(ggplot2::geom_smooth, mappings$smooth, geom_args$smooth, ggplot2::aes(x=as.numeric(againstval)), list(se=FALSE))
+      }
+      else o <- o + mode_call(ggplot2::geom_point, mappings$point, geom_args$point) +
+             mode_call(ggplot2::geom_smooth, mappings$smooth, geom_args$smooth, def_args=list(se=FALSE))
+      o <- o + ggplot2::xlab(xlab) + ggplot2::ylab(ylab) +
+        mode_call(ggrepel::geom_text_repel, mappings$text, geom_args$text, ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
+      o
+    }
 
     if(1L %in% which){
-      o <- ggplot2::ggplot(nattrs, modifyList(eval(substitute(ggplot2::aes(x=.against, y=.pearson, weight=.weight), list(.against=against))), mapping))
-      if(is.factor(againstval)) o <- o + ggplot2::geom_boxplot()
-      else o <- o + ggplot2::geom_point() + ggplot2::geom_smooth(se=FALSE)
-      o <- o + ggplot2::xlab(xlab) + ggplot2::ylab("Std. Pearson resid.")
-      o <- o + ggrepel::geom_text_repel(ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
+      o <- resid_plot(eval(substitute(ggplot2::aes(x=.against, y=.pearson, weight=.weight), list(.against=against))),
+                      "Std. Pearson resid.")
       plots <- c(plots, list(o))
     }
 
     if(2L %in% which){
-      o <- ggplot2::ggplot(nattrs, modifyList(eval(substitute(ggplot2::aes(x=.against, y=sqrt(abs(.pearson)), weight=.weight), list(.against=against))), mapping))
-      if(is.factor(againstval)) o <- o + ggplot2::geom_boxplot()
-      else o <- o + ggplot2::geom_point() + ggplot2::geom_smooth(se=FALSE)
-      o <- o + ggplot2::xlab(xlab) + ggplot2::ylab(expression(sqrt(abs("Std. Pearson resid."))))
-      o <- o + ggrepel::geom_text_repel(ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
+      o <- resid_plot(eval(substitute(ggplot2::aes(x=.against, y=sqrt(abs(.pearson)), weight=.weight), list(.against=against))),
+                      expression(sqrt(abs("Std. Pearson resid."))))
       plots <- c(plots, list(o))
     }
   }
 
   if(length(plots)==1) plots[[1]] else plots
+}
+
+
+#' @describeIn gofN a method for constructing a [`tibble`] of network attributes augmented with goodness of fit information. Columns include:\describe{
+#' \item{network attributes}{the attributes of each of the networks}
+#'
+#' \item{`.stat_name`}{name of the simulated statistic}
+#'
+#' \item{`.stat_id`}{index of the simulated statistic in the `gofN` object}
+#'
+#' \item{`.network_id`}{index of the network in the networks for which `gofN` was run (excluding those not in the subset)}
+#'
+#' \item{`.fitted`}{predicted value for the statistic}
+#'
+#' \item{`.observed`}{either the observed (for completely observed networks) or the predicted conditional on observed (for partially observed networks) value of the statistic}
+#'
+#' \item{`.pearson`}{the standardised Pearson residual}
+#'
+#' \item{`.var`, `.var.obs`}{estimated unconditional and average conditional variance of the statistic}
+#'
+#' \item{`.weight`}{inverse of the variance of the residual}
+#' }
+#'
+#' @examples
+#'
+#' ### If 'generics' is installed, illustrate the augment() method.
+#' if(require("generics")){
+#'   augment(fit.gof)
+#' }
+#'
+#' @method augment gofN
+#' @rawNamespace S3method(generics::augment, gofN)
+augment.gofN <- function(x, ...){
+  if(!requireNamespace("generics")) stop(sQuote("augment()"), " method for ", sQuote("gofN"), " objects requires package ", paste.and(sQuote(c("generics"))), ".")
+
+  nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
+
+  seq_along(x) %>%
+    map(~dplyr::bind_cols(.stat_name = names(x)[.],
+                          .stat_id = .,
+                          .network_id = seq_len(nrow(nattrs)),
+                          nattrs,
+                          .fitted = x[[.]]$fitted,
+                          .pearson = x[[.]]$pearson,
+                          .observed = x[[.]]$observed,
+                          .var = x[[.]]$var,
+                          .var.obs = x[[.]]$var.obs,
+                          .weight = 1/(x[[.]]$var - x[[.]]$var.obs))) %>%
+    dplyr::bind_rows()
 }
 
 

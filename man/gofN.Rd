@@ -3,8 +3,7 @@
 \name{gofN}
 \alias{gofN}
 \alias{[.gofN}
-\alias{plot.gofN}
-\alias{autoplot.gofN}
+\alias{augment.gofN}
 \alias{summary.gofN}
 \title{Linear model diagnostics for multinetwork linear models}
 \usage{
@@ -19,31 +18,7 @@ gofN(
 
 \method{[}{gofN}(x, i, j, ..., drop = FALSE)
 
-\method{plot}{gofN}(
-  x,
-  against = NULL,
-  which = 1:2,
-  col = 1,
-  pch = 1,
-  cex = 1,
-  bg = 0,
-  ...,
-  ask = length(which) > 1 && dev.interactive(TRUE),
-  id.n = 3,
-  main = "{type} for {sQuote(name)}",
-  xlab = NULL,
-  ylim = NULL,
-  cex.id = 0.75
-)
-
-\method{autoplot}{gofN}(
-  x,
-  against = .fitted,
-  which = 1:2,
-  mapping = ggplot2::aes(),
-  id.n = 3,
-  main = "{type} for {sQuote(name)}"
-)
+\method{augment}{gofN}(x, ...)
 
 \method{summary}{gofN}(object, by = NULL, ...)
 }
@@ -62,36 +37,15 @@ uses the original model.}
 defaults to \code{FALSE} to save memory and disk space.}
 
 \item{\dots}{additional arguments to functions (\code{\link[=simulate.ergm]{simulate.ergm()}}
-and \code{\link[=summary.ergm_model]{summary.ergm_model()}} for the constructor, \code{\link[=plot]{plot()}},
-\code{\link[=qqnorm]{qqnorm()}}, and \code{\link[=qqline]{qqline()}} for the plotting method).}
+and \code{\link[=summary.ergm_model]{summary.ergm_model()}}) for the constructor.}
 
-\item{x}{a \code{\link{gofN}} object.}
+\item{x}{a \code{gofN} object.}
 
 \item{i}{for the indexing operator, index of statistics to be kept in the subset.}
 
 \item{j}{for the indexing operator, index of networks to be kept in the subset.}
 
 \item{drop}{whether the indexing operator should drop attributes and return simply a list.}
-
-\item{against}{vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against; if \code{NULL} (default), plots against fitted values. The formula may also contain a \code{.fitted} variable which will be substituted with the fitted values. Factor values are visualised using boxplots.}
-
-\item{which}{which to plot (\code{1} for residuals plot, \code{2} for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and \code{3} for normal quantile-quantile plot).}
-
-\item{col, pch, cex, bg}{vector of values (wrapped in \code{\link[=I]{I()}}), network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against.}
-
-\item{ask}{whether the user should be prompted between the plots.}
-
-\item{id.n}{Number of extreme points to label explicitly.}
-
-\item{main}{A template for the plots' titles; these use \code{\link[=glue]{glue()}}'s templating, with \code{{type}} replaced with the type of plot and \code{{name}} replaced with the statistic.}
-
-\item{xlab}{Horizontal axis label; defaults to a character representation of \code{against}.}
-
-\item{ylim}{Vertical range for the plots, interpreted as in \code{\link[graphics:plot.default]{graphics::plot()}}; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the \verb{which=} argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.}
-
-\item{cex.id}{Scaling factor for characters used to label extreme points; see \code{\link[=plot.lm]{plot.lm()}}.}
-
-\item{mapping}{a list of mappings constructed by \code{\link[ggplot2:aes]{ggplot2::aes()}} overriding the defaults.}
 
 \item{by}{a numeric or character vector, or a formula whose RHS gives an expression in terms of network attributes, used as a grouping variable for summarizing the values.}
 }
@@ -133,9 +87,25 @@ used for a variety of diagnostics and diagnostic plots developed by
 \itemize{
 \item \code{[}: Extract a subset of statistics for which goodness-of-fit had been computed.
 
-\item \code{plot(gofN)}: A plotting method using base \R graphics, making residual and scale-location plots.
+\item \code{augment(gofN)}: a method for constructing a \code{\link{tibble}} of network attributes augmented with goodness of fit information. Columns include:\describe{
+\item{network attributes}{the attributes of each of the networks}
 
-\item \code{autoplot(gofN)}: A plotting method using \CRANpkg{ggplot2} and \CRANpkg{ggrepel}, making residual and scale-location plots.
+\item{\code{.stat_name}}{name of the simulated statistic}
+
+\item{\code{.stat_id}}{index of the simulated statistic in the \code{gofN} object}
+
+\item{\code{.network_id}}{index of the network in the networks for which \code{gofN} was run (excluding those not in the subset)}
+
+\item{\code{.fitted}}{predicted value for the statistic}
+
+\item{\code{.observed}}{either the observed (for completely observed networks) or the predicted conditional on observed (for partially observed networks) value of the statistic}
+
+\item{\code{.pearson}}{the standardised Pearson residual}
+
+\item{\code{.var}, \code{.var.obs}}{estimated unconditional and average conditional variance of the statistic}
+
+\item{\code{.weight}}{inverse of the variance of the residual}
+}
 
 \item \code{summary(gofN)}: A simple summary function.
 
@@ -165,15 +135,20 @@ plot(fit.gof)
 plot(fit.gof, against=~log(.fitted)) # Plot against transformed fitted values.
 }
 
+### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
+if(require("ggplot2") && requireNamespace("ggrepel")){
+  autoplot(fit.gof)
+}
+
 # Default is good enough in this case, but sometimes, we might want to set it higher. E.g.,
 \dontrun{
 fit.gof <- gofN(fit, GOF=~edges, control=control.gofN.ergm(nsim=400))
 }
 
 
-### If 'ggplot2' and 'ggrepel' are installed, illustrate the autoplot() method.
-if(require("ggplot2") && requireNamespace("ggrepel")){
-  autoplot(fit.gof)
+### If 'generics' is installed, illustrate the augment() method.
+if(require("generics")){
+  augment(fit.gof)
 }
 
 }
@@ -181,7 +156,7 @@ if(require("ggplot2") && requireNamespace("ggrepel")){
 \insertAllCited{}
 }
 \seealso{
-\code{\link[ergm:gof]{ergm::gof()}} for single-network goodness-of-fit simulations in \CRANpkg{ergm}
-
-\code{\link[=plot.lm]{plot.lm()}}, \code{\link[graphics:plot.default]{graphics::plot()}} for regression diagnostic plots and their parameters
+\code{\link[=plot.gofN]{plot.gofN()}} and \code{\link[=autoplot.gofN]{autoplot.gofN()}} for plotting \code{gofN}
+objects to make residual plots; \code{\link[ergm:gof]{ergm::gof()}} for single-network
+goodness-of-fit simulations in \CRANpkg{ergm}
 }
