@@ -64,6 +64,19 @@
 
 %% }
 
+
+\section{Changes in version 0.2.0}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \code{\link{gofN}} objects now how \code{\link{augment}} and \code{\link{autoplot}} methods for Tidyverse and \CRANpkg{ggplot2} diagnostics.
+    }
+  }
+
+}
+
+
+
 \section{Changes in version 0.1.2}{
   \subsection{BUG FIXES}{
     \itemize{
