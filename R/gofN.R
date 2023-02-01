@@ -369,13 +369,14 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #' @param which which to plot (`1` for residuals plot, `2` for \eqn{\sqrt{|R_i|}}{sqrt(|R_i|)} scale plot, and `3` for normal quantile-quantile plot).
 #' @param ... additional arguments to [plot()], [qqnorm()], and [qqline()], and others.
 #' @param ask whether the user should be prompted between the plots.
-#' @param id.n number of extreme points to label explicitly.
+#' @param id.n maximum number of extreme points to label explicitly.
+#' @param id.label specification for how extreme points are to be labeled, defaulting to network's index in the combined network.
 #' @param main a template for the plots' titles; these use [glue()]'s templating, with `{type}` replaced with the type of plot and `{name}` replaced with the statistic.
 #' @param xlab horizontal axis label; defaults to a character representation of `against`.
 #' @param ylim vertical range for the plots, interpreted as in [graphics::plot()]; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the `which=` argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.
 #' @param cex.id scaling factor for characters used to label extreme points; see [plot.lm()].
 #'
-#' @details For the `plot()` method, `against` can be a vector of values, network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against. The formula may also contain a `.fitted` variable which will be substituted with the fitted values.
+#' @details For the `plot()` method, `against` and `id.label` can be vectors of values (enclosed in [I()] to be used as is), a character string identifying a network attribute, or a formula whose RHS gives an expression in terms of network attributes to plot against. The `against` formula may also contain a `.fitted` variable which will be substituted with the fitted values.
 #' 
 #' @importFrom grDevices dev.interactive devAskNewPage adjustcolor
 #' @importFrom graphics abline panel.smooth plot text axis boxplot lines points
@@ -384,7 +385,7 @@ gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, contro
 #'
 #' @seealso [gofN()] for examples, [plot.lm()], [graphics::plot()] for regression diagnostic plots and their parameters.
 #' @export
-plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
+plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ..., ask = length(which)>1 && dev.interactive(TRUE), id.n=3, id.label=NULL, main="{type} for {sQuote(name)}", xlab=NULL, ylim=NULL, cex.id=0.75){
   if(ask){
     prev.ask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(prev.ask))
@@ -393,7 +394,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
   if(!is.list(ylim)) ylim <- list(ylim)
   ylim <- rep_len(ylim, 3)
 
-  if(any(sapply(list(against, col, pch, cex),
+  if(any(sapply(list(against, col, pch, cex, id.label),
                 function(x) is.character(x) || is(x,"formula"))))
     nattrs <- as_tibble(attr(x,"nw"), unit="networks")[attr(x,"subset"),]
   
@@ -405,7 +406,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
                      despace(deparse(substitute(against),width.cutoff=500L))))
 
   np <- sum(attr(x,"subset"))
-  for(gpar in c("col", "bg", "pch", "cex")){
+  for(gpar in c("col", "bg", "pch", "cex", "id.label")){
     a <- get(gpar)
     a <- switch(class(a),
                 AsIs = a,
@@ -473,6 +474,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
+    NVL(id.label) <- seq_along(summ$pearson)
 
     NVL(againstval) <- summ$fitted
     resid.plotter <- if(is.factor(againstval)) boxplot.smooth else points.smooth
@@ -480,11 +482,11 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
     w <- 1/(summ$var - summ$var.obs)
 
     if(1L %in% which){
-      resid.plotter(againstval, summ$pearson, w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, seq_along(summ$pearson), NA), main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.", ylim=ylim[[1L]], ...)
+      resid.plotter(againstval, summ$pearson, w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, id.label, NA), main = glue(main, type="Residuals vs. Fitted"), xlab=xlab, ylab="Std. Pearson resid.", ylim=ylim[[1L]], ...)
     }
     
     if(2L %in% which){
-      resid.plotter(againstval, sqrt(abs(summ$pearson)), w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, seq_along(summ$pearson), NA), main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), ylim=ylim[[2L]], ...)
+      resid.plotter(againstval, sqrt(abs(summ$pearson)), w=w, col=col, bg=bg, pch=pch, cex=cex, cex.id=cex.id, id=ifelse(ei, id.label, NA), main = glue(main, type="Scale-location"), xlab=xlab, ylab=expression(sqrt(abs("Std. Pearson resid."))), ylim=ylim[[2L]], ...)
     }
 
     if(3L %in% which){
@@ -503,8 +505,8 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
 #' @param mappings a named list of lists of mappings constructed by [ggplot2::aes()] overriding the defaults. See Details below.
 #' @param geom_args a named list of lists of arguments overriding the defaults for the individual geoms. See Details below.
 #'
-#' @details For `autoplot.gofN()`, `against` is interpreted as an
-#'   expression in terms of network attributes and values generated by
+#' @details For `autoplot.gofN()`, `against` and `id.label` are interpreted as
+#'   expressions in terms of network attributes and values generated by
 #'   [augment.gofN()], included `.fitted` for the fitted values.
 #'
 #' @section Customising `autoplot.gofN()`:
@@ -527,15 +529,14 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
 autoplot.gofN <- function(x, against=.fitted, which=1:2,
                           mappings=list(),
                           geom_args=list(),
-                          id.n=3, main="{type} for {sQuote(name)}"){
+                          id.n=3, id.label=NULL){
   if(!requireNamespace("ggplot2") || !requireNamespace("ggrepel")) stop(sQuote("autoplot()"), " method for ", sQuote("gofN"), " objects requires packages ", paste.and(sQuote(c("ggplot2", "ggrepel"))), ".")
 
   against <- substitute(against)
+  id.label <- substitute(id.label)
+
   nattrs <- generics::augment(x)
-
   xlab <- deparse1(do.call(substitute, list(against, list(.fitted=as.name("Fitted values")))))
-
-  np <- sum(attr(x,"subset"))
 
   plots <- list()
 
@@ -546,32 +547,33 @@ autoplot.gofN <- function(x, against=.fitted, which=1:2,
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(a$.pearson) & rank(-abs(a$.pearson), ties.method="min")<=id.n & abs(a$.pearson)>ez
 
-    againstval <- eval(against, envir = a, enclos = parent.frame())
+    a$.against <- eval(against, envir = a, enclos = parent.frame())
+    a$.rownames <- NVL(eval(id.label, envir = a, enclos = parent.frame()), seq_along(ei))
 
     mode_call <- function(f, custom_map, custom_args, def_map=ggplot2::aes(), def_args=list())
       do.call(f, c(list(mapping=modifyList(def_map, as.list(custom_map))), modifyList(def_args, as.list(custom_args))))
 
     resid_plot <- function(mapping, ylab){
       o <- mode_call(ggplot2::ggplot, mappings$default, geom_args$default, mapping, list(data=a))
-      if(is.factor(againstval)){
+      if(is.factor(a$.against)){
         o <- o + mode_call(ggplot2::geom_boxplot, mappings$point, geom_args$point)
-        if(is.ordered(againstval)) o <- o +  mode_call(ggplot2::geom_smooth, mappings$smooth, geom_args$smooth, ggplot2::aes(x=as.numeric(againstval)), list(se=FALSE))
+        if(is.ordered(a$.against)) o <- o +  mode_call(ggplot2::geom_smooth, mappings$smooth, geom_args$smooth, ggplot2::aes(x=as.numeric(.against)), list(se=FALSE))
       }
       else o <- o + mode_call(ggplot2::geom_point, mappings$point, geom_args$point) +
              mode_call(ggplot2::geom_smooth, mappings$smooth, geom_args$smooth, def_args=list(se=FALSE))
       o <- o + ggplot2::xlab(xlab) + ggplot2::ylab(ylab) +
-        mode_call(ggrepel::geom_text_repel, mappings$text, geom_args$text, ggplot2::aes(label=ifelse(ei, seq_along(ei), "")))
+        mode_call(ggrepel::geom_text_repel, mappings$text, geom_args$text, ggplot2::aes(label=ifelse(ei, .rownames, "")))
       o
     }
 
     if(1L %in% which){
-      o <- resid_plot(eval(substitute(ggplot2::aes(x=.against, y=.pearson, weight=.weight), list(.against=against))),
+      o <- resid_plot(ggplot2::aes(x=.against, y=.pearson, weight=.weight),
                       "Std. Pearson resid.")
       plots <- c(plots, list(o))
     }
 
     if(2L %in% which){
-      o <- resid_plot(eval(substitute(ggplot2::aes(x=.against, y=sqrt(abs(.pearson)), weight=.weight), list(.against=against))),
+      o <- resid_plot(ggplot2::aes(x=.against, y=sqrt(abs(.pearson)), weight=.weight),
                       expression(sqrt(abs("Std. Pearson resid."))))
       plots <- c(plots, list(o))
     }

@@ -24,7 +24,7 @@
 
 .onLoad <- function(libname, pkgname){
   # . is used as a placeholder by stantet.common::NVL3().
-  utils::globalVariables(c(".", ".fitted"))
+  utils::globalVariables(c(".", ".fitted", ".against", ".rownames", ".pearson", ".weight"))
   options(ergm.eval.loglik=TRUE)
 
   eval(COLLATE_ALL_MY_CONTROLS_EXPR)
