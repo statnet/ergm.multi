@@ -30,6 +30,7 @@ library(ergm.multi)
 library(dplyr)
 library(purrr)
 library(tibble)
+library(ggplot2)
 ```
 
 # Obtaining data
@@ -153,7 +154,7 @@ summary(gof.wd)
 Variances of Pearson residuals substantially greater than 1 suggest unaccounted-for heterogeneity.
 
 ```{r}
-plot(gof.wd)
+autoplot(gof.wd)
 ```
 
 The plots don't look unreasonable.
@@ -161,8 +162,8 @@ The plots don't look unreasonable.
 
 Also make plots of residuals vs. square root of fitted and vs. network size:
 ```{r}
-plot(gof.wd, against=~sqrt(.fitted))
-plot(gof.wd, against=~factor(n))
+autoplot(gof.wd, against=sqrt(.fitted))
+autoplot(gof.wd, against=ordered(n))
 ```
 
 It looks like network-size effects are probably accounted for.
