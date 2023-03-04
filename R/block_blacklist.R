@@ -52,7 +52,7 @@ add_block_guid <- function(nw, blocks, attrname=".ubid"){
   id <- unname(guid(nlevels(blocks)))
   new_id <- id[as.integer(blocks)]
   old_id <- get.vertex.attribute(nw, attrname, null.na=FALSE, na.omit=FALSE, unlist=FALSE)
-  list(nw=set.vertex.attribute(nw, attrname, mapply(function(new,old)c(list(new),old,recursive=FALSE), new_id, old_id, SIMPLIFY=FALSE, USE.NAMES=FALSE)),
+  list(nw=set.vertex.attribute(nw, attrname, .mapply(function(new,old)c(list(new),old,recursive=FALSE), list(new_id, old_id), NULL)),
        id=id)
 }
 

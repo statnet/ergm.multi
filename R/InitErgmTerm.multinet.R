@@ -296,7 +296,7 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
 
   # Get the extended state and empty network stats wrapping. Note that
   # naming, curved models, etc., are handled "in-house" (for now).
-  wms <- mapply(wrap.ergm_model, ms, nwl, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+  wms <- .mapply(wrap.ergm_model, list(ms, nwl), NULL)
   
   ## An important special case is when all models are linear and have
   ## the same number of stats. lm-offset does not work with this
@@ -402,7 +402,7 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
       if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
         NULL
       }else{ # All numeric or NULL
-        unlist(mapply(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats, SIMPLIFY=FALSE))
+        unlist(Map(function(gs, nst) if(is.null(gs)) numeric(nst) else gs, gss, nstats))
       }
 
     list(name="MultiNets", coef.names = coef.names, iinputs=iinputs, submodels=ms, dependence=any(map_lgl(wms, "dependence")), emptynwstats = gs, auxiliaries = auxiliaries, map = etamap, gradient = etagradient, params = params)

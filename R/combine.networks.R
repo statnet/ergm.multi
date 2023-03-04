@@ -204,10 +204,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
   b <- rep(seq_along(ns),ns)
   if(blockID.vattr %in% list.vertex.attributes(out)){ # blockID.vattr already exists
-    b <- mapply(c, # Concatenate
-                b, # each element of b
-                get.vertex.attribute(out, blockID.vattr, unlist=FALSE), # with the corresponding element of out %v% blockID.vattr.
-                SIMPLIFY=FALSE)
+    b <- Map(c, # Concatenate
+             b, # each element of b
+             get.vertex.attribute(out, blockID.vattr, unlist=FALSE)) # with the corresponding element of out %v% blockID.vattr.
   }
   out <- set.vertex.attribute(out, blockID.vattr, b)
 
@@ -218,10 +217,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       else seq_along(ns)
     b <- rep(bn,ns)
     if(blockName.vattr %in% list.vertex.attributes(out)){ # blockID.vattr already exists
-      b <- mapply(c, # Concatenate
-                  b, # each element of b
-                  get.vertex.attribute(out, blockName.vattr, unlist=FALSE), # with the corresponding element of out %v% blockID.vattr.
-                  SIMPLIFY=FALSE)
+      b <- Map(c, # Concatenate
+               b, # each element of b
+               get.vertex.attribute(out, blockName.vattr, unlist=FALSE)) # with the corresponding element of out %v% blockID.vattr.
     }
     out <- set.vertex.attribute(out, blockName.vattr, b)
   }
@@ -315,10 +313,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
   b <- rep(rep(seq_along(ns),2),c(es,ns-es))
   if(blockID.vattr %in% list.vertex.attributes(out)){ # blockID.vattr already exists
-    b <- mapply(c, # Concatenate
-                b, # each element of b
-                get.vertex.attribute(out, blockID.vattr, unlist=FALSE), # with the corresponding element of out %v% blockID.vattr.
-                SIMPLIFY=FALSE)
+    b <- Map(c, # Concatenate
+             b, # each element of b
+             get.vertex.attribute(out, blockID.vattr, unlist=FALSE)) # with the corresponding element of out %v% blockID.vattr.
   }
   out <- set.vertex.attribute(out, blockID.vattr, b)
 
@@ -329,10 +326,9 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       else seq_along(ns)
     b <- rep(rep(bn,2),c(es,ns-es))
     if(blockName.vattr %in% list.vertex.attributes(out)){ # blockID.vattr already exists
-      b <- mapply(c, # Concatenate
-                  b, # each element of b
-                  get.vertex.attribute(out, blockName.vattr, unlist=FALSE), # with the corresponding element of out %v% blockID.vattr.
-                  SIMPLIFY=FALSE)
+      b <- Map(c, # Concatenate
+               b, # each element of b
+               get.vertex.attribute(out, blockName.vattr, unlist=FALSE)) # with the corresponding element of out %v% blockID.vattr.
     }
     out <- set.vertex.attribute(out, blockName.vattr, b)
   }
