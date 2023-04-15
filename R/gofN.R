@@ -135,10 +135,10 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
       control$obs.twostage <- obs.twostage.new
     }
 
-    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=control$obs.simulate, basis=nw, output="stats", ..., return.args="ergm_model")
+    sim.m.obs_settings <- simulate(object, monitor=NULL, observational=TRUE, nsim=control$nsim, control=copy_parallel_controls(control,control$obs.simulate), basis=nw, output="stats", ..., return.args="ergm_model")
   }else control$obs.twostage <- FALSE # Ignore two-stage setting if no observational process.
 
-  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=control$simulate, basis=nw, output="stats", ..., return.args="ergm_model")
+  sim.m_settings <- simulate(object, monitor=NULL, nsim=control$nsim, control=copy_parallel_controls(control,control$simulate), basis=nw, output="stats", ..., return.args="ergm_model")
 
   message("Constructing GOF model.")
   NVL(GOF) <- if(length(object$formula)==3) object$formula[-2] else object$formula
@@ -183,6 +183,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
 
       #' @importFrom parallel clusterCall
       if(!is.null(cl)){
+        ## NB: gen_obs_imputation_series() suppresses parallel processing inside it.
         sim <- clusterCall(cl, gen_obs_imputation_series, sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats)
         SST <- lapply(sim, attr, "SST")
         MV <- lapply(sim, attr, "MV")
@@ -201,6 +202,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
     }
     suppressWarnings(rm(sim.s_settings))
     message("Simulating constrained sample.")
+    ## NB: sim_stats_piecemeal() doesn't suppress parallel processing inside it.
     sim.obs <- sim_stats_piecemeal(.update.list(sim.s.obs_settings,
                                                 list(nsim=control$nsim, return.args=NULL)), monitored, max_elts, save_stats)
     rm(sim.s.obs_settings)
@@ -260,7 +262,13 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   structure(o, nw=nw, subset=subset, control=control, class="gofN")
 }
 
-# Helper functions for gofN.
+## Helper functions for gofN.
+
+copy_parallel_controls <- function(from, to){
+  ctrls <- c("parallel", "parallel.type", "parallel.version.check", "parallel.inherit.MT")
+  replace(to, ctrls, from[ctrls])
+}
+
 sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=FALSE){
   nthreads <- nthreads(sim.s_settings$control)
   # This needs to be a multiple of nthreads:
@@ -301,6 +309,7 @@ sim_stats_piecemeal <- function(sim.s_settings, monitored, max_elts, save_stats=
 
   structure(sim, SST=SST, state=state)
 }
+
 gen_obs_imputation_series <- function(sim.s_settings, sim.s.obs_settings, control, nthreads, monitored, save_stats=FALSE){
   n_cond <- control$obs.twostage/nthreads
   sim <- if(save_stats) vector("list", n_cond) else list()
