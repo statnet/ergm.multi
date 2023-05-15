@@ -70,6 +70,14 @@
   \subsection{NEW FEATURES}{
     \itemize{
       \item \code{\link{gofN}} objects now how \code{\link{augment}} and \code{\link{autoplot}} methods for Tidyverse and \CRANpkg{ggplot2} diagnostics.
+
+      \item \code{\link{plot.gofN}()} and \code{\link{autoplot.gofN}()} are now more flexible in how they label extreme points via the \code{id.label=} argument.
+    }
+  }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Fixed how parallel processing settings are handled in \code{\link{gofN}()} and \code{\link{marg_cond_sim}()}.
     }
   }
 
