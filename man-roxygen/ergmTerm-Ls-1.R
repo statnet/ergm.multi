@@ -5,6 +5,6 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2022 Statnet Commons
+#  Copyright 2003-2023 Statnet Commons
 ################################################################################
 #' @param Ls either a Layer Logic specification formula (c.f. Layer Logic section in the [Layer()] documentation) or a list thereof (constructed by [list()] or [c()])<%= Ls.interp %>
