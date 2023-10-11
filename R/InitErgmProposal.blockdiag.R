@@ -169,8 +169,9 @@ NULL
 InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   el <- as.edgelist(nw)
   a <- .get.blockdiag.attr(nw, arguments$constraints)
-  
-  if(any(a[el[,1]]!=a[el[,2]])) stop("Block-diagonal TNT sampler implementation does not support sampling networks with off-block-diagonal ties at this time.")
+
+  ## This proposal does not work if there are any edges outside the blocks.
+  if(any(a[el[,1]]!=a[el[,2]])) return(NULL)
 
   BDI <- ergm_block_diag_samp_info(nw, a)
   
