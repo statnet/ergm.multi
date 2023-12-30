@@ -14,7 +14,7 @@ LinkingTo: ergm
 Suggests: rmarkdown (>= 2.18), knitr (>= 1.41), dplyr (>= 1.0.10), testthat (>= 3.1.6), ggplot2, ggrepel, generics
 RdMacros: Rdpack
 BugReports: https://github.com/statnet/ergm.multi/issues
-Description: A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm.multi' is a part of the Statnet suite of packages for network analysis. See Krivitsky, Koehly, and Marcum (2020) <doi:10.1007/s11336-020-09720-7> and Krivitsky, Coletti, and Hens (2022) <doi:10.48550/arXiv.2202.03685>.
+Description: A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm.multi' is a part of the Statnet suite of packages for network analysis. See Krivitsky, Koehly, and Marcum (2020) <doi:10.1007/s11336-020-09720-7> and Krivitsky, Coletti, and Hens (2023) <doi:10.1080/01621459.2023.2242627>.
 License: GPL-3 + file LICENSE
 URL: https://statnet.org
 VignetteBuilder: rmarkdown, knitr
