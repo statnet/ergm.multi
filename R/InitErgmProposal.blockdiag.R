@@ -116,7 +116,7 @@ ergm_block_diag_samp_info <- function(nw, a){
   
     ## rle() returns contigous runs of values.
     # If we have more runs than unique values, the blocks must not be all contiguous.
-    if(length(rle(ea)$lengths)!=length(unique(rle(ea)$values)) || length(rle(aa)$lengths)!=length(unique(rle(aa)$values))) stop("Current implementation of block-diagonal sampling requires that the blocks of the egos and the alters be contiguous. See ", sQuote("?ergmConstraint"), " for more information.")
+    if(length(rle(ea)$lengths)!=length(unique(rle(ea)$values)) || length(rle(aa)$lengths)!=length(unique(rle(aa)$values))) return(NULL)
 
     tmp <- .double.rle(ea, aa)
 
@@ -130,7 +130,7 @@ ergm_block_diag_samp_info <- function(nw, a){
     ## rle() returns contigous runs of values.
     a <- rle(a)
     # If we have more runs than unique values, the blocks must not be all contiguous.
-    if(length(a$lengths)!=length(unique(a$values))) stop("Current implementation of block-diagonal sampling requires that the blocks be contiguous.")
+    if(length(a$lengths)!=length(unique(a$values))) return(NULL)
     b <- cumsum(c(0,a$lengths)) # upper bounds of blocks
     w <- cumsum(a$lengths*(a$lengths-1)) # cumulative block weights ~ # dyads in the block
     w <- w/max(w)
@@ -151,7 +151,8 @@ NULL
 
 InitErgmProposal.blockdiag <- function(arguments, nw){
   BDI <- ergm_block_diag_samp_info(nw, .get.blockdiag.attr(nw, arguments$constraints))
-  list(name = "blockdiag", BDI = BDI, bd = ergm_bd_init(arguments, nw))
+  if(is.null(BDI)) "The optimized block-diagonal TNT proposal requires the blocks to be contiguous."
+  else list(name = "blockdiag", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
 
 #' @templateVar name blockdiagTNT
@@ -171,9 +172,10 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   a <- .get.blockdiag.attr(nw, arguments$constraints)
 
   ## This proposal does not work if there are any edges outside the blocks.
-  if(any(a[el[,1]]!=a[el[,2]])) return(NULL)
+  if(any(a[el[,1]]!=a[el[,2]])) return("The optimized block-diagonal TNT proposal does not support networks with edges outside of the blocks.")
 
   BDI <- ergm_block_diag_samp_info(nw, a)
-  
-  list(name = "blockdiagTNT", BDI = BDI, bd = ergm_bd_init(arguments, nw))
+
+  if(is.null(BDI)) "The optimized block-diagonal TNT proposal requires the blocks to be contiguous."
+  else list(name = "blockdiagTNT", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
