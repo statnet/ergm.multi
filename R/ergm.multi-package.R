@@ -40,7 +40,7 @@
 #'     network is limited only by computing power.}
 #'
 #'   \item{flexibility and simplicity:}{*Any* valid binary ERGM can be
-#'     specified for any later or a logical combination of layers
+#'     specified for any layer or a logical combination of layers
 #'     using simple term operators.}
 #'
 #'   \item{heterogeneous layers:}{A network can have directed and

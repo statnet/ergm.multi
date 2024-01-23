@@ -35,7 +35,7 @@ nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and m
 network is limited only by computing power.}
 
 \item{flexibility and simplicity:}{\emph{Any} valid binary ERGM can be
-specified for any later or a logical combination of layers
+specified for any layer or a logical combination of layers
 using simple term operators.}
 
 \item{heterogeneous layers:}{A network can have directed and
