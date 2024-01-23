@@ -7,13 +7,13 @@
 #
 #  Copyright 2003-2023 Statnet Commons
 ################################################################################
-#' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
-#'
-#' @description \pkg{ergm.multi} is a collection of extensions and
-#'   utilities for package \CRANpkg{ergm} to facilitate modeling of
-#'   multilayer and multi-network models. Some experimental support
-#'   for multimode networks is also implemented.
-#'
+## #' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
+## #'
+## #' @description \pkg{ergm.multi} is a collection of extensions and
+## #'   utilities for package \CRANpkg{ergm} to facilitate modeling of
+## #'   multilayer and multi-network models. Some experimental support
+## #'   for multimode networks is also implemented.
+## #'
 #' @section Multilayer network models: Also known as multiplex,
 #'   multirelational, or multivariate networks, in a multilayer network a pair
 #'   of actors can have multiple simultaneous relations of different
@@ -87,9 +87,7 @@
 #'   `vignette("Goeyvaerts_reproduction")` for a demonstration.
 #'
 #' @name ergm.multi-package
-#' @docType package
-#' @author Pavel N. Krivitsky \email{pavel@@statnet.org}
 #'
 #' @references \insertAllCited{}
 #' @keywords package models
-NULL
+"_PACKAGE"
