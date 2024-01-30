@@ -11,6 +11,7 @@ marg_cond_sim(
   GOF = NULL,
   control = control.gofN.ergm(),
   save_stats = FALSE,
+  negative_info = c("error", "warning", "message", "ignore"),
   ...
 )
 }
@@ -22,6 +23,8 @@ marg_cond_sim(
 \item{obs.twostage, GOF, save_stats}{see \code{\link[=gofN]{gofN()}}.}
 
 \item{control}{a control list returned by \code{\link[=control.gofN.ergm]{control.gofN.ergm()}}; note that \code{nsim} and \code{obs.twostage} parameters in the control list are ignored in favor of those passed to the function directly.}
+
+\item{negative_info}{how to handle the situation in which the constrained variance exceeds the unconstrained: the corresponding action will be taken.}
 
 \item{...}{additional arguments to \code{\link[=ergm_model]{ergm_model()}}, \code{\link[=simulate.ergm]{simulate.ergm()}}, and \code{\link[=summary.ergm_model]{summary.ergm_model()}}.}
 }

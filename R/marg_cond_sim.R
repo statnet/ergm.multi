@@ -17,12 +17,14 @@
 #' @param nsim number of realizations.
 #' @param obs.twostage,GOF,save_stats see [gofN()].
 #' @param control a control list returned by [control.gofN.ergm()]; note that `nsim` and `obs.twostage` parameters in the control list are ignored in favor of those passed to the function directly.
+#' @param negative_info how to handle the situation in which the constrained variance exceeds the unconstrained: the corresponding action will be taken.
 #' @param ... additional arguments to [ergm_model()], [simulate.ergm()], and [summary.ergm_model()].
 #'
 #' @return an object of similar structure as that returned by [gofN()].
 #' @export
-marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.gofN.ergm(), save_stats=FALSE, ...){
+marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control=control.gofN.ergm(), save_stats=FALSE, negative_info=c("error","warning","message","ignore"), ...){
   check.control.class(c("gofN.ergm"), "marg_cond_sim")
+  negative_info <- match.arg(negative_info)
   control$obs.twostage <- obs.twostage
   control$nsim <- nsim
   if(control$obs.twostage && nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by control$obs.twostage control parameter must divide the nsim control parameter evenly.")
@@ -125,9 +127,16 @@ marg_cond_sim <- function(object, nsim=1, obs.twostage=nsim/2, GOF=NULL, control
   v <- SST$vars
   vo <- if(control$obs.twostage) MV else .col_var(sim.obs)
   # If any statistic for the network has negative variance estimate, stop with an error.
-  remain <- any(v>0 & v-vo<=0)
-  if(any(remain))
-    stop(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
+  if(negative_info != "ignore"){
+    remain <- v>0 & v-vo<=0
+    if(any(remain)){
+      msg <- paste0(sum(remain), " network statistics have bad simulations after permitted number of retries. Rerun with higher nsim= control parameter.")
+      switch(negative_info,
+             error = stop(msg),
+             warning = warning(msg),
+             message = message(msg))
+    }
+  }
 
   m <- SST$means
   mo <- colMeans(sim.obs)
