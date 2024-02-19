@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2023 Statnet Commons
+#  Copyright 2003-2024 Statnet Commons
 ################################################################################
 ## #' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 ## #'
