@@ -151,7 +151,7 @@ NULL
 
 InitErgmProposal.blockdiag <- function(arguments, nw){
   BDI <- ergm_block_diag_samp_info(nw, .get.blockdiag.attr(nw, arguments$constraints))
-  if(is.null(BDI)) "The optimized block-diagonal TNT proposal requires the blocks to be contiguous."
+  if(is.null(BDI)) NULL
   else list(name = "blockdiag", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }
 
@@ -172,10 +172,10 @@ InitErgmProposal.blockdiagTNT <- function(arguments, nw){
   a <- .get.blockdiag.attr(nw, arguments$constraints)
 
   ## This proposal does not work if there are any edges outside the blocks.
-  if(any(a[el[,1]]!=a[el[,2]])) return("The optimized block-diagonal TNT proposal does not support networks with edges outside of the blocks.")
+  if(any(a[el[,1]]!=a[el[,2]])) return(NULL)
 
   BDI <- ergm_block_diag_samp_info(nw, a)
 
-  if(is.null(BDI)) "The optimized block-diagonal TNT proposal requires the blocks to be contiguous."
+  if(is.null(BDI)) NULL
   else list(name = "blockdiagTNT", BDI = BDI, bd = ergm_bd_init(arguments, nw))
 }

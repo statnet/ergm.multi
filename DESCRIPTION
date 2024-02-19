@@ -10,7 +10,7 @@ Authors@R: c(person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="p
              person("Joyce", "Cheng", role=c("ctb"), email="joyce.cheng@student.unsw.edu.au"))
 Depends:
     R (>= 3.5.0),
-    ergm (>= 4.7.0),
+    ergm (>= 4.6.0),
     network (>= 1.18.2)
 Imports:
     statnet.common (>= 4.9.0),
