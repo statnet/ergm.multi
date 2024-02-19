@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2023 Statnet Commons
+#  Copyright 2003-2024 Statnet Commons
 ################################################################################
 #' A sample of within-household contact networks in Flanders and Brussels
 #'
@@ -89,7 +89,7 @@
 #'
 #' \item{`coworker`}{(logical) whether \eqn{i} has reported receiving \eqn{j}'s assistance in preparing documents. (Note that as defined, assistance flows from head of the directed edge to the tail.)}
 #'
-#' \item{`friendship`}{(logical) whether \eqn{i} considers {j} a friend outside of work.}
+#' \item{`friendship`}{(logical) whether \eqn{i} considers \eqn{j} a friend outside of work.}
 #'
 #' }
 #'

@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2023 Statnet Commons
+#  Copyright 2003-2024 Statnet Commons
 ################################################################################
 ## TODO: LL-Constrained proposals.
 ## TODO: Check that noncommutative LL operators work as intended.
@@ -862,7 +862,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
-  wm$dependence <- wm$dependence || !is.dyad.independent(auxiliaries, basis=nw)
+  wm$dependence <- wm$dependence || !is.dyad.independent(auxiliaries, basis=nw, ignore_aux=FALSE)
 
   c(list(name="OnLayer", iinputs=nltrms, inputs=w, submodel=m, auxiliaries = auxiliaries),
     wm)

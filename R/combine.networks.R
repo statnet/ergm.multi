@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2023 Statnet Commons
+#  Copyright 2003-2024 Statnet Commons
 ################################################################################
 
 #' A single block-diagonal network created by combining multiple networks
@@ -464,7 +464,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
 #'
 #' This utility uncombines a [combine_networks()] network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.
 #'
-#' @param nw,split.vattr,nams.vattr see [uncombine_network()].
+#' @param nw,split.vattr,names.vattr see [uncombine_network()].
 #'
 #' @param copy.ergmlhs a character vector of [`%ergmlhs%`] settings that are to be copied into the constituent networks.
 #'

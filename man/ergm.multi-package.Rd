@@ -2,13 +2,11 @@
 % Please edit documentation in R/ergm.multi-package.R
 \docType{package}
 \name{ergm.multi-package}
+\alias{ergm.multi}
 \alias{ergm.multi-package}
-\title{\pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks}
+\title{ergm.multi: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks}
 \description{
-\pkg{ergm.multi} is a collection of extensions and
-utilities for package \CRANpkg{ergm} to facilitate modeling of
-multilayer and multi-network models. Some experimental support
-for multimode networks is also implemented.
+A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm.multi' is a part of the Statnet suite of packages for network analysis. See Krivitsky, Koehly, and Marcum (2020) \doi{10.1007/s11336-020-09720-7} and Krivitsky, Coletti, and Hens (2023) \doi{10.1080/01621459.2023.2242627}.
 }
 \section{Multilayer network models}{
  Also known as multiplex,
@@ -37,7 +35,7 @@ nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and m
 network is limited only by computing power.}
 
 \item{flexibility and simplicity:}{\emph{Any} valid binary ERGM can be
-specified for any later or a logical combination of layers
+specified for any layer or a logical combination of layers
 using simple term operators.}
 
 \item{heterogeneous layers:}{A network can have directed and
@@ -88,8 +86,26 @@ See \code{\link[=Networks]{Networks()}}, \code{\link[=N-ergmTerm]{ergmTerm?N}} f
 \references{
 \insertAllCited{}
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://statnet.org}
+  \item Report bugs at \url{https://github.com/statnet/ergm.multi/issues}
+}
+
+}
 \author{
-Pavel N. Krivitsky \email{pavel@statnet.org}
+\strong{Maintainer}: Pavel N. Krivitsky \email{pavel@statnet.org} (\href{https://orcid.org/0000-0002-9101-3362}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Mark S. Handcock \email{handcock@stat.ucla.edu} [contributor]
+  \item David R. Hunter \email{dhunter@stat.psu.edu} [contributor]
+  \item Chad Klumb \email{cklumb@gmail.com} [contributor]
+  \item Pietro Coletti \email{pietro.coletti@uhasselt.be} [contributor]
+  \item Joyce Cheng \email{joyce.cheng@student.unsw.edu.au} [contributor]
+}
+
 }
 \keyword{models}
 \keyword{package}

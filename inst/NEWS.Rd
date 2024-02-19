@@ -5,7 +5,7 @@
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  https://statnet.org/attribution .
 %
-%  Copyright 2003-2023 Statnet Commons
+%  Copyright 2003-2024 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{NEWS}
 \title{NEWS file for the \code{\link[=ergm-package]{ergm}} package}
@@ -63,6 +63,41 @@
   % }
 
 %% }
+
+
+\section{Changes in version 0.2.1}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item{
+        \code{\link{marg_cond_sim}()} now has an argument for how to handle when the constrained sample has a higher variance than the unconstrained. (Previously, it would always throw an error.)
+      }
+    }
+  }
+
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item{
+        Fixes for documentation issues flagged by CRAN and compatibility with the latest \CRANpkg{Roxygen2}.
+      }
+    }
+  }
+
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item{
+        Some citations updated.
+      }
+      \item{
+        When the optimized block-diagonal proposals encounter an initial network with off-block-diagonal edges, they no longer throw an error but rather use the \CRANpkg{ergm} 4.6.0+ proposal declination API.
+      }
+    }
+  }
+
+}
+
 
 
 \section{Changes in version 0.2.0}{

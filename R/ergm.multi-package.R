@@ -5,15 +5,15 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2003-2023 Statnet Commons
+#  Copyright 2003-2024 Statnet Commons
 ################################################################################
-#' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
-#'
-#' @description \pkg{ergm.multi} is a collection of extensions and
-#'   utilities for package \CRANpkg{ergm} to facilitate modeling of
-#'   multilayer and multi-network models. Some experimental support
-#'   for multimode networks is also implemented.
-#'
+## #' @title \pkg{ergm.multi}: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
+## #'
+## #' @description \pkg{ergm.multi} is a collection of extensions and
+## #'   utilities for package \CRANpkg{ergm} to facilitate modeling of
+## #'   multilayer and multi-network models. Some experimental support
+## #'   for multimode networks is also implemented.
+## #'
 #' @section Multilayer network models: Also known as multiplex,
 #'   multirelational, or multivariate networks, in a multilayer network a pair
 #'   of actors can have multiple simultaneous relations of different
@@ -40,7 +40,7 @@
 #'     network is limited only by computing power.}
 #'
 #'   \item{flexibility and simplicity:}{*Any* valid binary ERGM can be
-#'     specified for any later or a logical combination of layers
+#'     specified for any layer or a logical combination of layers
 #'     using simple term operators.}
 #'
 #'   \item{heterogeneous layers:}{A network can have directed and
@@ -87,9 +87,7 @@
 #'   `vignette("Goeyvaerts_reproduction")` for a demonstration.
 #'
 #' @name ergm.multi-package
-#' @docType package
-#' @author Pavel N. Krivitsky \email{pavel@@statnet.org}
 #'
 #' @references \insertAllCited{}
 #' @keywords package models
-NULL
+"_PACKAGE"

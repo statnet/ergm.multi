@@ -12,7 +12,7 @@ subnetwork_templates(
 )
 }
 \arguments{
-\item{nw, split.vattr, nams.vattr}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
+\item{nw, split.vattr, names.vattr}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
 
 \item{copy.ergmlhs}{a character vector of \code{\link{\%ergmlhs\%}} settings that are to be copied into the constituent networks.}
 }
