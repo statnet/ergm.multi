@@ -79,7 +79,7 @@
   \subsection{BUG FIXES}{
     \itemize{
       \item{
-        Fixes for documentation issues flagged by CRAN and compatibility with the latest \CRANpkg{Roxygen2}.
+        Fixes for documentation issues flagged by CRAN and compatibility with the latest \CRANpkg{roxygen2}.
       }
     }
   }
