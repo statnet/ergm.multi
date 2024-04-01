@@ -520,3 +520,70 @@ subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".Net
   }
   o
 }
+
+#' @noRd
+#' @export
+set.vertex.attribute.combined_networks <- function(x, attrname, value, v = seq_len(network.size(x)), ...) {
+  xn <- substitute(x) # Save the object's name.
+  x <- NextMethod("set.vertex.attribute") # Set the vertex attribute on the combined network.
+
+  ## Extract the block information.
+  bid <- x %n% ".blockID.vattr"
+  info <- .block_vertexmap(x)
+  bids <- info$bids[v]
+  vids <- info$bmap[v]
+
+  ## For each affected network in the subnet cache update the corresponding attributes.
+  snc <- (x %n% ".subnetcache")[[bid]]
+  for(b in unique(bids)){
+    ## Hopefully, if the subnetworks themselves are combined networks, this will recurse.
+    snc[[b]] <- set.vertex.attribute(snc[[b]], attrname, value[bids==b], v = vids[bids==b], ...)
+  }
+  x %n% ".subnetcache" <- structure(list(snc), names=bid)
+
+  ## Attempt to assign to the object.
+  if(.validLHS(xn,parent.frame())){  #If x not anonymous, set in calling env
+    on.exit(eval.parent(call('<-',xn,x)))
+  }
+  invisible(x)
+}
+
+###### The following code is incorporated from the `network` package. It should be deleted if exported.
+
+# Recursively traverse the parse tree of the expression x, ensuring that it is
+# a valid subset expresssion, and return the name associated with the expression.
+#
+.findNameInSubsetExpr <- function(x){
+  if (inherits(x,'call')){
+    # Ensure call is a subset function, one of $, [, or [[
+    if(!(deparse(x[[1]]) %in% c('$','[','[['))) return(NA)
+
+    # Make sure arguments are clean
+    xns <- lapply(x[2:length(x)],.findNameInSubsetExpr)
+    if (any(is.na(xns))) return(NA)
+
+    # Possible name found
+    return(xns[[1]])
+  }
+  else if (inherits(x,'name'))
+    return(deparse(x))
+
+  NULL
+}
+
+# Return TRUE if x is a valid left-hand-side object that can take a value
+
+.validLHS <- function(x,ev){
+  xn <- .findNameInSubsetExpr(x)
+  # There are valid expressions for which we don't want to assign into the caller's env.
+  # For instance, when a user executes z<-add.edges(x+y), then the user obviously
+  # doesn't want x+y to be assigned. Rather he's using them as temporaries to obtain
+  # z. OTOH we don't want someone doing something obtuse like add.edges(x[sample(...)])
+  # In the first case, it's not wrong to end up here, but in the second case we would
+  # like to warn the user. But we're not going to at this point.
+  #warning('Cannot make assignment into ',deparse(x))
+  if (!is.null(xn) && !is.na(xn) && exists(xn,envir=ev))
+    return(TRUE)
+  else
+    return(FALSE)
+}

@@ -7,7 +7,8 @@ Authors@R: c(person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="p
              person(c("David", "R."), "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"),
              person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"),
              person("Pietro", "Coletti", role=c("ctb"), email="pietro.coletti@uhasselt.be"),
-             person("Joyce", "Cheng", role=c("ctb"), email="joyce.cheng@student.unsw.edu.au"))
+             person("Joyce", "Cheng", role=c("ctb"), email="joyce.cheng@student.unsw.edu.au"),
+             person(c("Carter", "T."), "Butts", role=c("ctb"), email="buttsc@uci.edu"))
 Depends:
     R (>= 3.5.0),
     ergm (>= 4.7.0),
