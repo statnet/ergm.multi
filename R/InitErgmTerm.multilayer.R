@@ -14,6 +14,27 @@
   map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
 }
 
+.varying_attributes <- function(nwl, lister, getter, type, ignore = c()){
+  attrs1 <- lister(nwl[[1]]) %>% setdiff(ignore)
+  attrs <- nwl[-1] %>% map(lister) %>% map(setdiff, ignore)
+  extra_attrs <- attrs %>% unlist() %>% unique() %>% setdiff(attrs1)
+
+  if(length(extra_attrs))
+    warning(type, " attribute(s) ", paste.and(sQuote(extra_attrs)), " are not found in the first layer and will be ignored.", call.=FALSE, immediate.=TRUE)
+
+  common_attrs <- attrs %>% map(intersect, attrs1)
+  differing <-
+    ! map_lgl(attrs1, function(a)
+      pmap_lgl(
+        list(nwl[-1], common_attrs),
+        function(nw, al) if(a %in% al) identical(getter(nw, a, unlist = FALSE), getter(nwl[[1]], a, unlist = FALSE)) else TRUE
+      ) %>% all())
+  if(any(differing))
+    warning(type, " attribute(s) ", paste.and(sQuote(attrs1[differing])), " have values different from those in the first layer and will be overwritten.", call.=FALSE, immediate.=TRUE)
+
+  length(extra_attrs) || any(differing)
+}
+
 .layer_namemap <- function(nw){
   nwnames <- .peek_vattrv(nw, ".LayerName", missing="NULL")
   if(is.numeric(nwnames)) nwnames <- NULL
@@ -224,11 +245,10 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' @param .bipartite If the layer specification is via a single
 #'   network with edge attributes and the network is unipartite, an
 #'   optional integer vector to specify which of the layers should be
-#'   treated as bipartite and how many `b1` vertices there are.
-#' @param .active A [nodal attribute specification][nodal_attributes]
-#'   (`? nodal_attributes`) specifying which nodes on each network
-#'   *may* have ties, or a list with an element for each network. The
-#'   list will be recycled up to the number of layers.
+#'   treated as bipartite and how many mode 1 vertices there are.
+#' @param .active An optional list with a [nodal attribute
+#'   specification][nodal_attributes] (`? nodal_attributes`) for each
+#'   layer, specifying which nodes on each layer *may* have ties.
 #'
 #' @return A network object with layer metadata.
 #'
@@ -240,7 +260,12 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   used to construct a bipartite subgraph of a unipartite graph or
 #'   change directedness.
 #'
-#' @section Specifying models for multilayer network:
+#'   Its nonstandard network and vertex attributes will be taken from
+#'   the *first* network in the list. The subsequent networks'
+#'   attributes will be overwritten with a warning if they differ from
+#'   those in the first network.
+#'
+#' @section Specifying models for multilayer networks:
 #' In order to fit a model for multilayer
 #' networks, first use [`Layer`] construct an LHS network that
 #' [ergm()] will understand as multilayered.
@@ -435,11 +460,16 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
+  ## If network or vertex attributes differ from the first network, warn.
+  .varying_attributes(nwl, list.network.attributes, get.network.attribute, "Network", ignore = c("directed", "bipartite", "mnext", ".block_blacklist"))
+  .varying_attributes(nwl, list.vertex.attributes, get.vertex.attribute, "Vertex", ignore = c(".undirected", ".bipartite", ".ubid"))
+
+  for(i in seq_along(nwl)[-1L])
+    nwl[[i]] <- nvattr.copy.network(nwl[[i]], nwl[[1]], ignore = c(eval(formals(nvattr.copy.network)$ignore), ".block_blacklist", ".ubid", ".undirected", ".bipartite"))
+
   if(!is.null(.active)){
-    if(!is.list(.active)) .active <- list(.active)
-    .active <- rep(.active, length.out=length(nwl))
-    al <- Map(function(nw, a) ergm_get_vattr(a, nw, accept="logical"),
-              nwl, .active)
+    if(!is.list(.active) || length(.active) != length(nwl)) stop(sQuote(".active="), " argument if given must be a list of attribute specifications, one for each layer.")
+    al <- map(.active, ergm_get_vattr, nwl[[1]], accept="logical")
     if(!all(unlist(al)))
       nwl <- Map(function(nw, a) blacklist_intersect(nw, a, invert=TRUE),
                  nwl, al)
@@ -491,7 +521,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
   if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
-  
+
   nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)

@@ -7,12 +7,35 @@
 #
 #  Copyright 2003-2024 Statnet Commons
 ################################################################################
-nwu <- network.initialize(2, dir=FALSE)
-nwu[1,2] <- 1
-nwd <- network.initialize(2, dir=TRUE)
-nwd[2,1] <- 1
-
 test_that("multilayer heterogeneous directedness summary", {
+  nwu <- network.initialize(2, directed = FALSE)
+  nwu[1,2] <- 1
+  nwd <- network.initialize(2, directed = TRUE)
+  nwd[2,1] <- 1
+
   lnw <- Layer(nwu, nwd)
   expect_equal(summary(lnw~L(~edges,~`1`)+L(~edges,~`2`)+CMBL), c(2,1,-sum(lchoose(2,as.matrix(nwu)+as.matrix(nwd)))), ignore_attr=TRUE)
+})
+
+test_that("multilayer heterogeneous layers messages", {
+  nw1 <- network.initialize(20, dir=FALSE)
+  nw12 <- network.initialize(20, dir=FALSE, bipartite=5)
+  nw1 %v% "mode" <- rep(1:2,c(5,15))
+  nw1 %n% "nattr" <- "abc"
+
+  expect_silent(Layer(nw1, nw12, .active=list(~mode==1, ~TRUE)))
+
+  expect_warning(expect_warning(
+    Layer(nw12, nw1),
+    "Vertex attribute\\(s\\) 'mode' are not found in the first layer and will be ignored\\."),
+    "Network attribute\\(s\\) 'nattr' are not found in the first layer and will be ignored\\."
+  )
+
+  nw12 %v% "mode" <- rep(1:2,c(15,5))
+  nw12 %n% "nattr" <- "def"
+  expect_warning(expect_warning(
+    Layer(nw1, nw12, .active=list(~mode==1, ~TRUE)),
+    "Vertex attribute\\(s\\) 'mode' have values different from those in the first layer and will be overwritten\\."),
+    "Network attribute\\(s\\) 'nattr' have values different from those in the first layer and will be overwritten\\."
+  )
 })

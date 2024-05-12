@@ -28,12 +28,10 @@ treated as undirected.}
 \item{.bipartite}{If the layer specification is via a single
 network with edge attributes and the network is unipartite, an
 optional integer vector to specify which of the layers should be
-treated as bipartite and how many \code{b1} vertices there are.}
+treated as bipartite and how many mode 1 vertices there are.}
 
-\item{.active}{A \link[=nodal_attributes]{nodal attribute specification}
-(\code{? nodal_attributes}) specifying which nodes on each network
-\emph{may} have ties, or a list with an element for each network. The
-list will be recycled up to the number of layers.}
+\item{.active}{An optional list with a \link[=nodal_attributes]{nodal attribute specification} (\code{? nodal_attributes}) for each
+layer, specifying which nodes on each layer \emph{may} have ties.}
 }
 \value{
 A network object with layer metadata.
@@ -50,8 +48,13 @@ will appear as unipartite to the statistics, and if any are
 directed, all will be. However, \link[=ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
+
+Its nonstandard network and vertex attributes will be taken from
+the \emph{first} network in the list. The subsequent networks'
+attributes will be overwritten with a warning if they differ from
+those in the first network.
 }
-\section{Specifying models for multilayer network}{
+\section{Specifying models for multilayer networks}{
 
 In order to fit a model for multilayer
 networks, first use \code{\link{Layer}} construct an LHS network that
