@@ -141,6 +141,14 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
   list(xf=xf, xm=xm, subset=subset, offset=offset)  
 }
 
+assert_LHS_Networks <- function(nw, nid, term_trace = TRUE, call = if(term_trace) NULL else rlang::caller_env()){
+  if(anyNA(.peek_vattrv(nw, nid))){
+    msg <- paste0("The LHS of the model is not a multi-network ", sQuote("Networks()"), " construct.")
+    if(term_trace) ergm_Init_abort(msg, call=call)
+    else abort(msg, call=call)
+  }
+}
+
 #' @import purrr
 #' @import tibble
 #' @templateVar name N
@@ -238,6 +246,8 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
                       vartypes = c("formula", "formula", "formula,logical,numeric,expression,call", "formula,logical,numeric,expression,call", "list", "formula,logical,numeric,expression,call", "character,function", "character", "character"),
                       defaultvalues = list(NULL, ~1, TRUE, 1, NULL, NULL, NULL, .NetworkID, .NetworkName),
                       required = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+
+  assert_LHS_Networks(nw, a$.NetworkID)
 
   auxiliaries <- eval(substitute(~.subnets(.NetworkID), list(.NetworkID=a$.NetworkID)), baseenv())
 
@@ -434,6 +444,8 @@ InitErgmTerm.ByNetDStats <- function(nw, arglist, ..., .NetworkID=".NetworkID"){
                       vartypes = c("formula", "formula,logical,numeric,expression,call", "character"),
                       defaultvalues = list(NULL, TRUE, .NetworkID),
                       required = c(TRUE, FALSE, FALSE))
+
+  assert_LHS_Networks(nw, a$.NetworkID)
 
   auxiliaries <- eval(substitute(~.subnets(.NetworkID), list(.NetworkID=a$.NetworkID)), baseenv())
   nattrs <- as_tibble(nw, unit="networks")

@@ -109,11 +109,14 @@
 #' 
 #' @export
 gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), save_stats=FALSE, ...){
+  if(!inherits(object, "ergm")) stop(sQuote("object"), " must be an ", sQuote("ergm()"), " fit.")
+
   check.control.class(c("gofN.ergm"), "gofN")
   if(control$obs.twostage && control$nsim %% control$obs.twostage !=0) stop("Number of imputation networks specified by obs.twostage control parameter must divide the nsim control parameter evenly.")
   max_elts <- if(save_stats) Inf else control$array.max*1024^2/8 # A numeric is 8 bytes per element.
 
   nw <- object$network
+  assert_LHS_Networks(nw, ".NetworkID", term_trace=FALSE)
   nnets <- length(unique(.peek_vattrv(nw, ".NetworkID")))
 
   if(is.numeric(subset)) subset <- unwhich(subset, nnets)

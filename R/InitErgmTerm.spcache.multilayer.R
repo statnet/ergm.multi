@@ -15,6 +15,8 @@ InitErgmTerm..spcache.netL<-function(nw, arglist, ...){
                       defaultvalues = list(NULL,NULL,NULL),
                       required = c(TRUE, TRUE, TRUE))
 
+  assert_LHS_Layer(nw)
+
   type <- match.arg(tolower(a$type), c("otp","osp","isp","utp")) # ITP not included, because it's just OTP with direction reversed.
 
   if(is.directed(nw)==(type=="utp")) stop("Type UTP may only be used with undirected networks, the others only with directed.")

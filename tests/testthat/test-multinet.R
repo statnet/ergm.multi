@@ -121,3 +121,14 @@ test_that("N() warns on parameter name mismatch",{
   expect_warning(summary(Networks(samplk1,samplk2)~N(~nodemix("x"))),
                  "different parameter names")
 })
+
+
+test_that("N() stops if given a non-multi-net object with a sensible error message.",{
+  expect_error(ergm_model(samplk1 ~ N(~edges)),
+               "In term 'N' in package 'ergm\\.multi': The LHS of the model is not a multi-network 'Networks\\(\\)' construct\\.")
+})
+
+test_that("gofN() stops if given a non-multi-net fit with a sensible error message.",{
+  expect_error(gofN(ergm(samplk1 ~ edges)),
+               "The LHS of the model is not a multi-network 'Networks\\(\\)' construct\\.")
+})

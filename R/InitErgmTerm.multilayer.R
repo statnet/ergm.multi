@@ -61,6 +61,10 @@
   if(collapse) ergm_mk_std_op_namewrap("L", reprs) else reprs
 }
 
+assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
+  if(anyNA(.peek_vattrv(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
+}
+
 #' Construct a "view" of a network.
 #'
 #' Returns a network with edges optionally filtered according to a
@@ -564,7 +568,8 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  
+  assert_LHS_Layer(nw)
+
   nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
 
   ll <- to_ergm_Cdouble(.set_layer_namemap(a$L, nw))
@@ -872,6 +877,8 @@ InitErgmTerm.L <- function(nw, arglist, ...){
                       defaultvalues = list(NULL, empty_env(~.)),
                       required = c(TRUE, FALSE))
 
+  assert_LHS_Layer(nw)
+
   nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
 
   Ls <- .set_layer_namemap(a$Ls, nw)
@@ -930,6 +937,8 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
                       defaultvalues = list(empty_env(~.)),
                       required = c(FALSE))
 
+  assert_LHS_Layer(nw)
+
   Ls <- .set_layer_namemap(a$Ls, nw)
   auxiliaries <- .mk_.layer.net_auxform(Ls)
   nltrms <- length(list_rhs.formula(auxiliaries))
@@ -985,6 +994,9 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
                       vartypes = c("formula,list", "character", "logical"),
                       defaultvalues = list(NULL, NULL, TRUE),
                       required = c(TRUE, TRUE, FALSE))
+
+  assert_LHS_Layer(nw)
+
   TYPES <- c("any", "out", "in", "path")
   TYPEREP <- setNames(c("--", "<>", "><", ">>"), TYPES)
   type <- match.arg(tolower(a$type), TYPES)

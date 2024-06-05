@@ -385,3 +385,8 @@ test_that("Statistics simulation for heterogeneously bipartite networks", {
   expect_equal(summary(slnw~edges+L(~edges,~`1`)+L(~edges,~`2`)+L(~edges,~(`1`|`2`))+L(~edges,~(`1`&`2`))),
                c(85,10,75,85,0), ignore_attr=TRUE)
 })
+
+test_that("L() stops if given a non-multilayer object with a sensible error message.",{
+  expect_error(ergm_model(nw1 ~ L(~edges)),
+               "In term 'L' in package 'ergm\\.multi': The LHS of the model is not a multilayer 'Layer\\(\\)' construct\\.")
+})

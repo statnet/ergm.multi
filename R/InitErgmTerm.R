@@ -104,6 +104,8 @@ GWDECAY <- list(
 )
 
 .process_layers_degree <- function(nw, a, name, coef.names, inputs, emptynwstats=NULL){
+  assert_LHS_Layer(nw)
+
   if(!is.null(a$Ls)){
     Ls <- .set_layer_namemap(a$Ls)
     if(is(Ls,"formula")) Ls <- list(Ls)
@@ -906,13 +908,16 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
 #' @concept frequently-used
 #' @concept layer-aware
 InitErgmTerm.mutualL<-function (nw, arglist, ...) {
-  ### Check the network and arguments to make sure they are appropriate.
+  ## Check the network and arguments to make sure they are appropriate.
   a <- check.ErgmTerm(nw, arglist, directed=TRUE, bipartite=NULL,
                       varnames = c("same", "by", "diff", "keep", "Ls"),
                       vartypes = c("character", "character", "logical", "numeric", "formula,list"),
                       defaultvalues = list(NULL, NULL, FALSE, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
-  ### Process the arguments
+
+  assert_LHS_Layer(nw)
+
+  ## Process the arguments
   if (!is.null(a$same) || !is.null(a$by)) {
     if (!is.null(a$same)) {
      attrname <- a$same

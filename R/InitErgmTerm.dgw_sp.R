@@ -125,6 +125,8 @@
 }
 
 .sp.handle_layers <- function(nw, a, type, has_base, cache.sp=FALSE){
+  assert_LHS_Layer(nw)
+
   out <- list()
 
   namemap <- .layer_namemap(nw)
