@@ -132,6 +132,7 @@
   namemap <- .layer_namemap(nw)
 
   if(is(a$Ls.path,"formula")) a$Ls.path <- list(a$Ls.path)
+  if(length(a$Ls.path) == 1) a$Ls.path <- rep(a$Ls.path, 2)
   L.path1 <- NVL3(a$Ls.path[[1]], .set_layer_namemap(., namemap))
   L.path2 <- NVL3(a$Ls.path[[2]], .set_layer_namemap(., namemap))
   L.base <- NVL3(a$L.base, .set_layer_namemap(., namemap))
