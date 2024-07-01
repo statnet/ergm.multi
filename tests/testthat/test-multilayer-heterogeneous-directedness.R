@@ -14,7 +14,7 @@ test_that("multilayer heterogeneous directedness summary", {
   nwd[2,1] <- 1
 
   lnw <- Layer(nwu, nwd)
-  expect_equal(summary(lnw~L(~edges,~`1`)+L(~edges,~`2`)+CMBL), c(2,1,-sum(lchoose(2,as.matrix(nwu)+as.matrix(nwd)))), ignore_attr=TRUE)
+  expect_equal(summary(lnw~L(~edges,~`1`)+L(~edges,~`2`)+CMBL), c(1,1,-sum(lchoose(2,as.matrix(nwu)+as.matrix(nwd)))), ignore_attr=TRUE)
 })
 
 test_that("multilayer heterogeneous layers messages", {

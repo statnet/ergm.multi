@@ -258,13 +258,15 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' @note The resulting network will be the "least common denominator"
 #'   network: if not all layers have the same bipartedness, all layers
-#'   will appear as unipartite to the statistics, and if any are
-#'   directed, all will be. However, [certain operator
+#'   will be represented as unipartite, and if any are directed, all
+#'   will be. The `L()` operator will attempt to reconstruct the least
+#'   common denominator of the layers in the specification, though it
+#'   may not always succeed. In those situations, [certain operator
 #'   terms][ergmTerm], particularly `Symmetrize()` and `S()`, can be
 #'   used to construct a bipartite subgraph of a unipartite graph or
 #'   change directedness.
 #'
-#'   Its nonstandard network and vertex attributes will be taken from
+#'   The nonstandard network and vertex attributes will be taken from
 #'   the *first* network in the list. The subsequent networks'
 #'   attributes will be overwritten with a warning if they differ from
 #'   those in the first network.
@@ -418,10 +420,12 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' # layer, i.e., 1-2-3:
 #' summary(lnw~triangles)
 #'
-#' # If you need to evaluate bipartite-only statistics on the second
-#' # layer, you need to use the S() operator to select the bipartite
-#' # view:
-#' summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
+#' # L() autodetects when the requested layer is entirely bipartite:
+#' summary(lnw~L(~b1degree(1:3)+b2degree(1:3), ~`2`))
+#'
+#' # It also removes the nodes not in Mode 1 before evaluating a
+#' # statistic that depends only layers only active in Mode 1:
+#' summary(lnw~L(~degree(0:5), ~1)) # sum to 5, not 20
 #'
 #' @export
 Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
@@ -475,8 +479,12 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
     if(!is.list(.active) || length(.active) != length(nwl)) stop(sQuote(".active="), " argument if given must be a list of attribute specifications, one for each layer.")
     al <- map(.active, ergm_get_vattr, nwl[[1]], accept="logical")
     if(!all(unlist(al)))
-      nwl <- Map(function(nw, a) blacklist_intersect(nw, a, invert=TRUE),
-                 nwl, al)
+      nwl <- Map(function(nw, a){
+        a <- as.vector(a)
+        if(!all(a) && (any(nw[!a,]!=0) || any(nw[,!a]!=0))) stop("Edges incident on nodes tagged inactive.")
+        nw %v% ".active" <- a
+        nw <- blacklist_intersect(nw, a, invert=TRUE)
+      }, nwl, al)
   }
 
   # nwl may now be a list with networks of heterogeneous bipartitedness.
@@ -493,6 +501,8 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
       nw <- nw %>% blacklist_intersect(v) %>% blacklist_intersect(!v)
       # Bipartiteness is now enforced by the blacklist.
       nw %n% "bipartite" <- FALSE
+      if(anyNA(a <- nw %v% ".active")) a <- TRUE 
+      if(any(nw[v&a,v&a]!=0) || any(nw[!v&a,!v&a]!=0)) stop("Within-bipartition edges in a layer tagged bipartite.")
     }
     nw
   }, nwl, blockout)
@@ -571,7 +581,6 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
   assert_LHS_Layer(nw)
 
   nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
-
   ll <- to_ergm_Cdouble(.set_layer_namemap(a$L, nw))
   # Terms on this logical layer will induce dyadic independence if its
   # value depends on more than one other layer value.
@@ -870,7 +879,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 #'
 #' @concept operator
 #' @concept layer-aware
-InitErgmTerm.L <- function(nw, arglist, ...){
+InitErgmTerm.L <- function(nw, arglist, ..., env){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "Ls"),
                       vartypes = c("formula", "formula,list"),
@@ -884,6 +893,40 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   Ls <- .set_layer_namemap(a$Ls, nw)
   if(is(Ls, "formula")) Ls <- list(Ls)
   Ls.dotexp <- .layers_expand_dot(Ls)
+  lls <- lapply(Ls.dotexp, to_ergm_Cdouble)
+
+  deps <- lapply(lls, .depends_on_layers)
+  ## Terms on a logical layer will induce dyadic independence if its
+  ## value depends on more than one other layer value; but a weighted
+  ## sum doesn't.
+  dependence <- any(lengths(deps)>1)
+  deps <- unique(unlist(deps)) # Don't need layer-specific anymore.
+
+  ## Should any nodes be deactivated?
+  active <- lapply(nwl[deps], function(nw) is.na(nw %v% ".active") | (nw %v% ".active")) %>% reduce(`|`)
+
+  ## Should it be wrapped into bipartite?
+  if(!is.bipartite(nw)){
+    bipartite <- lapply(nwl[deps], `%v%`, ".bipartite")
+    bipartite <-
+      if(all_identical(bipartite)) bipartite[[1]][1]
+      else 0
+  }else bipartite <- 0
+
+  symmetrize <- is.directed(nw) && all(sapply(nwl[deps], function(nw) (nw%v% ".undirected")[1])) && !bipartite
+
+  f <- a$formula
+  if(!all(active) || bipartite){
+    sel <- which(active)
+    sel.f <- if(bipartite) # Two-sided formula.
+               as.formula(call("~", sel[sel<=bipartite], sel[sel>bipartite]), env = baseenv())
+             else # One-sided formula.
+               as.formula(call("~", sel), env = baseenv())
+
+    ult(f) <- call("S", f[c(1,length(f))], sel.f)
+  }
+
+  if(symmetrize) ult(f) <- call("Symmetrize", f[c(1,length(f))], "upper")
 
   auxiliaries <- .mk_.layer.net_auxform(Ls)
   nltrms <- length(list_rhs.formula(auxiliaries))
@@ -893,13 +936,13 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   w[have.LHS] <- as.numeric(sapply(lapply(Ls.dotexp[have.LHS], "[[", 2), eval,environment(Ls[[1]])))
   
   nw1 <- nwl[[1]]
-  m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
+  m <- ergm_model(f, nw1, ..., env=env, offset.decorate=FALSE)
 
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
   wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
-  wm$dependence <- wm$dependence || !is.dyad.independent(auxiliaries, basis=nw, ignore_aux=FALSE)
+  wm$dependence <- wm$dependence || dependence
 
   c(list(name="OnLayer", iinputs=nltrms, inputs=w, submodel=m, auxiliaries = auxiliaries),
     wm)

@@ -44,12 +44,14 @@ ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 \note{
 The resulting network will be the "least common denominator"
 network: if not all layers have the same bipartedness, all layers
-will appear as unipartite to the statistics, and if any are
-directed, all will be. However, \link[=ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
+will be represented as unipartite, and if any are directed, all
+will be. The \code{L()} operator will attempt to reconstruct the least
+common denominator of the layers in the specification, though it
+may not always succeed. In those situations, \link[=ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 
-Its nonstandard network and vertex attributes will be taken from
+The nonstandard network and vertex attributes will be taken from
 the \emph{first} network in the list. The subsequent networks'
 attributes will be overwritten with a warning if they differ from
 those in the first network.
@@ -202,10 +204,12 @@ summary(lnw~L(~triangles, ~`1`)+ # 1-2-3 triangle.
 # layer, i.e., 1-2-3:
 summary(lnw~triangles)
 
-# If you need to evaluate bipartite-only statistics on the second
-# layer, you need to use the S() operator to select the bipartite
-# view:
-summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
+# L() autodetects when the requested layer is entirely bipartite:
+summary(lnw~L(~b1degree(1:3)+b2degree(1:3), ~`2`))
+
+# It also removes the nodes not in Mode 1 before evaluating a
+# statistic that depends only layers only active in Mode 1:
+summary(lnw~L(~degree(0:5), ~1)) # sum to 5, not 20
 
 }
 \references{
