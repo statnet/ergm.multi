@@ -4,13 +4,22 @@
 \alias{network_view}
 \title{Construct a "view" of a network.}
 \usage{
-network_view(x, ..., .clear = FALSE, .sep = ".")
+network_view(
+  x,
+  ...,
+  .sub = TRUE,
+  .symm = c("none", "weak", "strong", "upper", "lower", "already"),
+  .clear = FALSE,
+  .sep = "."
+)
 }
 \arguments{
 \item{x}{a \code{\link{network}} object.}
 
 \item{...}{a list of attribute or filtering specifications. See
 Details.}
+
+\item{.sub}{filter the nodes as well. See Details.}
 
 \item{.clear}{whether the edge attributes not set by this call
 should be deleted.}
@@ -27,6 +36,7 @@ specified criterion and with edge attributes optionally computed
 from other edge attributes.
 }
 \details{
+\subsection{Edge filters and attributes}{
 Attribute specification arguments have the form
 \verb{<newattrname> = <expr>}, where \verb{<newattrname>} specifies the
 name of the new edge attribute (or attribute to be overwritten)
@@ -61,6 +71,30 @@ may be specified, and the edge will be kept if it satisfies
 \emph{all}. If the conjunction of the edge's original states and the
 filtering results is ambiguous (i.e., \code{NA}), it will be set as
 missing.
+
+}\subsection{Node filters}{
+
+If argument \code{.sub} is specified, an induced subgraph will be
+returned. It can be specified as follows: \describe{
+
+\item{a numeric or logical vector of indices}{Nodes selected by the
+indices will be retained.}
+
+\item{a function}{The function will be passed the input network and
+is expected to return one of the other input types.}
+
+\item{a list with two elements}{Each element must be in one of the
+other input formats and will be used to induce a bipartite
+graph. If the specified node sets overlap, an error will be
+raised.}
+
+\item{a formula}{The expressions in the formula (one-sided for
+unipartie graphs, two-sided for bipartite) will be evaluated with
+names in it referencing the nodal attributes. The input network may
+be referenced as \code{.nw} or \code{.}.}
+
+}
+}
 }
 \examples{
 data(florentine)

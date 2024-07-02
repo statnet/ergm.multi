@@ -65,6 +65,45 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
   if(anyNA(.peek_vattrv(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
 }
 
+subgraph_spec <- function(nw, spec){
+  bip <- as.integer(NVL(nw %n% "bipartite", 0L))
+
+  if(is.list(spec)){
+    if(length(spec) == 1) subgraph_spec(nw, list(spec, spec))
+    if(length(spec) == 2){
+      tailspec <- spec[[1]]
+      headspec <- spec[[2]]
+      
+      ## Obtain the boolean indicators or numeric indices. If the network
+      ## is bipartite in the first place, expect bipartite indices.
+      tailsel <- if(!is.numeric(tailspec) && !is.logical(tailspec)) ergm_get_vattr(tailspec, nw, accept="index", bip="b1") else tailspec
+      headsel <- if(!is.numeric(headspec) && !is.logical(headspec)) ergm_get_vattr(headspec, nw, accept="index", bip="b2") else headspec
+
+      ## Convert to numeric selectors.
+      if(is.logical(tailsel)) tailsel <- which(tailsel)
+      if(is.logical(headsel)) headsel <- which(headsel) + bip
+
+      tailsel <- as.integer(tailsel)
+      headsel <- as.integer(headsel)
+  
+      if(length(tailsel)==0 || length(headsel)==0) ergm_Init_abort("Empty subgraph selected.")
+
+      if(bip){
+        if(max(tailsel)>bip || min(headsel)<=bip)
+          ergm_Init_abort("Invalid vertex subsets selected for a bipartite graph.")
+      }else{
+        if(!identical(tailsel,headsel)){ # Rectangular selection: output bipartite.
+          if(length(intersect(tailsel,headsel))) ergm_Init_abort("Vertex subsets constructing a bipartite subgraph must have disjoint ranges.")
+        }
+      }
+      list(tailsel,if(!identical(tailsel,headsel)) headsel)
+    }
+  }else if(is(spec, "formula")){
+    if(length(spec) == 3) subgraph_spec(nw, list(spec[-3], spec[-2]))
+    else subgraph_spec(nw, list(spec, spec))
+  }else sugraph_spec(nw, list(spec, spec))
+}
+
 #' Construct a "view" of a network.
 #'
 #' Returns a network with edges optionally filtered according to a
@@ -74,12 +113,15 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
 #' @param x a [`network`] object.
 #' @param ... a list of attribute or filtering specifications. See
 #'   Details.
+#' @param .sub filter the nodes as well. See Details.
 #' @param .clear whether the edge attributes not set by this call
 #'   should be deleted.
 #' @param .sep when specifying via a character vector, use this as the
 #'   separator for concatenating edge values.
 #'
-#' @details Attribute specification arguments have the form
+#' @details
+#' \subsection{Edge filters and attributes}{
+#' Attribute specification arguments have the form
 #'   `<newattrname> = <expr>`, where `<newattrname>` specifies the
 #'   name of the new edge attribute (or attribute to be overwritten)
 #'   and `<expr>` can be one of the following:
@@ -113,6 +155,30 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
 #' *all*. If the conjunction of the edge's original states and the
 #' filtering results is ambiguous (i.e., `NA`), it will be set as
 #' missing.
+#'
+#' }\subsection{Node filters}{
+#'
+#' If argument `.sub` is specified, an induced subgraph will be
+#' returned. It can be specified as follows: \describe{
+#'
+#' \item{a numeric or logical vector of indices}{Nodes selected by the
+#' indices will be retained.}
+#' 
+#' \item{a function}{The function will be passed the input network and
+#' is expected to return one of the other input types.}
+#'
+#' \item{a list with two elements}{Each element must be in one of the
+#' other input formats and will be used to induce a bipartite
+#' graph. If the specified node sets overlap, an error will be
+#' raised.}
+#'
+#' \item{a formula}{The expressions in the formula (one-sided for
+#' unipartie graphs, two-sided for bipartite) will be evaluated with
+#' names in it referencing the nodal attributes. The input network may
+#' be referenced as `.nw` or `.`.}
+#' 
+#' }
+#' }
 #'
 #' @return A [`network`] object with modified edges and edge attributes.
 #'
@@ -154,7 +220,15 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
 #' 
 #' 
 #' @export
-network_view <- function(x, ..., .clear=FALSE, .sep="."){
+network_view <- function(x, ..., .sub=TRUE, .symm=c("none", "weak", "strong", "upper", "lower", "already"), .clear=FALSE, .sep="."){
+  .symm <- if(isFALSE(.symm)) "none" else match.arg(.symm)
+
+  # Extract subgraph
+  if(!identical(.sub, TRUE)){
+    sel <- subgraph_spec(x, .sub)
+    x <- get.inducedSubgraph(x, sel[[1]], sel[[2]])
+  }
+  
   # Handle empty network
   if(network.edgecount(x,na.omit=FALSE)==0) return(x)
   
@@ -199,6 +273,20 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
   }
   
   if(.clear) for(a in setdiff(list.edge.attributes(x), c(nm,"na"))) delete.edge.attribute(x, a)
+  x <- switch(if(is.directed(x)) .symm else "none",
+              none = x,
+              already = {
+                ## There is probably a more efficient way to do this,
+                ## but we need to compute nw1 anyway.
+                x1 <- ergm_symmetrize(x, rule="weak")
+                x2 <- ergm_symmetrize(x, rule="strong")
+                if(!identical(as.vector(as.edgelist(x1)),as.vector(as.edgelist(x2))))
+                  stop("Network specified to be symmetric is not symmetric.")
+                x1
+              },
+              ## The rest: Pass through.
+              ergm_symmetrize(x, rule=.symm)
+              )
   x
 }
 
@@ -208,6 +296,8 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
 #' @param x a [`network`] object.
 #' @param rule a string specifying how the network is to be
 #'   constructed.
+#'
+#' @noRd
 direct.network <- function(x, rule=c("both", "upper", "lower")){
   rule <- match.arg(rule)
 
@@ -222,6 +312,115 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
   nvattr.copy.network(o, x)
 }
 
+conform.networks <- function(nwl, .symmetric, .bipartite, .active){
+  NVL(.symmetric) <- logical(length(nwl))
+  NVL(.bipartite) <- numeric(length(nwl))
+  NVL(.active) <- rep.int(TRUE, length(nwl))
+
+  Map(function(nw, s, b, a){
+    vn <- nw %v% "vertex.names"
+
+    ## Remember vertex names for later bipartitioning.
+    if(b){
+      vn1 <- vn[seq_len(b)]
+      vn2 <- vn[-seq_len(b)]
+    }
+
+    if(!isTRUE(a)) nw <- network_view(nw, .sub=a, .symm=s)
+    vn <- nw %v% "vertex.names"
+    if(b){
+      if(is.bipartite(nw)){
+        if(length(setdiff(vn[seq_len(nw%n%"bipartite")], vn1)) ||
+           length(setdiff(vn[-seq_len(nw%n%"bipartite")], vn2)))
+           stop("Conflicting bipartitedness specifications on a layer.")
+      }else
+        nw <- network_view(nw, .sub=list(vn%in%vn1, vn%in%vn2), .symm=s)
+    }
+    if(is.directed(nw) && s) nw <- network_view(nw, .symm=s)
+    nw
+  }, nwl, .symmetric, .bipartite, .active)
+}
+
+harmonize.networks <- function(nwl, on = "vertex.names", ignore.vattr = c("na", ".undirected", ".bipartite", ".ubid"), ignore.nattr = c("n", "directed", "bipartite", "mnext", ".block_blacklist", "ergm")){ 
+  vns <- lapply(nwl, `%v%`, "vertex.names")
+  dirs <- sapply(nwl, is.directed)
+  bips <- lapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0L) %>% as.integer()
+
+  vn <- vns %>% unlist() %>% unique()
+  vnmaps <- lapply(vns, match, vn)
+
+  nw0 <- network.initialize(n <- length(vn), directed = max(dirs), bipartite = if(all_identical(bips) && bips[1]) bips[1] else FALSE)
+  nw0 %v% "vertex.names"  <- rep(list(NULL), n)
+
+  ## Transfer the vertex and network attributes, keeping track of conflicts.
+  conflict.vattr <- c()
+  conflict.nattr <- c()
+  for(i in rev(seq_along(nwl))){ ## Earlier nets should overwrite later.
+    nw <- nwl[[i]]
+    vnmap <- vnmaps[[i]]
+    for(a in setdiff(list.vertex.attributes(nw), ignore.vattr)){
+      cur <- get.vertex.attribute(nw0, a, null.na=FALSE, unlist=FALSE)[vnmap]
+      new <- get.vertex.attribute(nw, a, null.na=FALSE, unlist=FALSE)
+      if(any(!sapply(cur, is.null) &
+             !mapply(identical, cur, new)))
+        conflict.vattr <- c(conflict.vattr, a)
+      set.vertex.attribute(nw0, a, new, vnmap)
+    }
+
+    for(a in setdiff(list.network.attributes(nw), ignore.nattr)){
+      cur <- get.network.attribute(nw0, a)
+      new <- get.network.attribute(nw, a)
+      if(!is.null(cur) && !identical(cur, new))
+        conflict.nattr <- c(conflict.nattr, a)
+      set.network.attribute(nw0, a, new)
+    }
+  }
+
+  if(length(conflict.vattr)) warning("Vertex attribute(s) ", paste.and(sQuote(conflict.vattr)), " have conflicting values in different layers. Earlier networks will overwrite the later.")
+  if(length(conflict.nattr)) warning("Network attribute(s) ", paste.and(sQuote(conflict.nattr)), " have conflicting values in different layers. Earlier networks will overwrite the later.")
+
+  elmap <- function(el, vnmap) cbind(vnmap[el[,1]], vnmap[el[,2]])
+  
+  ## Now, transfer the edges and set the metadata.
+  Map(function(nw, vnmap, dir, bip){
+    if(bip && !identical(vnmap, sort(vnmap))) stop("Inconsistent ordering of nodes in a bipartite layer. It may be possible to fix this by moving bipartite layers to the front.")
+    
+    nw1 <- nw0
+
+    ## Handle heterogeneous directedness, if any.
+    if(is.directed(nw1) && !dir){
+      nw <- direct.network(nw,rule="upper")
+      nw1 %v% ".undirected" <- !dir
+    }else nw1 %v% ".undirected" <- FALSE
+
+    ## Transfer the edges, including missing edges.
+    el <- elmap(as.edgelist(nw), vnmap)
+    nael <- elmap(as.edgelist(is.na(nw)), vnmap)
+    nw1[el] <- 1
+    nw1[nael] <- NA
+
+    ## Transfer the preexisting blocks and block blacklists.
+    set.vertex.attribute(nw1, ".ubid", get.vertex.attribute(nw, ".ubid", unlist=FALSE, null.na=FALSE), vnmap)
+    nw1 %n% ".block_blacklist" <- nw %n% ".block_blacklist"
+
+    ## Blacklist inactive nodes.
+    nw1 %v% ".active" <- a <- unwhich(vnmap, n)
+    if(!all(a)) nw1 <- blacklist_intersect(nw1, a, invert=TRUE)
+
+    ## Remap the bipartitedness and blacklist b1-b1 ties and b2-b2 ties.
+    if(!is.bipartite(nw1) && bip){
+      nw1 %v% ".bipartite" <- b <- vnmap[bip]
+      v <- rep(c(TRUE,FALSE), c(b,n-b))
+      nw1 <- nw1 %>% blacklist_intersect(v) %>% blacklist_intersect(!v)
+    }else nw1 %v% ".bipartite" <- FALSE
+
+    nw1 %n% "ergm" <- nw %n% "ergm"
+    
+    nw1
+  }, nwl, vnmaps, dirs, bips)
+}
+
+
 #' A multilayer network representation.
 #'
 #' A function for specifying the LHS of a multilayer
@@ -230,8 +429,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' @param ... layer specification, in one of three formats:
 #' 
-#'   1. An (optionally named) list of identically-dimensioned
-#'      networks.
+#'   1. An (optionally named) list of networks.
 #'
 #'   1. Several networks as (optionally named) arguments.
 #'
@@ -242,6 +440,10 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'      renamed accordingly. The optional arguments `.symmetric` and
 #'      `.bipartite` are then interpreted as described below.
 #'
+#'   The networks may have different size, directedness, and
+#'   bipartitedness. In this case, they will be combined based on the
+#'   `vertex.names` vertex attribute.
+#' 
 #' @param .symmetric If the layer specification is via a single
 #'   network with edge attributes and the network is directed, an
 #'   optional logical vector to specify which of the layers should be
@@ -266,10 +468,10 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   used to construct a bipartite subgraph of a unipartite graph or
 #'   change directedness.
 #'
-#'   The nonstandard network and vertex attributes will be taken from
-#'   the *first* network in the list. The subsequent networks'
-#'   attributes will be overwritten with a warning if they differ from
-#'   those in the first network.
+#'   The network will have nonstandard network and vertex attributes
+#'   of all of the constituent networks, with the earlier networks in
+#'   the list having precedence. If a conflict is detected, a warning
+#'   will be printed.
 #'
 #' @section Specifying models for multilayer networks:
 #' In order to fit a model for multilayer
@@ -425,11 +627,13 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' # It also removes the nodes not in Mode 1 before evaluating a
 #' # statistic that depends only layers only active in Mode 1:
-#' summary(lnw~L(~degree(0:5), ~1)) # sum to 5, not 20
+#' summary(lnw~L(~degree(0:5), ~`1`)) # sum to 5, not 20
 #'
 #' @export
 Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   args <- list(...)
+
+  ## First, extract or obtain the networks.
   if(all(sapply(args, is, "network"))){
     nwl <- args
   }else if(is.list(args[[1]]) && all(sapply(args[[1]], is, "network"))){
@@ -439,88 +643,19 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
     nwl <-
       lapply(args[[2]], function(eattr){
         network_view(nw, eattr)
-      })
-
-    if(is.directed(nw) && !is.null(.symmetric)){
-      symm <- as.logical(.symmetric)
-      for(i in which(symm)){
-        # There is probably a more efficient way to do this, but we need
-        # to compute nw1 anyway.
-        nw1 <- ergm_symmetrize(nwl[[i]], rule="weak")
-        nw2 <- ergm_symmetrize(nwl[[i]], rule="strong")
-        if(!identical(as.vector(as.edgelist(nw1)),as.vector(as.edgelist(nw2))))
-          stop("Layer specified to be treated as undirected is not symmetric.")
-        nwl[[i]] <- nw1
-      }
-    }
-
-    if(!is.bipartite(nw) && !is.null(.bipartite)){
-      bip <- as.integer(.bipartite)
-      for(i in which(bip!=0)){
-        nw1 <- nwl[[i]]
-        nw1 %n% "bipartite" <- bip[i]
-        nwl[[i]] <- nw1
-      }
-    }
-
-    # Set names: if args[[2]] is a named vector, use those where set.
-    names(nwl) <- NVL3(names(args[[2]]), ifelse(.=="", args[[2]], .), args[[2]])
-
+      }) %>% setNames(NVL3(names(args[[2]]), ifelse(.=="", args[[2]], .), args[[2]]))
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
-  ## If network or vertex attributes differ from the first network, warn.
-  .varying_attributes(nwl, list.network.attributes, get.network.attribute, "Network", ignore = c("directed", "bipartite", "mnext", ".block_blacklist"))
-  .varying_attributes(nwl, list.vertex.attributes, get.vertex.attribute, "Vertex", ignore = c(".undirected", ".bipartite", ".ubid"))
+  ## Next, make sure they conform to their specification.
+  nwl <- conform.networks(nwl, .symmetric, .bipartite, .active)
 
-  for(i in seq_along(nwl)[-1L])
-    nwl[[i]] <- nvattr.copy.network(nwl[[i]], nwl[[1]], ignore = c(eval(formals(nvattr.copy.network)$ignore), ".block_blacklist", ".ubid", ".undirected", ".bipartite"))
+  ## nwl may now be a list with networks of heterogeneous size, directedness, and bipartiteddness.
 
-  if(!is.null(.active)){
-    if(!is.list(.active) || length(.active) != length(nwl)) stop(sQuote(".active="), " argument if given must be a list of attribute specifications, one for each layer.")
-    al <- map(.active, ergm_get_vattr, nwl[[1]], accept="logical")
-    if(!all(unlist(al)))
-      nwl <- Map(function(nw, a){
-        a <- as.vector(a)
-        if(!all(a) && (any(nw[!a,]!=0) || any(nw[,!a]!=0))) stop("Edges incident on nodes tagged inactive.")
-        nw %v% ".active" <- a
-        nw <- blacklist_intersect(nw, a, invert=TRUE)
-      }, nwl, al)
-  }
+  nwl <- harmonize.networks(nwl)
+  ## nwl is now a list of lowest common denominator networks,
+  ## vertices tagged to indicate individual properties.
 
-  # nwl may now be a list with networks of heterogeneous bipartitedness.
-  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0L)
-  blockout <- if(all_identical(bip)) rep(FALSE, length(nwl)) else bip
-
-  nwl <- Map(function(nw, b){
-    nw %v% ".bipartite" <- b;
-    if(b){
-      n <- network.size(nw)
-      v <- rep(c(TRUE,FALSE), c(b,n-b))
-      # Blacklist b1-b1 ties and b2-b2 ties for the purpose of
-      # sampling.
-      nw <- nw %>% blacklist_intersect(v) %>% blacklist_intersect(!v)
-      # Bipartiteness is now enforced by the blacklist.
-      nw %n% "bipartite" <- FALSE
-      if(anyNA(a <- nw %v% ".active")) a <- TRUE 
-      if(any(nw[v&a,v&a]!=0) || any(nw[!v&a,!v&a]!=0)) stop("Within-bipartition edges in a layer tagged bipartite.")
-    }
-    nw
-  }, nwl, blockout)
-
-  # nwl may now be a list with networks of heterogeneous directedness.
-  
-  dir <- sapply(nwl, is.directed)
-  symm <- if(all_identical(dir)) rep(FALSE, length(nwl)) else !dir
-
-  nwl <- Map(function(nw, symm) {
-    nw %v% ".undirected" <- symm
-    if(symm) direct.network(nw,rule="upper") else nw
-  }, nwl, symm)
-
-  # nwl is now a list of networks with homogeneous directedness, some
-  # networks tagged with vertex attribute .undirected.
-
-  # Perform some checks and imputations for layer names.
+  ## Perform some checks and imputations for layer names.
   nnames <- names(nwl)
   if(!is.null(nnames) && any(blank<-(nnames==""))){
     warning("Only some of the layers have specified names; they have been imputed with the corresponding layer number.")
@@ -533,10 +668,10 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   if(anyDuplicated(nnames)) stop("Duplicate layer names.")
   names(nwl) <- nnames
 
-  if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
-  if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
+  ## if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
+  ## if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
 
-  nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+  nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "ergm"), subnet.cache=TRUE)
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)
 
@@ -545,9 +680,10 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
         base_env(~blockdiag(".LayerID"))
       else
         append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
+
+  if(any(nw %v% ".undirected")) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
   
-  if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
-  if(any(blockout!=0)||!is.null(.active)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
+  if(any(nw %v% ".bipartite") || !all(nw %v% ".active")) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
 
   if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]] %ergmlhs% "obs.constraints"
 
@@ -901,6 +1037,7 @@ InitErgmTerm.L <- function(nw, arglist, ..., env){
   ## sum doesn't.
   dependence <- any(lengths(deps)>1)
   deps <- unique(unlist(deps)) # Don't need layer-specific anymore.
+  if(length(deps) == 0) ergm_Init_abort(sprintf("Layer specification %s does not depend on any layers. Note that references to layers by numbers should use backticks, e.g., `1`.", sQuote(deparse1(a$Ls))))
 
   ## Should any nodes be deactivated?
   active <- lapply(nwl[deps], function(nw) is.na(nw %v% ".active") | (nw %v% ".active")) %>% reduce(`|`)

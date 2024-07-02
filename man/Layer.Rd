@@ -9,8 +9,7 @@ Layer(..., .symmetric = NULL, .bipartite = NULL, .active = NULL)
 \arguments{
 \item{...}{layer specification, in one of three formats:
 \enumerate{
-\item An (optionally named) list of identically-dimensioned
-networks.
+\item An (optionally named) list of networks.
 \item Several networks as (optionally named) arguments.
 \item A single network, a character vector, and several optional
 arguments. Then, the layers are values of the named edge
@@ -18,7 +17,11 @@ attributes. If the vector has named elements (e.g.,
 \code{c(a="advice", c="collaboration")}), the layers will be
 renamed accordingly. The optional arguments \code{.symmetric} and
 \code{.bipartite} are then interpreted as described below.
-}}
+}
+
+The networks may have different size, directedness, and
+bipartitedness. In this case, they will be combined based on the
+\code{vertex.names} vertex attribute.}
 
 \item{.symmetric}{If the layer specification is via a single
 network with edge attributes and the network is directed, an
@@ -51,10 +54,10 @@ may not always succeed. In those situations, \link[=ergmTerm]{certain operator t
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 
-The nonstandard network and vertex attributes will be taken from
-the \emph{first} network in the list. The subsequent networks'
-attributes will be overwritten with a warning if they differ from
-those in the first network.
+The network will have nonstandard network and vertex attributes
+of all of the constituent networks, with the earlier networks in
+the list having precedence. If a conflict is detected, a warning
+will be printed.
 }
 \section{Specifying models for multilayer networks}{
 
@@ -209,7 +212,7 @@ summary(lnw~L(~b1degree(1:3)+b2degree(1:3), ~`2`))
 
 # It also removes the nodes not in Mode 1 before evaluating a
 # statistic that depends only layers only active in Mode 1:
-summary(lnw~L(~degree(0:5), ~1)) # sum to 5, not 20
+summary(lnw~L(~degree(0:5), ~`1`)) # sum to 5, not 20
 
 }
 \references{
