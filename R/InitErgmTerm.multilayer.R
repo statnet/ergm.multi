@@ -101,7 +101,7 @@ subgraph_spec <- function(nw, spec){
   }else if(is(spec, "formula")){
     if(length(spec) == 3) subgraph_spec(nw, list(spec[-3], spec[-2]))
     else subgraph_spec(nw, list(spec, spec))
-  }else sugraph_spec(nw, list(spec, spec))
+  }else subgraph_spec(nw, list(spec, spec))
 }
 
 #' Construct a "view" of a network.
@@ -420,6 +420,49 @@ harmonize.networks <- function(nwl, on = "vertex.names", ignore.vattr = c("na", 
   }, nwl, vnmaps, dirs, bips)
 }
 
+extract_layer_spec <- function(spec, nw){
+  active <- ~TRUE
+  bipartite <- 0L
+  symmetric <- FALSE
+  if(is.character(spec)){
+    eattr <- spec
+  }else if(is(spec, "formula")){
+    if(length(spec) == 3){ # m1 ~ e, m1 ~ m2 ~ e, m1 ~~ e, or m1 ~ m2 ~~ e
+      if(length(spec[[2]]) <= 1 || spec[[2]][[1]] != "~") # m1 ~ e or m1 ~~ e
+        aspec <- spec[-3]
+      else{ # m1 ~ m2 ~ e or m1 ~ m2 ~~ e
+        aspec <- as.formula(spec[[2]], env = environment(spec))
+      }
+      aspec <- subgraph_spec(nw, aspec)
+      active <- I(sort(unlist(aspec)))
+      if(!is.bipartite(nw) && !is.null(aspec[[2]])){ # Bipartite
+        if(max(aspec[[1]]) < min(aspec[[2]])) bipartite <- max(aspec[[1]])
+        else if(max(aspec[[2]]) < min(aspec[[2]])) bipartite <- max(aspec[[2]])
+          else stop("Invalid bipartite mode specification.")
+      }
+
+      spec <- spec[-2] # spec is now ~e or ~~e
+    }
+
+    if(length(spec[[2]]) > 1 && spec[[2]][[1]] == "~"){ # ~~e
+      eattr <- spec[[2]]
+      symmetric <- is.directed(nw)
+    }else{ # ~e
+      eattr <- spec
+    }
+  }
+
+  if(is(eattr, "formula")){
+    if(all(eattr[[2]] == ".")) eattr <- ""
+    else if(is.character(eattr[[2]])) eattr <- eattr[[2]]
+  }
+
+  list(eattr = eattr,
+       active = active,
+       bipartite = bipartite,
+       symmetric = symmetric)
+}
+
 
 #' A multilayer network representation.
 #'
@@ -433,12 +476,18 @@ harmonize.networks <- function(nwl, on = "vertex.names", ignore.vattr = c("na", 
 #'
 #'   1. Several networks as (optionally named) arguments.
 #'
-#'   1. A single network, a character vector, and several optional
-#'      arguments. Then, the layers are values of the named edge
-#'      attributes. If the vector has named elements (e.g.,
-#'      `c(a="advice", c="collaboration")`), the layers will be
-#'      renamed accordingly. The optional arguments `.symmetric` and
-#'      `.bipartite` are then interpreted as described below.
+#'   1. A single network and a character vector or a vector of
+#'      formulas or several optional arguments.
+#'
+#'      If a character vector, the layers are values of the named edge
+#'      attributes. See Details for the formula specification.
+#'
+#'      If the vector has named elements (e.g., `c(a="advice",
+#'      c="collaboration")`), the layers will be renamed
+#'      accordingly. The optional arguments `.symmetric`,
+#'      `.bipartite`, and `.active` are then interpreted as described
+#'      below, though the recommended way to specify them is with a
+#'      series of formula expressions described below.
 #'
 #'   The networks may have different size, directedness, and
 #'   bipartitedness. In this case, they will be combined based on the
@@ -457,6 +506,16 @@ harmonize.networks <- function(nwl, on = "vertex.names", ignore.vattr = c("na", 
 #'   layer, specifying which nodes on each layer *may* have ties.
 #'
 #' @return A network object with layer metadata.
+#'
+#' @details For the one-network input, the formula has the general
+#'   form `~ e`, `~~ e`, `a ~ e`, `a ~~ e`, `a1 ~ a2 ~ e` or `a1 ~ a2
+#'   ~~ e`. Here, `e` specifies the edge attribute or an expression in
+#'   terms of edge attributes to be used for layer's edges, with `.`
+#'   as a placeholder for all edges; doubled tildes (`~~`) indicate
+#'   that the layer should be treated as undirected; `a` is an
+#'   expression in terms of nodal attributes to indicate which nodes
+#'   are active in the layer, and `a1 ~ a2` indicate that the layer is
+#'   bipartite over those node sets.
 #'
 #' @note The resulting network will be the "least common denominator"
 #'   network: if not all layers have the same bipartedness, all layers
@@ -577,29 +636,67 @@ harmonize.networks <- function(nwl, on = "vertex.names", ignore.vattr = c("na", 
 #' # on Mode 2, and suppose that we observe two layers, one only among
 #' # actors of Mode 1 and the other bipartite between Modes 1 and 2.
 #'
+#' # Method 1: Heterogeneous networks aligned by vertex names
+#'
+#' # These networks have different dimensions and bipartitedness.
+#' nw1 <- network.initialize(5, dir=FALSE)
+#' nw12 <- network.initialize(20, dir=FALSE, bipartite=5)
+#' nw2 <- network.initialize(15, dir=FALSE)
+#'
+#' # Specify the vertex names to align them
+#' nw1 %v% "vertex.names" <- 1:5
+#' nw12 %v% "vertex.names" <- 1:20
+#' nw2 %v% "vertex.names" <- 6:20
+#'
+#' # For testing: the maximal set of edges for each type of network:
+#' nw1[,] <- 1
+#' nw12[,] <- 1
+#' nw2[,] <- 1
+#'
+#' # Everything else is automatic.
+#' lnw <- Layer(nw1, nw12, nw2)
+#'
+#' summary(lnw~
+#' edges+ # 5*4/2+5*15+15*14/2 = 10+75+105 = 190
+#' L(~edges,~`1`)+ # 5*4/2 = 10
+#' L(~edges,~`2`)+ # 5*15 = 75
+#' L(~edges,~`3`)+ # 15*14/2 = 105
+#' L(~edges,~(`1`|`2`))+ # This logical layer has contents of both, so 85.
+#' L(~edges,~(`1`&`2`)) # There is no overlap between the two layers, so 0.
+#' )
+#'
+#' # Method 2: A single lowest common denominator network
+#' nw <- network.initialize(20, dir=FALSE)
+#' nw %v% "mode" <- rep(1:2,c(5,15))
+#' nw[1:5,1:5] <- 1
+#' nw[1:5,6:20] <- 1
+#' nw[6:20,6:20] <- 1
+#'
+#' lnw2 <- Layer(nw, c(mode==1~., mode==1~mode==2~., mode==2~.))
+#' stopifnot(identical(as.matrix(lnw), as.matrix(lnw2)))
+#'
+#' # Method 3: A list of lowest common denominator networks with
+#' # activity specification.
+#'
 #' # Construct the two layers' networks:
 #' nw1 <- network.initialize(20, dir=FALSE)
 #' nw12 <- network.initialize(20, dir=FALSE, bipartite=5)
-#' nw1 %v% "mode" <- rep(1:2,c(5,15))
+#' nw2 <- network.initialize(20, dir=FALSE)
+#' nw1 %v% "mode" <- nw2 %v% "mode" <- rep(1:2,c(5,15))
 #'
-#' # For testing: the maximal set of edges for each type of network:
 #' nw1[1:5,1:5] <- 1
 #' nw12[1:5,6:20] <- 1
+#' nw2[6:20,6:20] <- 1
 #'
 #' # The .active argument specifies the following:
 #' # * nw1's vertices are only active if their mode=1 (i.e., 1-2, 2-1,
 #' #   and 2-2 can't have edges).
 #' # * nw12's vertices are all active, but the network is bipartite,
-#' #   so constraints will be adjusted automatically.
-#' lnw <- Layer(nw1, nw12, .active=list(~mode==1, ~TRUE))
+#' #   so constraints will be adjusted automatically. We could also
+#' #   specify it in .bipartite=.
 #'
-#' summary(lnw~
-#' edges+ # 5*4/2+5*15 = 10+75 = 85
-#' L(~edges,~`1`)+ # 5*4/2 = 10
-#' L(~edges,~`2`)+ # 5*15 = 75
-#' L(~edges,~(`1`|`2`))+ # This logical layer has contents of both, so also 85.
-#' L(~edges,~(`1`&`2`)) # There is no overlap between the two layers, so 0.
-#' )
+#' lnw3 <- Layer(nw1, nw12, nw2, .active=list(~mode==1, ~TRUE, ~mode==2))
+#' stopifnot(identical(as.matrix(lnw), as.matrix(lnw3)))
 #'
 #' # Layer-aware terms can be used:
 #'
@@ -640,8 +737,14 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
     nwl <- args[[1]]
   }else if(length(args)>=1 && is(args[[1]], "network") && is(args[[2]], "vector")){
     nw <- args[[1]]
+    spec <- lapply(args[[2]], extract_layer_spec, nw) %>% transpose()
+    eattrs <- spec$eattr
+    NVL(.active) <- spec$active
+    NVL(.bipartite) <- spec$bipartite
+    NVL(.symmetric) <- spec$symmetric
+
     nwl <-
-      lapply(args[[2]], function(eattr){
+      lapply(eattrs, function(eattr){
         network_view(nw, eattr)
       }) %>% setNames(NVL3(names(args[[2]]), ifelse(.=="", args[[2]], .), args[[2]]))
   }else stop("Unrecognized format for multilayer specification. See help for information.")
