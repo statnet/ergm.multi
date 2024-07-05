@@ -16,8 +16,8 @@
 
 #define SETUP_calc_esp							\
   SETUP_calc_dsp;							\
-  l3fc = ergm_LayerLogic2(t0, h0, tail, head, ll3, TRUE);		\
-  l3rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll3, TRUE) : 0;
+  l3fc = ergm_LayerLogic2(t0, h0, tail, head, ll3, LL_DIFF);		\
+  l3rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll3, LL_DIFF) : 0;
 
 #define INC_IF_TWOPATH(ij, t1, h1, t2, h2) if(ergm_LayerLogic2Path(t1,h1,t2,h2, ll1, ll2, any_order)) L2 ## ij ++;
 

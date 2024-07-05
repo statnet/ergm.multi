@@ -62,10 +62,10 @@ static inline unsigned int ergm_LayerLogic2Path(Vertex tail1, Vertex head1, Vert
 
 #define SETUP_update_spcache						\
   Vertex t0 = ML_IO_TAIL(ll0, tail), h0 = ML_IO_HEAD(ll0, head);	\
-  int l1fc = ergm_LayerLogic2(t0, h0, tail, head, ll1, TRUE);		\
-  int l2fc = ergm_LayerLogic2(t0, h0, tail, head, ll2, TRUE);		\
-  int l1rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll1, TRUE) : 0; \
-  int l2rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll2, TRUE) : 0; \
+  int l1fc = ergm_LayerLogic2(t0, h0, tail, head, ll1, LL_DIFF);		\
+  int l2fc = ergm_LayerLogic2(t0, h0, tail, head, ll2, LL_DIFF);		\
+  int l1rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll1, LL_DIFF) : 0; \
+  int l2rc = DIRECTED ? ergm_LayerLogic2(h0, t0, tail, head, ll2, LL_DIFF) : 0; \
   int l3fc = 0, l3rc = 0;
 
 

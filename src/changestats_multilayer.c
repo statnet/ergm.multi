@@ -75,7 +75,7 @@ I_CHANGESTAT_FN(i__layer_net){
   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, {
       Vertex at[2];
       Vertex ah[2];
-      unsigned int nt = ergm_LayerLogic_affects(t, h, ll, 0, at, ah);
+      unsigned int nt = ergm_LayerLogic_affects(t, h, ll, LL_ASIS, at, ah);
       for(unsigned int i=0; i<nt; i++){
 	ML_SETWT(ll, at[i], ah[i], 1);
       }
@@ -85,7 +85,7 @@ I_CHANGESTAT_FN(i__layer_net){
 U_CHANGESTAT_FN(u__layer_net){ 
   GET_AUX_STORAGE(StoreLayerLogic, ll);
   Vertex at[2], ah[2];
-  unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, 1, at, ah);
+  unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, LL_DIFF, at, ah);
   for(unsigned int i=0; i<nt; i++){
     ML_TOGGLE(ll, at[i], ah[i]);
   }
@@ -149,7 +149,7 @@ C_CHANGESTAT_FN(c_OnLayer){
   for(unsigned int ml=0; ml < nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex at[2], ah[2];
-    unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, 1, at, ah);
+    unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, LL_DIFF, at, ah);
     if(nt){
       ChangeStats(nt, at, ah, ll->onwp, ms[ml]);
       for(unsigned int i=0; i<N_CHANGE_STATS; i++)
@@ -204,12 +204,12 @@ C_CHANGESTAT_FN(c_layerCMB){
   for(unsigned int ml=0; ml < nml; ml++){
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
-    unsigned int v = ergm_LayerLogic2(lt, lh, tail, head, ll, 2);
+    unsigned int v = ergm_LayerLogic2(lt, lh, tail, head, ll, LL_ENCODE);
     if(v&1) oldct_th++; // Pre-toggle edge present.
     if(v&2) newct_th++; // Post-toggle edge present.
 
     if(need_ht){
-      v = ergm_LayerLogic2(lh, lt, tail, head, ll, 2);
+      v = ergm_LayerLogic2(lh, lt, tail, head, ll, LL_ENCODE);
       if(v&1) oldct_ht++; // Pre-toggle edge present.
       if(v&2) newct_ht++; // Post-toggle edge present.
     }
@@ -233,10 +233,10 @@ C_CHANGESTAT_FN(c_twostarL) {
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
 
   int
-    change1_th = ergm_LayerLogic2(lt, lh, tail, head, ll1, TRUE),
-    change1_ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, TRUE),
-    change2_th = ergm_LayerLogic2(lt, lh, tail, head, ll2, TRUE),
-    change2_ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, TRUE);
+    change1_th = ergm_LayerLogic2(lt, lh, tail, head, ll1, LL_DIFF),
+    change1_ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, LL_DIFF),
+    change2_th = ergm_LayerLogic2(lt, lh, tail, head, ll2, LL_DIFF),
+    change2_ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, LL_DIFF);
 
 
   // Need int here since we need signed arithmetic.
@@ -363,7 +363,7 @@ C_CHANGESTAT_FN(c_b1degree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b1deg += od[lt];
   }
   
@@ -393,7 +393,7 @@ C_CHANGESTAT_FN(c_b1degree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_IN_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b1deg += od[lt];
   }   
 
@@ -423,7 +423,7 @@ C_CHANGESTAT_FN(c_b2degree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b2deg += id[lh];
   }
   
@@ -453,7 +453,7 @@ C_CHANGESTAT_FN(c_b2degree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b2deg += id[lh];
   }   
 
@@ -483,7 +483,7 @@ C_CHANGESTAT_FN(c_degree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll), *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt] + id[lt];
     headdeg += od[lh] + id[lh];
   }
@@ -515,7 +515,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll), *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt] + id[lt];
     headdeg += od[lh] + id[lh];
   }   
@@ -548,7 +548,7 @@ C_CHANGESTAT_FN(c_gwb1degree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b1deg += od[lt];
   }
 
@@ -580,7 +580,7 @@ C_CHANGESTAT_FN(c_gwb1degree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b1deg += od[lt];
   }
 
@@ -606,7 +606,7 @@ C_CHANGESTAT_FN(c_gwdegree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll), *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt] + id[lt];
     headdeg += od[lh] + id[lh];
   }
@@ -641,7 +641,7 @@ C_CHANGESTAT_FN(c_gwdegree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll), *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt] + id[lt];
     headdeg += od[lh] + id[lh];
   }
@@ -671,7 +671,7 @@ C_CHANGESTAT_FN(c_gwb2degree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b2deg += id[lh];
   }
 
@@ -703,7 +703,7 @@ C_CHANGESTAT_FN(c_gwb2degree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     b2deg += id[lh];
   }
 
@@ -729,7 +729,7 @@ C_CHANGESTAT_FN(c_gwidegree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     headdeg += id[lh];
   }
 
@@ -761,7 +761,7 @@ C_CHANGESTAT_FN(c_gwidegree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     headdeg += id[lh];
   }
 
@@ -787,7 +787,7 @@ C_CHANGESTAT_FN(c_gwodegree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt];
   }
     
@@ -818,7 +818,7 @@ C_CHANGESTAT_FN(c_gwodegree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt];
   }
 
@@ -845,7 +845,7 @@ C_CHANGESTAT_FN(c_idegree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     headdeg += id[lh];
   }
   
@@ -875,7 +875,7 @@ C_CHANGESTAT_FN(c_idegree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *id=ML_IN_DEG(ll);
     Vertex lh = ML_IO_HEAD(ll, head);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     headdeg += id[lh];
   }   
 
@@ -906,10 +906,10 @@ C_CHANGESTAT_FN(c_mutual_ML){
 
   /* *** don't forget tail -> head */
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
-  int l1th = ergm_LayerLogic2(lt, lh, tail, head, ll1, 2);
-  int l1ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, 2);
-  int l2th = ergm_LayerLogic2(lt, lh, tail, head, ll2, 2);
-  int l2ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, 2);
+  int l1th = ergm_LayerLogic2(lt, lh, tail, head, ll1, LL_ENCODE);
+  int l1ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, LL_ENCODE);
+  int l2th = ergm_LayerLogic2(lt, lh, tail, head, ll2, LL_ENCODE);
+  int l2ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, LL_ENCODE);
 
   int change =
     +((l1th&2)&&(l2ht&2))-((l1th&1)&&(l2ht&1)) // t-l1->h and h->l2->t
@@ -948,10 +948,10 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
 
   /* *** don't forget tail -> head */
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
-  int l1th = ergm_LayerLogic2(lt, lh, tail, head, ll1, 2);
-  int l1ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, 2);
-  int l2th = ergm_LayerLogic2(lt, lh, tail, head, ll2, 2);
-  int l2ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, 2);
+  int l1th = ergm_LayerLogic2(lt, lh, tail, head, ll1, LL_ENCODE);
+  int l1ht = ergm_LayerLogic2(lh, lt, tail, head, ll1, LL_ENCODE);
+  int l2th = ergm_LayerLogic2(lt, lh, tail, head, ll2, LL_ENCODE);
+  int l2ht = ergm_LayerLogic2(lh, lt, tail, head, ll2, LL_ENCODE);
 
   int change =
     +((l1th&2)&&(l2ht&2))-((l1th&1)&&(l2ht&1)) // t-l1->h and h->l2->t
@@ -983,7 +983,7 @@ C_CHANGESTAT_FN(c_odegree_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt];
   }
   
@@ -1013,7 +1013,7 @@ C_CHANGESTAT_FN(c_odegree_by_attr_ML_sum) {
     GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
     Vertex *od=ML_OUT_DEG(ll);
     Vertex lt = ML_IO_TAIL(ll, tail);
-    degchange += ergm_LayerLogic(tail, head, ll, TRUE);
+    degchange += ergm_LayerLogic(tail, head, ll, LL_DIFF);
     taildeg += od[lt];
   }   
 

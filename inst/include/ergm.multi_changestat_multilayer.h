@@ -93,6 +93,7 @@ typedef struct {
 
  */
 
+typedef enum{LL_ASIS, LL_DIFF, LL_ENCODE, LL_POST} LayerLogicTask;
 
 #define ergm_UNOP(op)				\
   {						\
@@ -188,7 +189,7 @@ typedef struct {
 static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose value/change to evaluate within the logical layer.
 				   Vertex ttail, Vertex thead, // Dyad to toggle on LHS network.
 				   StoreLayerLogic *ll, // Layer Logic
-				   unsigned int change
+				   LayerLogicTask change
 				  ){
   int *commands = ll->commands;
   unsigned int ncom = *(commands++);
@@ -199,8 +200,8 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
   // Is the dyad being toggled the same one as being looked up?
   unsigned int t_th = lt==tlt && lh==tlh, t_ht = ll->need_ht && lt==tlh && lh==tlt;
 
-  int *stack0=ll->stacks-1, // stack0 and stack1 always point to the top element (if any)
-    *stack1=change && (t_th||t_ht)? ll->stacks+ncom-1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
+  int *stack0 = ll->stacks-1, // stack0 and stack1 always point to the top element (if any)
+    *stack1 = change!=LL_ASIS && (t_th||t_ht) ? ll->stacks+ncom-1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
 
   for(unsigned int i=0; i<ncom; i++){
     int com = *(commands++);
@@ -261,16 +262,16 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
 
   if(t_th||t_ht){
     switch(change){
-    case 1: return (int)(*stack1!=0) - (int)(*stack0!=0);
-    case 2: return (*stack0!=0) | ((*stack1!=0)<<1);
-    case 3: return (*stack1!=0);
+    case LL_DIFF: return (int)(*stack1!=0) - (int)(*stack0!=0);
+    case LL_ENCODE: return (*stack0!=0) | ((*stack1!=0)<<1);
+    case LL_POST: return (*stack1!=0);
     default: return (*stack0!=0);
     }
   }else{
     switch(change){
-    case 1: return 0;
-    case 2: return (*stack0!=0) | ((*stack0!=0)<<1);
-    case 3: return (*stack0!=0);
+    case LL_DIFF: return 0;
+    case LL_ENCODE: return (*stack0!=0) | ((*stack0!=0)<<1);
+    case LL_POST: return (*stack0!=0);
     default: return (*stack0!=0);
     }
   }
@@ -278,7 +279,7 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
 
 static inline int ergm_LayerLogic(Vertex tail, Vertex head, // Dyad to toggle and evaluate on LHS network.
 				   StoreLayerLogic *ll, // Layer Logic
-				   unsigned int change
+				   LayerLogicTask change
 				  ){
   return ergm_LayerLogic2(tail, head, tail, head, ll, change);
 }
@@ -286,12 +287,12 @@ static inline int ergm_LayerLogic(Vertex tail, Vertex head, // Dyad to toggle an
 // change = 2 -> asis_th + toggled_th*2 + asis_ht*4 + toggled_ht*8
 static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, // Dyad to toggle on LHS network.
 						   StoreLayerLogic *ll, // Layer Logic
-						   unsigned int change,
+						   LayerLogicTask change,
 						   Vertex *atails, Vertex *aheads){
   unsigned int nt = 0;
   Vertex lt = ML_IO_TAIL(ll, ttail), lh = ML_IO_HEAD(ll, thead);
-  if(change==2){
-    return ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2) | (ll->need_ht ? ergm_LayerLogic2(lt, lh, ttail, thead, ll, 2)<<2 : 0);
+  if(change==LL_ENCODE){
+    return ergm_LayerLogic2(lt, lh, ttail, thead, ll, LL_ENCODE) | (ll->need_ht ? ergm_LayerLogic2(lt, lh, ttail, thead, ll, LL_ENCODE)<<2 : 0);
   }else{
     if(ergm_LayerLogic2(lt, lh, ttail, thead, ll, change)){
       if(atails) atails[nt] = lt;
