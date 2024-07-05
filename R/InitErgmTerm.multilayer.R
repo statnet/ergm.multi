@@ -713,7 +713,8 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
         coml <- c(coml, LL_PREOPMAP[[length(call)-1]][[as.character(op)]])
         postop <- FALSE
       }else postop <- TRUE
-      for(i in seq_along(call[-1])+1){
+      ## Push in reverse order, so they pop in the right order.
+      for(i in rev(seq_along(call[-1])+1)){
         coml <- c(coml, postfix(call[[i]]))
       }
       if(postop) coml <- c(coml, LL_POSTOPMAP[[length(call)-1]][as.character(op)])
