@@ -555,10 +555,16 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 ## }
 
 .depends_on_layers <- function(commands){
-  coms <- commands[-1]
-  if(any(coms==0)) coms <- coms[-(which(coms==0)+1)] # Drop all numeric literals (i.e., numbers preceded by 0).
-  coms <- coms[coms>=1] # Drop all commands.
-  unique(coms)
+  ## Drop all numeric literals and filter references.
+  i <- 1
+  while(i <= length(commands)){
+    while(commands[i]==0)
+      commands <- commands[c(-i,-i-1)]
+    i <- i + 1
+  }
+
+  commands <- commands[commands>=1] # Drop all commands.
+  unique(commands)
 }
 
 InitErgmTerm..layer.net <- function(nw, arglist, ...){
@@ -616,6 +622,8 @@ LL_POSTOPMAP <- list(
       `%/%` = -14,
       `round` = -19)
 )
+
+LL_STOP <- -.Machine$integer.max
 
 LL_IDEMPOTENT <- c("&", "&&", "|", "||")
 LL_TAUTOLOGICAL <- c("==", ">=", "<=")
@@ -725,15 +733,17 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
   }
   
   com <- postfix(ult(formula))
-  c(sum(com!=0 & !com%in%unlist(LL_PREOPMAP)), com)
+  c(com, LL_STOP)
 }
 
 test_eval.LayerLogic <- function(commands, lv, lvr = lv){
-  coms <- as.integer(commands[-1])
-  lv <- rep(lv, length.out=max(coms))
+  coms <- as.integer(commands)
+  ndeps <- EVL3(.depends_on_layers(commands), max(.), 0)
+  lv <- rep_len(lv, max(ndeps))
+  lvr <- rep_len(lvr, max(ndeps))
   stack <- integer(0)
-  if(sum(coms!=0 & !coms%in%unlist(LL_PREOPMAP))!=commands[1]) stop("Layer specification command vector specifies incorrect number of commands.", call.=FALSE)
-  for(i in 1:commands[1]){
+
+  repeat{
     com <- coms[1]
     if(com==0){
       coms <- coms[-1]
@@ -819,6 +829,8 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
       coms <- coms[-1]
       x0 <- coms[1]
       stack <- c(lvr[x0], stack)
+    }else if(com==LL_STOP){
+      break
     }else{
       stack <- c(lv[com], stack)
     }

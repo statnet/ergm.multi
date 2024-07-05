@@ -48,6 +48,8 @@
 #define ML_GETWT(ll, a,b) (GetEdge(a,b,(ll)->onwp))
 #define ML_SETWT(ll, a,b,w) (SetEdge(a,b,w,(ll)->onwp))
 
+#define ML_STOP (-INT_MAX)
+
 typedef struct {
   unsigned int nl;
   Network *inwp, *onwp;
@@ -193,7 +195,6 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
 				   LayerLogicTask change
 				  ){
   int *commands = ll->commands;
-  unsigned int ncom = *(commands++);
   // What gets looked up?
   Vertex lt = ltail, lh = lhead;
   // What gets toggled?
@@ -204,8 +205,8 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
   int *stack0 = ll->stack0 - 1, // stack0 and stack1 always point to the top element (if any)
     *stack1 = change!=LL_ASIS && (t_th||t_ht)? ll->stack1 - 1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
 
-  for(unsigned int i=0; i<ncom; i++){
-    int com = *(commands++);
+  int com;
+  while((com = *(commands++)) != ML_STOP){
     switch(com){
     case 0:{
       int x0 = *(commands++);

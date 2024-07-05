@@ -54,15 +54,26 @@ I_CHANGESTAT_FN(i__layer_net){
   /* Set up the layer logic. */
 
   ll->commands = iinputs;
-  ll->stack0 = Calloc(ll->commands[0], int);
-  ll->stack1 = Calloc(ll->commands[0], int);
+  unsigned int nst = 0;
+  int com;
+  // com nonnegative means pushing to the stack, either layer or constant.
+  for(unsigned int i = 0; (com = ll->commands[i]) != ML_STOP; i++){
+    if(com >= 0) nst++;
+    if(com == 0) i++; // Next value is a literal.
+  }
+  ll->stack0 = Calloc(nst, int);
+  ll->stack1 = Calloc(nst, int);
 
   /* Figure out if this layer needs to calculate reciprocal toggles. */
 
   ll->need_ht = FALSE;
   if(DIRECTED){
-    for(unsigned int i=1; i<=*ll->commands; i++){
-      int com = ll->commands[i];
+    int com;
+    for(unsigned int i = 0; (com = ll->commands[i]) != ML_STOP; i++){
+      if(com == 0){ // Next value is a literal.
+        i++;
+        continue;
+      }
       if(com == -21 || // If t() is ever used, or
          (ll->symm && com > 0 && ll->symm[com])){ // any symmetrized layers are referenced,
         ll->need_ht = TRUE; // then toggle (t,h) somewhere may affect dyad (h,t) in this layer.
