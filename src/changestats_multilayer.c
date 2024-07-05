@@ -54,7 +54,8 @@ I_CHANGESTAT_FN(i__layer_net){
   /* Set up the layer logic. */
 
   ll->commands = iinputs;
-  ll->stacks = Calloc(2*ll->commands[0], int);
+  ll->stack0 = Calloc(ll->commands[0], int);
+  ll->stack1 = Calloc(ll->commands[0], int);
 
   /* Figure out if this layer needs to calculate reciprocal toggles. */
 
@@ -94,7 +95,8 @@ U_CHANGESTAT_FN(u__layer_net){
 F_CHANGESTAT_FN(f__layer_net){ 
   GET_AUX_STORAGE(StoreLayerLogic, ll);
   NetworkDestroy(ll->onwp);
-  Free(ll->stacks);
+  Free(ll->stack0);
+  Free(ll->stack1);
 }
 
 /* I_CHANGESTAT_FN(i__layer_nets){ */

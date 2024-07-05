@@ -56,7 +56,8 @@ typedef struct {
   int *symm;
   Rboolean need_ht;
   int *commands;
-  int *stacks;
+  int *stack0;
+  int *stack1;
 } StoreLayerLogic;
 
 #define ML_OI_TAIL(ll, l, t) ((Vertex) ((ll)->inwp->bipartite? (t) + ((l)-1)*(ll)->onwp->bipartite : (t) + ((l)-1)*(ll)->onwp->nnodes))
@@ -200,8 +201,8 @@ static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose val
   // Is the dyad being toggled the same one as being looked up?
   unsigned int t_th = lt==tlt && lh==tlh, t_ht = ll->need_ht && lt==tlh && lh==tlt;
 
-  int *stack0 = ll->stacks-1, // stack0 and stack1 always point to the top element (if any)
-    *stack1 = change!=LL_ASIS && (t_th||t_ht) ? ll->stacks+ncom-1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
+  int *stack0 = ll->stack0 - 1, // stack0 and stack1 always point to the top element (if any)
+    *stack1 = change!=LL_ASIS && (t_th||t_ht)? ll->stack1 - 1 : NULL;  // Don't bother with stack1 if toggle can't affect focus dyad.
 
   for(unsigned int i=0; i<ncom; i++){
     int com = *(commands++);
