@@ -675,13 +675,13 @@ sub.ergm_LayerLogic <- function(x){
 
   simplify <- function(call){
     if(is.call(call)){
-      op <- call[[1]]
+      op <- as.character(call[[1]])
 
       call[-1] <- lapply(call[-1], simplify)
 
-      if(as.character(op) %in% LL_IDEMPOTENT && all_identical(as.list(call)[-1])) call[[2]]
-      else if(as.character(op) %in% LL_TAUTOLOGICAL && all_identical(as.list(call)[-1])) TRUE
-      else if(as.character(op) %in% LL_CONTRADICTORY && length(call)%%2==0 && all_identical(as.list(call)[-1])) FALSE
+      if(op %in% LL_IDEMPOTENT && all_identical(as.list(call)[-1])) call[[2]]
+      else if(op %in% LL_TAUTOLOGICAL && all_identical(as.list(call)[-1])) TRUE
+      else if(op %in% LL_CONTRADICTORY && length(call)%%2==0 && all_identical(as.list(call)[-1])) FALSE
       else call
     }else{
       lidSub(call)
@@ -708,16 +708,16 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
 
   postfix <- function(call, coml=c()){
     if(is.call(call)){
-      op <- call[[1]]
-      if(as.character(op) %in% unlist(lapply(LL_PREOPMAP, names))){
-        coml <- c(coml, LL_PREOPMAP[[length(call)-1]][[as.character(op)]])
+      op <- as.character(call[[1]])
+      if(op %in% unlist(lapply(LL_PREOPMAP, names))){
+        coml <- c(coml, LL_PREOPMAP[[length(call)-1]][[op]])
         postop <- FALSE
       }else postop <- TRUE
       ## Push in reverse order, so they pop in the right order.
       for(i in rev(seq_along(call[-1])+1)){
         coml <- c(coml, postfix(call[[i]]))
       }
-      if(postop) coml <- c(coml, LL_POSTOPMAP[[length(call)-1]][as.character(op)])
+      if(postop) coml <- c(coml, LL_POSTOPMAP[[length(call)-1]][op])
     }else{
       coml <- c(coml, lidMap(call))
     }
