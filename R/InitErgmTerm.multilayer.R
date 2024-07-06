@@ -1099,7 +1099,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
   if(is(ll, "formula")) ll <- list(ll)
   nl <- length(attr(ll[[1]], "namemap"))
   # Replace . with all layers.
-  do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f))))
+  lapply(do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f)))), ergm_LayerLogic, attr(ll[[1]], "namemap"))
 }
 
 #' @templateVar name L
