@@ -31,6 +31,7 @@
 
   .RegisterProposals()
   .RegisterKeywords()
+  .RegisterCombiners()
 }
 
 ## BEGIN boilerplate: should be kept in sync with statnet.common.
@@ -61,6 +62,11 @@ eval(UPDATE_MY_SCTRL_EXPR)
 
 .RegisterKeywords <- function() {
   ergm_keyword(name="layer-aware", short="layer", description="operates on multilayer network constructs", popular=TRUE, package="ergm.multi")
+}
+
+.RegisterCombiners <- function() {
+  ergm.multi_combiner(".LayerID", c("Layer()", "layers"))
+  ergm.multi_combiner(".NetworkID", c("Networks()", "networks"))
 }
 
 #' @useDynLib ergm.multi

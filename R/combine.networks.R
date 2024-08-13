@@ -436,6 +436,8 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 #'
 #' @export
 uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vattr=nw %n% ".blockName.vattr", use.subnet.cache=FALSE){
+  if(!is(nw, "combined_networks")) stop("Specified network was not constructed by ", sQuote("combine_networks()"), ".")
+
   tmp <- .pop_vattrv(nw, split.vattr); nw <- tmp$nw; f <- tmp$vattr
   if(!is.null(names.vattr)){ tmp <- .pop_vattrv(nw, names.vattr); nw <- tmp$nw; nwnames <- tmp$vattr }
 
@@ -460,6 +462,29 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
   nwl
 }
 
+#' Dynamic registry of functions that combine networks.
+#'
+#' This is used primarily by developers to provide informative error
+#' messages.
+#'
+#' @param blockID the vertex attribute used as the ID of the block.
+#'
+#' @param combiner a character vector of length 1 or 2, giving the
+#'   top-level (i.e. user-visible) function that combines on it and
+#'   optionally what is being combined.
+#'
+#' @keywords internal
+#' @export
+ergm.multi_combiner <- local({
+  cache <- list()
+
+  function(blockID, combiner=NULL){
+    if(missing(blockID)) cache
+    else if(is.null(combiner)) cache[[blockID]]
+    else cache[[blockID]] <<- c(combiner, tolower(combiner))
+  }
+})
+
 #' Obtain empty networks representing constituents of a combined network
 #'
 #' This utility uncombines a [combine_networks()] network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.
@@ -472,7 +497,20 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
 #'
 #' @keywords internal
 #' @export
-subnetwork_templates <- function(nw, split.vattr=".NetworkID", names.vattr=".NetworkName", copy.ergmlhs=c("response")){
+subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.vattr=nw%n%".blockName.vattr", copy.ergmlhs=c("response")){
+  if(NVL3(nw.split.vattr<-nw%n%".blockID.vattr", split.vattr != ., FALSE)){
+    ergm_Init_stop(
+      "The LHS was (at the top level) created by ",
+      NVL3(ergm.multi_combiner(nw.split.vattr)[1],
+           sQuote(.),
+           paste0("an unknown function that uses attribute ", sQuote(nw.split.vattr))),
+      " but the term is trying to extract its ",
+      NVL3(ergm.multi_combiner(split.vattr)[2],
+           paste0(., " (created by ", sQuote(ergm.multi_combiner(split.vattr)[1]), ")."),
+           paste0("subgraphs defined by ", split.vattr)),
+      " Nesting of terms must match the nesting of constructors; this may change in the future.", immediate.=TRUE)
+  }
+
   uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, use.subnet.cache=TRUE) %>% map(function(nw1){
     for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1})

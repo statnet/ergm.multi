@@ -6,8 +6,8 @@
 \usage{
 subnetwork_templates(
   nw,
-  split.vattr = ".NetworkID",
-  names.vattr = ".NetworkName",
+  split.vattr = nw \%n\% ".blockID.vattr",
+  names.vattr = nw \%n\% ".blockName.vattr",
   copy.ergmlhs = c("response")
 )
 }
