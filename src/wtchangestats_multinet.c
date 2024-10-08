@@ -19,7 +19,7 @@ WtI_CHANGESTAT_FN(i__wtsubnets){
   ALLOC_AUX_STORAGE(1, StoreWtSubnets, sn);
   sn->ns = *(iinputs++);
   sn->inwp = nwp;
-  sn->onwp = Calloc(sn->ns, WtNetwork *);
+  sn->onwp = R_Calloc(sn->ns, WtNetwork *);
   sn->onwp--; // The -- is because WtNetwork IDs count from 1.
 
   /* Set up the layer information. */
@@ -56,7 +56,7 @@ WtF_CHANGESTAT_FN(f__wtsubnets){
   for(unsigned int i=1; i<=sn->ns; i++)
     WtNetworkDestroy(sn->onwp[i]);
   sn->onwp++;
-  Free(sn->onwp);
+  R_Free(sn->onwp);
 }
 
 // MultiNet: Take a weighted networkwise sum of the networks' statistics.
