@@ -2,12 +2,12 @@
 % Please edit documentation in R/ergmlhs.R
 \name{combine_ergmlhs}
 \alias{combine_ergmlhs}
-\title{Combine the \code{\link{\%ergmlhs\%}} settings of a list of networks}
+\title{Combine the \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings of a list of networks}
 \usage{
 combine_ergmlhs(nwl, ignore.settings = c())
 }
 \arguments{
-\item{nwl}{a \code{\link{list}} of \code{\link{network}} objects whose settings are to
+\item{nwl}{a \code{\link{list}} of \code{\link[network:network]{network}} objects whose settings are to
 be combined.}
 
 \item{ignore.settings}{a \code{\link{character}} vector of setting names to
@@ -18,8 +18,8 @@ A \code{\link{list}} of settings, suitable for being assigned as the
 \code{ergm} network attribute.
 }
 \description{
-This is a helper function to go through the \code{\link{network}} objects in the list
-and accumulate their \code{\link{\%ergmlhs\%}} settings, printing a message if
+This is a helper function to go through the \code{\link[network:network]{network}} objects in the list
+and accumulate their \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings, printing a message if
 the settings clash. Later networks' settings overwrite the earlier.
 }
 \keyword{internal}

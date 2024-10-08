@@ -322,7 +322,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' \dQuote{logical} layer that has ties that are in \code{nwA} but not in
 #' \code{nwB}.
 #'
-#' Transpose function \code{\link{t}} applied to a directed layer will reverse
+#' Transpose function [t()] applied to a directed layer will reverse
 #' the direction of all relations (transposing the sociomatrix). Unlike the
 #' others, it can only be used on an observed layer directly. For example,
 #' \code{~t(`1`)&t(`2`)} is valid but \code{~t(`1`&`2`)} is not.

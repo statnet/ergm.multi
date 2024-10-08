@@ -17,7 +17,7 @@ which \eqn{i < j} may be toggled. Optional argument \code{attr}
 controls which subgraphs are thus restricted.
 }
 \seealso{
-\code{\link{ergmConstraint}} for index of constraints and hints currently visible to the package.
+\code{\link[ergm:ergmConstraint]{ergmConstraint}} for index of constraints and hints currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmConstraint", "upper_tri", "subsection")}
 }

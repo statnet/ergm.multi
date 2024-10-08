@@ -29,7 +29,7 @@ is sometimes known as the "actor" mode.
 This term can only be used with undirected bipartite networks.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "b1degreeL", "subsection")}
 }

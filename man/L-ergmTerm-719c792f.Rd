@@ -8,7 +8,7 @@
 # binary: L(formula, Ls=~.)
 }
 \arguments{
-\item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}
+\item{formula}{a one-sided \code{\link[ergm:ergm]{ergm()}}-style formula with the terms to be evaluated}
 
 \item{Ls}{either a Layer Logic specification formula (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation) or a list thereof (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}), on which to evaluate \code{formula}}
 }
@@ -18,7 +18,7 @@ logical layers specified in formula \code{Ls} and sums the results
 elementwise.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "L", "subsection")}
 }

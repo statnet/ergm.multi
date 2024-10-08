@@ -7,7 +7,7 @@
 network_view(x, ..., .clear = FALSE, .sep = ".")
 }
 \arguments{
-\item{x}{a \code{\link{network}} object.}
+\item{x}{a \code{\link[network:network]{network}} object.}
 
 \item{...}{a list of attribute or filtering specifications. See
 Details.}
@@ -19,7 +19,7 @@ should be deleted.}
 separator for concatenating edge values.}
 }
 \value{
-A \code{\link{network}} object with modified edges and edge attributes.
+A \code{\link[network:network]{network}} object with modified edges and edge attributes.
 }
 \description{
 Returns a network with edges optionally filtered according to a
@@ -34,7 +34,7 @@ and \verb{<expr>} can be one of the following:
 \describe{
 
 \item{a function}{The function will be passed two arguments, the
-edgelist \code{\link{tibble}} and the network, and must return a vector of
+edgelist \code{\link[tibble:tibble]{tibble}} and the network, and must return a vector of
 edge attribute values to be set on the edges in the order
 specified.}
 

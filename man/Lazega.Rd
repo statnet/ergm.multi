@@ -16,7 +16,7 @@ N. Krivitsky for \insertCite{KrKo20e;textual}{ergm.multi}.
 data(Lazega)
 }
 \description{
-This dataset contains a \code{\link{network}} of relations of various types
+This dataset contains a \code{\link[network:network]{network}} of relations of various types
 among 71 lawyers (partners and associates) in a New England
 (Northeastern US) corporate law firm referred to as \dQuote{SG&R}
 collected 1988--1991 by \insertCite{La01c;textual}{ergm.multi}.

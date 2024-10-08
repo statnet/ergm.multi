@@ -35,7 +35,7 @@ ergm(monks ~ N(~edges))
 
 }
 \seealso{
-\link[=ergmTerm]{Help on model specification} for specific terms
+\link[ergm:ergmTerm]{Help on model specification} for specific terms
 
 \code{vignette("Goeyvaerts_reproduction")} for a demonstration
 }

@@ -7,7 +7,7 @@
 direct.network(x, rule = c("both", "upper", "lower"))
 }
 \arguments{
-\item{x}{a \code{\link{network}} object.}
+\item{x}{a \code{\link[network:network]{network}} object.}
 
 \item{rule}{a string specifying how the network is to be
 constructed.}

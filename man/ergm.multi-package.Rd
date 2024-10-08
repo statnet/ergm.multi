@@ -27,9 +27,9 @@ cross-layer specifications. Its features include:
 
 \describe{
 
-\item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multilayer
-specification is contained entirely in an \code{\link[=ergm]{ergm()}}-style formula and can be
-nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and multi-network.}
+\item{seamless integration with \code{\link[ergm:ergm]{ergm()}}:}{Multilayer
+specification is contained entirely in an \code{\link[ergm:ergm]{ergm()}}-style formula and can be
+nested with any other \code{\link[ergm:ergm]{ergm()}} terms, including dynamic and multi-network.}
 
 \item{unlimited layers:}{The number of layers in the modeled
 network is limited only by computing power.}
@@ -67,9 +67,9 @@ Its features include:
 
 \describe{
 
-\item{seamless integration with \code{\link[=ergm]{ergm()}}:}{Multi-network model
-specification is contained entirely in an \code{\link[=ergm]{ergm()}}-style formula and can be
-nested with any other \code{\link[=ergm]{ergm()}} terms, including dynamic and multilayer.}
+\item{seamless integration with \code{\link[ergm:ergm]{ergm()}}:}{Multi-network model
+specification is contained entirely in an \code{\link[ergm:ergm]{ergm()}}-style formula and can be
+nested with any other \code{\link[ergm:ergm]{ergm()}} terms, including dynamic and multilayer.}
 
 \item{flexibility and simplicity:}{\emph{Any} valid binary or valued
 ERGM can be specified for the networks, using simple term

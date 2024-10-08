@@ -14,10 +14,10 @@ subnetwork_templates(
 \arguments{
 \item{nw, split.vattr, names.vattr}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
 
-\item{copy.ergmlhs}{a character vector of \code{\link{\%ergmlhs\%}} settings that are to be copied into the constituent networks.}
+\item{copy.ergmlhs}{a character vector of \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings that are to be copied into the constituent networks.}
 }
 \value{
-A list of \code{\link{network}}s.
+A list of \code{\link[network:network]{network}}s.
 }
 \description{
 This utility uncombines a \code{\link[=combine_networks]{combine_networks()}} network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.

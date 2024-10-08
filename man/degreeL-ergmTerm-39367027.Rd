@@ -33,7 +33,7 @@ This term can only be used with undirected networks; for directed networks
 see \code{idegree} and \code{odegree} .
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "degreeL", "subsection")}
 }

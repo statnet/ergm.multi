@@ -47,7 +47,7 @@ This term adds one network statistic to the model equal to the geometrically wei
 }
 \note{
 This term takes an additional term option (see
-\code{\link[=ergm-options]{options?ergm}}), \code{cache.sp}, controlling whether
+\code{\link[ergm:ergm-options]{options?ergm}}), \code{cache.sp}, controlling whether
 the implementation will cache the number of shared partners for
 each dyad in the network; this is usually enabled by default.
 }
@@ -70,13 +70,14 @@ pair \eqn{(i,j)} iff \eqn{i \leftrightarrow k \leftrightarrow j}{i<->k<->j}.
 ordered pair \eqn{(i,j)} iff \eqn{i \to k, j \to k}{i->k, j->k}.
 \item Incoming Shared Partner (\code{"ISP"}): vertex \eqn{k} is an ISP shared partner of ordered
 pair \eqn{(i,j)} iff \eqn{k \to i, k \to j}{k->i, k->j}.
+}
+
 By default, outgoing two-paths (\code{"OTP"}) are calculated. Note that Robins et al. (2009)
 define closely related statistics to several of the above, using slightly different terminology.
 }
-}
 
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "dgwdspL", "subsection")}
 }

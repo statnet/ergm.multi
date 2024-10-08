@@ -15,7 +15,7 @@ curated by Pietro Coletti.
 data(Goeyvaerts)
 }
 \description{
-This is a list of 318 \code{\link{network}} objects derived from contact
+This is a list of 318 \code{\link[network:network]{network}} objects derived from contact
 diary data collected by by \insertCite{GoSa18h;textual}{ergm.multi}. The
 study recruited households in Flanders and Brussels-Capital region
 with at least one child 12 or under. The networks are symmetrized.

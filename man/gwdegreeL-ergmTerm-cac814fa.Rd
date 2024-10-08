@@ -21,7 +21,7 @@ value of the attribute.}
 
 \item{cutoff}{only relevant if \code{fixed=FALSE} . In that case it only uses this
 number of terms in computing the statistics to reduce the computational
-burden. Its default value can also be controlled by the \code{gw.cutoff} term option control parameter. (See \code{\link{control.ergm}} .)}
+burden. Its default value can also be controlled by the \code{gw.cutoff} term option control parameter. (See \code{\link[ergm:control.ergm]{control.ergm}} .)}
 
 \item{levels}{a list of layer specifications. If given, degree of a node
 \code{i} is considered to be the number of edges in all layers,
@@ -34,7 +34,7 @@ degree distribution with decay controlled by the \code{decay} parameter.
 This term can only be used with undirected networks.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "gwdegreeL", "subsection")}
 }

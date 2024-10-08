@@ -30,7 +30,7 @@ network with edge attributes and the network is unipartite, an
 optional integer vector to specify which of the layers should be
 treated as bipartite and how many mode 1 vertices there are.}
 
-\item{.active}{An optional list with a \link[=nodal_attributes]{nodal attribute specification} (\code{? nodal_attributes}) for each
+\item{.active}{An optional list with a \link[ergm:nodal_attributes]{nodal attribute specification} (\code{? nodal_attributes}) for each
 layer, specifying which nodes on each layer \emph{may} have ties.}
 }
 \value{
@@ -45,7 +45,7 @@ ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 The resulting network will be the "least common denominator"
 network: if not all layers have the same bipartedness, all layers
 will appear as unipartite to the statistics, and if any are
-directed, all will be. However, \link[=ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
+directed, all will be. However, \link[ergm:ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
 
@@ -58,7 +58,7 @@ those in the first network.
 
 In order to fit a model for multilayer
 networks, first use \code{\link{Layer}} construct an LHS network that
-\code{\link[=ergm]{ergm()}} will understand as multilayered.
+\code{\link[ergm:ergm]{ergm()}} will understand as multilayered.
 
 Used in the formula directly, most, but not all, \pkg{ergm} terms will
 sum their statistics over the observed layers.
@@ -66,7 +66,7 @@ sum their statistics over the observed layers.
 Some terms are \emph{layer-aware}, however. By convention, layer-aware
 terms have capital \code{L} appended to them. For example,
 \code{\link[=mutualL-ergmTerm]{mutualL}} is a layer-aware generalization of
-\code{\link[=mutual-ergmTerm]{mutual}}. These terms have one or more explicit
+\code{\link[ergm:mutual-ergmTerm-22863009]{mutual}}. These terms have one or more explicit
 (usually optional) layer specification arguments. By convention, an
 argument that requires one layer specification is named \code{L=} and
 one that requires a list of specifications (constructed by \code{\link[=list]{list()}}
@@ -107,7 +107,7 @@ For example, if LHS is \code{Layer(A=nwA, B=nwB)}, both \code{~`2`} and
 \dQuote{logical} layer that has ties that are in \code{nwA} but not in
 \code{nwB}.
 
-Transpose function \code{\link{t}} applied to a directed layer will reverse
+Transpose function \code{\link[=t]{t()}} applied to a directed layer will reverse
 the direction of all relations (transposing the sociomatrix). Unlike the
 others, it can only be used on an observed layer directly. For example,
 \code{~t(`1`)&t(`2`)} is valid but \code{~t(`1`&`2`)} is not.
@@ -212,5 +212,5 @@ summary(lnw~L(~S(~b1degree(1:3)+b2degree(1:3),1:5~6:20), ~`2`))
 \insertAllCited{}
 }
 \seealso{
-\link[=ergmTerm]{Help on model specification} for specific terms.
+\link[ergm:ergmTerm]{Help on model specification} for specific terms.
 }

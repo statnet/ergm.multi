@@ -14,7 +14,7 @@
 \item{...}{additional arguments, currently unused.}
 }
 \value{
-A \code{\link{network.list}} containing the networks. These networks
+A \code{\link[ergm:network.list]{network.list}} containing the networks. These networks
 will inherit all vertex and edge attributes, as well as relevant
 network attributes.
 }

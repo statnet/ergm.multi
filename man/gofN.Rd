@@ -23,9 +23,9 @@ gofN(
 \method{summary}{gofN}(object, by = NULL, ...)
 }
 \arguments{
-\item{object}{an \code{\link{ergm}} object.}
+\item{object}{an \code{\link[ergm:ergm]{ergm}} object.}
 
-\item{GOF}{a one-sided \code{\link{ergm}} formula specifying network
+\item{GOF}{a one-sided \code{\link[ergm:ergm]{ergm}} formula specifying network
 statistics whose goodness of fit to test, or \code{\link{NULL}}; if \code{NULL},
 uses the original model.}
 
@@ -36,8 +36,8 @@ uses the original model.}
 \item{save_stats}{If \code{TRUE}, save the simulated network statistics;
 defaults to \code{FALSE} to save memory and disk space.}
 
-\item{\dots}{additional arguments to functions (\code{\link[=simulate.ergm]{simulate.ergm()}}
-and \code{\link[=summary.ergm_model]{summary.ergm_model()}}) for the constructor.}
+\item{\dots}{additional arguments to functions (\code{\link[ergm:simulate.ergm]{simulate.ergm()}}
+and \code{\link[ergm:summary.ergm_model]{summary.ergm_model()}}) for the constructor.}
 
 \item{x}{a \code{gofN} object.}
 
@@ -69,7 +69,7 @@ of their imputations under the model.}
 
 \item{stats,stats.obs}{If \code{save_stats} control parameter is \code{TRUE}, the simulated statistics.}
 
-In addition, the following \code{\link{attr}}-style attributes are included:
+In addition, the following \code{\link[statnet.common:attr]{attr}}-style attributes are included:
 
 \item{nw}{The observed multinetwork object.}
 
@@ -87,7 +87,7 @@ used for a variety of diagnostics and diagnostic plots developed by
 \itemize{
 \item \code{[}: Extract a subset of statistics for which goodness-of-fit had been computed.
 
-\item \code{augment(gofN)}: a method for constructing a \code{\link{tibble}} of network attributes augmented with goodness of fit information. Columns include:\describe{
+\item \code{augment(gofN)}: a method for constructing a \code{\link[tibble:tibble]{tibble}} of network attributes augmented with goodness of fit information. Columns include:\describe{
 \item{network attributes}{the attributes of each of the networks}
 
 \item{\code{.stat_name}}{name of the simulated statistic}

@@ -60,29 +60,29 @@ to simulate from, which should divide the \code{\link[=control.gofN.ergm]{contro
 megabytes) than this. Is ignored if \code{save_stats} is passed.}
 
 \item{simulate, obs.simulate}{Control lists produced by
-\code{\link[=control.simulate.ergm]{control.simulate.ergm()}} or equivalent for unconstrained and
+\code{\link[ergm:control.simulate.ergm]{control.simulate.ergm()}} or equivalent for unconstrained and
 constrained simulation, respectively. Parameters are inherited
 from the model fit and can be overridden here.}
 
 \item{parallel}{Number of threads in which to run the sampling. Defaults to
-0 (no parallelism). See the entry on \link[=ergm-parallel]{parallel processing}
+0 (no parallelism). See \code{\link[ergm:ergm-parallel]{ergm-parallel}}
 for details and troubleshooting.}
 
-\item{parallel.type}{API to use for parallel processing. Supported values
-are \code{"MPI"} and \code{"PSOCK"}. Defaults to using the \code{parallel}
-package with PSOCK clusters. See \code{\link{ergm-parallel}}}
+\item{parallel.type}{API to use for parallel processing. Defaults
+to using the \pkg{parallel} package with PSOCK clusters. See
+\code{\link[ergm:ergm-parallel]{ergm-parallel}}.}
 
-\item{parallel.version.check}{Logical: If TRUE, check that the version of
-\code{\link[=ergm-package]{ergm}} running on the slave nodes is the same as
-that running on the master node.}
+\item{parallel.version.check}{Logical: If TRUE, check that the
+version of \CRANpkg{ergm} running on the slave
+nodes is the same as that running on the master node.}
 
 \item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
-processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
+processes inherit the \code{\link[ergm:ergm-parallel]{set.MT_terms()}} setting.}
 }
 \description{
 \code{control.gofN.ergm} (or its alias, \code{control.gofN}) is
 intended to be used with \code{\link[=gofN]{gofN()}} specifically and will "inherit"
-as many control parameters from \code{\link{ergm}} fit as possible().
+as many control parameters from \code{\link[ergm:ergm]{ergm}} fit as possible().
 }
 \details{
 Auxiliary function as user interface for fine-tuning ERGM Goodness-of-Fit

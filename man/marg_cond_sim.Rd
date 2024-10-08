@@ -16,7 +16,7 @@ marg_cond_sim(
 )
 }
 \arguments{
-\item{object}{an \code{\link{ergm}} object.}
+\item{object}{an \code{\link[ergm:ergm]{ergm}} object.}
 
 \item{nsim}{number of realizations.}
 
@@ -26,7 +26,7 @@ marg_cond_sim(
 
 \item{negative_info}{how to handle the situation in which the constrained variance exceeds the unconstrained: the corresponding action will be taken.}
 
-\item{...}{additional arguments to \code{\link[=ergm_model]{ergm_model()}}, \code{\link[=simulate.ergm]{simulate.ergm()}}, and \code{\link[=summary.ergm_model]{summary.ergm_model()}}.}
+\item{...}{additional arguments to \code{\link[ergm:ergm_model]{ergm_model()}}, \code{\link[ergm:simulate.ergm]{simulate.ergm()}}, and \code{\link[ergm:summary.ergm_model]{summary.ergm_model()}}.}
 }
 \value{
 an object of similar structure as that returned by \code{\link[=gofN]{gofN()}}.

@@ -50,7 +50,7 @@
 
 \item{id.label}{specification for how extreme points are to be labeled, defaulting to network's index in the combined network.}
 
-\item{main}{a template for the plots' titles; these use \code{\link[=glue]{glue()}}'s templating, with \code{{type}} replaced with the type of plot and \code{{name}} replaced with the statistic.}
+\item{main}{a template for the plots' titles; these use \code{\link[glue:glue]{glue()}}'s templating, with \code{{type}} replaced with the type of plot and \code{{name}} replaced with the statistic.}
 
 \item{xlab}{horizontal axis label; defaults to a character representation of \code{against}.}
 
