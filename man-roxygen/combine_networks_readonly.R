@@ -1,0 +1,1 @@
+#' @return Due to certain optimizations, the resulting [`network`] object's network and vertex attributes should be treated as read-only: do not modify them. If you need to change existing attributes or add new ones, do so on the input networks and call `<%= combiner %>(...)` again.

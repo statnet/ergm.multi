@@ -19,10 +19,13 @@
 #'
 #'   1. Several networks as (optionally named) arguments.
 #'
-#' @return A network object with multinetwork metadata.
+#' @return A [`network`] object comprising the provided networks, with multinetwork metadata.
 #'
-#' @seealso [Help on model specification][ergmTerm] for specific terms
-#' @seealso `vignette("Goeyvaerts_reproduction")` for a demonstration
+#' @templateVar combiner Networks
+#' @template combine_networks_readonly
+#'
+#' @seealso [`ergmTerm`] for specific terms.
+#' @seealso `vignette("Goeyvaerts_reproduction")` for a demonstration.
 #' @examples
 #'
 #' data(samplk)

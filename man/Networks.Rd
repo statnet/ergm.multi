@@ -14,7 +14,9 @@ Networks(...)
 }}
 }
 \value{
-A network object with multinetwork metadata.
+A \code{\link[network:network]{network}} object comprising the provided networks, with multinetwork metadata.
+
+Due to certain optimizations, the resulting \code{\link[network:network]{network}} object's network and vertex attributes should be treated as read-only: do not modify them. If you need to change existing attributes or add new ones, do so on the input networks and call \code{Networks(...)} again.
 }
 \description{
 A function for specifying the LHS of a multi-network
@@ -35,7 +37,7 @@ ergm(monks ~ N(~edges))
 
 }
 \seealso{
-\link[ergm:ergmTerm]{Help on model specification} for specific terms
+\code{\link[ergm:ergmTerm]{ergmTerm}} for specific terms.
 
-\code{vignette("Goeyvaerts_reproduction")} for a demonstration
+\code{vignette("Goeyvaerts_reproduction")} for a demonstration.
 }

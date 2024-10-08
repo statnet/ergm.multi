@@ -34,7 +34,9 @@ treated as bipartite and how many mode 1 vertices there are.}
 layer, specifying which nodes on each layer \emph{may} have ties.}
 }
 \value{
-A network object with layer metadata.
+A \code{\link[network:network]{network}} object comprising the provided layers, with layer metadata.
+
+Due to certain optimizations, the resulting \code{\link[network:network]{network}} object's network and vertex attributes should be treated as read-only: do not modify them. If you need to change existing attributes or add new ones, do so on the input networks and call \code{Layer(...)} again.
 }
 \description{
 A function for specifying the LHS of a multilayer

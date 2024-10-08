@@ -254,7 +254,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   specification][nodal_attributes] (`? nodal_attributes`) for each
 #'   layer, specifying which nodes on each layer *may* have ties.
 #'
-#' @return A network object with layer metadata.
+#' @return A [`network`] object comprising the provided layers, with layer metadata.
+#' @templateVar combiner Layer
+#' @template combine_networks_readonly
 #'
 #' @note The resulting network will be the "least common denominator"
 #'   network: if not all layers have the same bipartedness, all layers
