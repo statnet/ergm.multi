@@ -914,7 +914,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(list(a$Ls))(x))
   gs <- wm$emptynwstats
   wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
-  wm$dependence <- wm$dependence || !is.dyad.independent(auxiliaries, basis=nw, ignore_aux=FALSE)
+  wm$dependence <- wm$dependence || NA # If not determined by the model, set based on the layer logic.
 
   c(list(name="OnLayer", iinputs=nltrms, inputs=w, submodel=m, auxiliaries = auxiliaries),
     wm)
