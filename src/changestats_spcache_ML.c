@@ -21,7 +21,7 @@ I_CHANGESTAT_FN(i__otp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
   
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
       ML_EXEC_THROUGH_FOUTEDGES(ll0, j, e2, k, { // and j->k
@@ -36,7 +36,7 @@ U_CHANGESTAT_FN(u__otp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
 
@@ -84,7 +84,7 @@ I_CHANGESTAT_FN(i__osp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
       ML_EXEC_THROUGH_FINEDGES(ll0, j, e2, k, { // and k->j
@@ -99,7 +99,7 @@ U_CHANGESTAT_FN(u__osp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
 
@@ -132,7 +132,7 @@ I_CHANGESTAT_FN(i__isp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
       ML_EXEC_THROUGH_FOUTEDGES(ll0, i, e2, k, { // and i->k
@@ -147,7 +147,7 @@ U_CHANGESTAT_FN(u__isp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
 
@@ -180,7 +180,7 @@ I_CHANGESTAT_FN(i__utp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i-j
       ML_EXEC_THROUGH_EDGES(ll0, i, e2, k, { // and i-k
@@ -199,7 +199,7 @@ U_CHANGESTAT_FN(u__utp_wtnet_ML){
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
-  bool any_order=INPUT_PARAM[0];
+  bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
 

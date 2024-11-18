@@ -60,7 +60,7 @@ L2hk - for each h<->k neq t: k<->t, count u such that k<->u<->t
 
 This function will only work properly with undirected graphs, and should only be called in that case.
 */
-static inline void dspUTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void dspUTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_dsp;
   any_order = TRUE;
   
@@ -104,7 +104,7 @@ Changescore for dsps based on outgoing two-paths, i.e. configurations for non-ed
 
 This function should only be used in the directed case
 */
-static inline void dspOTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void dspOTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_dsp;
 
   CALC_with_dirs({
@@ -153,7 +153,7 @@ L2kt - for each k->i neq j: j->k, count u such that i->u->k
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void dspITP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void dspITP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_dsp;
 
   CALC_with_dirs({
@@ -199,7 +199,7 @@ L2kt - for each k->t neq h: k->h, count u such that t->u, k->u
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void dspOSP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void dspOSP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_dsp;
   any_order = TRUE;
 
@@ -234,7 +234,7 @@ L2kh - for each k->h neq t: t->k, count u such that u->h, u->k
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void dspISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void dspISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_dsp;
   any_order = TRUE;
 
@@ -271,7 +271,7 @@ static inline void dspISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Netw
 
 /* We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function. */
 /* *\/ */
-/* static inline void dspRTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, double *dvec, double *cs) {  */
+/* static inline void dspRTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, unsigned int any_order, int nd, Vertex *dvec, double *cs) {  */
 /*   Edge e, f; */
 /*   int j, echange, htedge; */
 /*   int L2th,L2tk,L2kt,L2hk,L2kh; /\*Two-path counts for various edges*\/ */
@@ -388,11 +388,11 @@ C_CHANGESTAT_FN(c_ddsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   StoreDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
   
   /*Set things up*/
-  unsigned int type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
-  double *dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
+  unsigned int type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  Vertex *dvec=(Vertex *) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   double *cs=CHANGE_STAT;               /*Grab the pointer to the CS vector*/
 
   /*Obtain the DSP changescores (by type)*/
@@ -425,9 +425,9 @@ Only one type may be specified per esp term.  The default, OTP, retains the orig
 */
 
 I_CHANGESTAT_FN(i_dgwdsp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
+  Vertex maxesp = IINPUT_PARAM[2]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*2, double, storage);
-  double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
+  Vertex *dvec=(Vertex*) (storage+maxesp);          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
     dvec[i]=i+1;
 }
@@ -437,20 +437,20 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   StoreDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
-  Vertex i,maxesp;
-  double alpha, oneexpa,*dvec,*cs;
+  Vertex i,maxesp,*dvec;
+  double alpha, oneexpa,*cs;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[1];       /*Get alpha*/
+  alpha = INPUT_PARAM[0];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
+  type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
-  dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
+  dvec=(Vertex*) (storage+maxesp);          /*Grab memory for the ESP vals*/
 
   /*Obtain the DSP changescores (by type)*/
   switch(type){
@@ -488,7 +488,7 @@ L2hk - for each h<->k neq t: k<->t, count u such that k<->u<->t
 
 This function will only work properly with undirected graphs, and should only be called in that case.
 */
-static inline void espUTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void espUTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_esp;
   any_order = TRUE;
   
@@ -534,7 +534,7 @@ L2kh - for each k->j neq i: k->i, count u such that k->u->j
 
 This function should only be used in the directed case, with espUTP being used in the undirected case.
 */
-static inline void espOTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void espOTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_esp;
 
   CALC_with_dirs({
@@ -594,7 +594,7 @@ L2kt - for each k->i neq j: j->k, count u such that i->u->k
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void espITP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void espITP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
    SETUP_calc_esp;
    
   CALC_with_dirs({
@@ -663,7 +663,7 @@ L2kt - for each k->t neq h: k->h, count u such that t->u, k->u
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void espOSP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void espOSP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
   SETUP_calc_esp;
   
   CALC_with_dirs({
@@ -730,7 +730,7 @@ L2kh - for each k->h neq t: t->k, count u such that u->h, u->k
 
 We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function.
 */
-static inline void espISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) { 
+static inline void espISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) { 
    SETUP_calc_esp;
   
   CALC_with_dirs({
@@ -799,7 +799,7 @@ static inline void espISP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Netw
 
 /* We assume that this is only called for directed graphs - otherwise, use the baseline espUTP function. */
 /* *\/ */
-/* static inline void espRTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, double *dvec, double *cs) {  */
+/* static inline void espRTP_ML_calc(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, StoreDyadMapUInt *spcache, StoreLayerLogic *ll0, StoreLayerLogic *ll1, StoreLayerLogic *ll2, StoreLayerLogic *ll3, unsigned int any_order, int nd, Vertex *dvec, double *cs) {  */
 /*   Edge e, f; */
 /*   int j, echange, htedge; */
 /*   int L2th,L2tk,L2kt,L2hk,L2kh; /\*Two-path counts for various edges*\/ */
@@ -918,15 +918,16 @@ C_CHANGESTAT_FN(c_desp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
 
   int type;
-  double *dvec,*cs;
+  Vertex *dvec;
+  double *cs;
   
   /*Set things up*/
   ZERO_ALL_CHANGESTATS(i);
-  type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
-  dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
+  type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  dvec=(Vertex*) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   cs=CHANGE_STAT;               /*Grab the pointer to the CS vector*/
 
   /*Obtain the ESP changescores (by type)*/
@@ -958,9 +959,9 @@ Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; t
 Only one type may be specified per esp term.  The default, OTP, retains the original behavior of esp/gwesp.  In the case of undirected graphs, OTP should be used (the others assume a directed network memory structure, and are not safe in the undirected case).
 */
 I_CHANGESTAT_FN(i_dgwesp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
+  Vertex maxesp = IINPUT_PARAM[2]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*2, double, storage);
-  double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
+  Vertex *dvec=(Vertex*) (storage+maxesp);          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
     dvec[i]=i+1;
 }
@@ -971,20 +972,20 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
-  Vertex i,maxesp;
-  double alpha, oneexpa,*dvec,*cs;
+  Vertex i,maxesp,*dvec;
+  double alpha, oneexpa,*cs;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[1];       /*Get alpha*/
+  alpha = INPUT_PARAM[0];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
+  type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
-  dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
+  dvec=(Vertex*) (storage+maxesp);          /*Grab memory for the ESP vals*/
 
   /*Obtain the ESP changescores (by type)*/
   switch(type){
@@ -1038,14 +1039,15 @@ C_CHANGESTAT_FN(c_dnsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int i,type;
-  double *dvec,*cs_esp, *cs_dsp;
+  Vertex *dvec;
+  double *cs_esp, *cs_dsp;
   
   /*Set things up*/
-  type=(int)INPUT_PARAM[1];     /*Get the ESP type code to be used*/
-  dvec=INPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
+  type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  dvec=(Vertex*) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
   cs_esp=storage;               /*Grab memory for the DSP changescores*/
   cs_dsp=storage+N_CHANGE_STATS;/*Grab memory for the DSP changescores*/
 
@@ -1099,9 +1101,9 @@ Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; t
 Only one type may be specified per esp term.  The default, OTP, retains the original behavior of esp/gwesp.  In the case of undirected graphs, OTP should be used (the others assume a directed network memory structure, and are not safe in the undirected case).
 */
 I_CHANGESTAT_FN(i_dgwnsp_ML) {
-  Vertex maxesp = (unsigned int)INPUT_PARAM[3]; // Index must be same as for maxesp below.
+  Vertex maxesp = (unsigned int)IINPUT_PARAM[2]; // Index must be same as for maxesp below.
   ALLOC_STORAGE(maxesp*3, double, storage);
-  double *dvec=storage+maxesp;          /*Grab memory for the ESP vals*/
+  Vertex *dvec=(Vertex*) (storage+maxesp);          /*Grab memory for the ESP vals*/
   for(unsigned int i=0;i<maxesp;i++)         /*Initialize the ESP vals*/
     dvec[i]=i+1;
 }
@@ -1112,20 +1114,20 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
-  unsigned int any_order = (unsigned int) INPUT_PARAM[0];
+  unsigned int any_order = (unsigned int) IINPUT_PARAM[0];
   GET_STORAGE(double, storage);
   int type;
-  Vertex i,maxesp;
-  double alpha, oneexpa,*dvec,*cs_esp, *cs_dsp;
+  Vertex i,maxesp,*dvec;
+  double alpha, oneexpa,*cs_esp,*cs_dsp;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
-  alpha = INPUT_PARAM[1];       /*Get alpha*/
+  alpha = INPUT_PARAM[0];       /*Get alpha*/
   oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
-  type=(int)INPUT_PARAM[2];     /*Get the ESP type code to be used*/
-  maxesp=(int)INPUT_PARAM[3];   /*Get the max ESP cutoff to use*/
+  type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs_esp=storage;     /*Grab memory for the ESP changescores*/
-  dvec=storage+maxesp;   /*Grab memory for the ESP vals*/
+  dvec=(Vertex*) (storage+maxesp);   /*Grab memory for the ESP vals*/
   cs_dsp=storage+maxesp+maxesp;     /*Grab memory for the ESP changescores*/
 
   /*Obtain the changescores (by type)*/

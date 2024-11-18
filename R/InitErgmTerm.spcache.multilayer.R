@@ -26,6 +26,6 @@ InitErgmTerm..spcache.netL<-function(nw, arglist, ...){
   linfo <- .sp.handle_layers(nw, a, type, FALSE)
 
   
-  list(name=paste0(dname,linfo$name_suffix), auxiliaries=linfo$auxiliaries, inputs=c(linfo$any_order),
+  list(name=paste0(dname,linfo$name_suffix), auxiliaries=linfo$auxiliaries, iinputs=c(linfo$any_order),
        coef.names=c(), dependence=TRUE)
 }
