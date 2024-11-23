@@ -134,8 +134,8 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
-  out <- network.initialize(sum(ns), directed=is.directed(nwl[[1]]))
-
+  constructor <- if(is(nwl[[1]], "networkLite")) networkLite::networkLite else network.initialize
+  out <-  constructor(sum(ns), directed=is.directed(nwl[[1]]))
 
   # Concatenate network attributes. If you run into what looks like a covariate matrix, combine it correctly.
   sna <- list()
@@ -190,15 +190,14 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
   # Add ties and attributes
 
-  for(b in seq_along(nwl)){
-    el <- rbind(as.edgelist(nwl[[b]]),as.edgelist(is.na(nwl[[b]])))
-    eids <- apply(el, 1, function(e) get.edgeIDs(nwl[[b]], e[1], e[2], na.omit=FALSE))
+  el <- map(seq_along(nwl), function(b) {
+    df <- as_tibble(nwl[[b]], attrname = TRUE, unit = "edge", na.rm = FALSE)
+    names <- rep(list(as.list(names(df)[-(1:2)])), nrow(df))
+    vals <- transpose(df[,-(1:2)])
+    list(tails = df[[1]]+blks[b], heads = df[[2]]+blks[b], names = names, vals = vals)
+  }) %>% transpose()
 
-    vals <- lapply(nwl[[b]]$mel,"[[","atl")[eids]
-    names <- lapply(vals, names)
-
-    out <- add.edges(out, el[,1]+blks[b], el[,2]+blks[b], names.eval=names, vals.eval=vals)
-  }
+  out <- add.edges(out, unlist(el$tails), unlist(el$heads), names.eval=do.call(c, el$names), vals.eval=do.call(c, el$vals))
 
   # Finally, add a vertex attribute specifying the blocks
 
@@ -240,7 +239,8 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   bip <- eblks[length(eblks)]
   ablks <- cumsum(c(bip, ns-es))
 
-  out <- network.initialize(sum(ns), directed=is.directed(nwl[[1]]), bipartite=bip)
+  constructor <- if(is(nwl[[1]], "networkLite")) networkLite::networkLite else network.initialize
+  out <-  constructor(sum(ns), directed=is.directed(nwl[[1]]), bipartite=bip)
 
   # Concatenate network attributes. If you run into what looks like a covariate matrix, combine it correctly.
   sna <- list()
@@ -299,15 +299,14 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
 
   # Add ties and attributes
 
-  for(b in seq_along(nwl)){
-    el <- rbind(as.edgelist(nwl[[b]]),as.edgelist(is.na(nwl[[b]])))
-    eids <- apply(el, 1, function(e) get.edgeIDs(nwl[[b]], e[1], e[2], na.omit=FALSE))
+  el <- map(seq_along(nwl), function(b) {
+    df <- as_tibble(nwl[[b]], attrname = TRUE, unit = "edge", na.rm = FALSE)
+    names <- rep(list(as.list(names(df)[-(1:2)])), nrow(df))
+    vals <- transpose(df[,-(1:2)])
+    list(tails = el[[1]]+eblks[b], heads = el[[2]]-es[b]+ablks[b], names = names, vals = vals)
+  }) %>% transpose()
 
-    vals <- lapply(nwl[[b]]$mel,"[[","atl")[eids]
-    names <- lapply(vals, names)
-
-    out <- add.edges(out, el[,1]+eblks[b], el[,2]-es[b]+ablks[b], names.eval=names, vals.eval=vals)
-  }
+  out <- add.edges(out, unlist(el$tails), unlist(el$heads), names.eval=do.call(c, el$names), vals.eval=do.call(c, el$vals))
 
   # Finally, add a vertex attribute specifying the blocks
 

@@ -20,6 +20,7 @@ Imports:
     glue (>= 1.7.0),
     rle (>= 0.9.2),
     Rdpack (>= 2.6),
+    networkLite (>= 1.1.0),
     Matrix,
     methods,
     parallel
@@ -47,4 +48,5 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
+    github::EpiModel/networkLite@main,
     github::statnet/ergm@master
