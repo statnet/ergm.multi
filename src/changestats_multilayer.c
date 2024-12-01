@@ -552,7 +552,7 @@ C_CHANGESTAT_FN(c_gwb1degree_ML_sum) {
   double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int b1deg = 0;
   int degchange = 0;
@@ -568,7 +568,7 @@ C_CHANGESTAT_FN(c_gwb1degree_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[0] =
-    exp(decay) * ((1-pow(oneexpd,b1deg+degchange)) - (1-pow(oneexpd,b1deg)));
+    exp(decay + loneexpd*b1deg) - exp(decay + loneexpd*(b1deg+degchange));
 }
 
 /*****************
@@ -584,7 +584,7 @@ C_CHANGESTAT_FN(c_gwb1degree_by_attr_ML_sum) {
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int b1deg = 0;
   int degchange = 0;
@@ -600,7 +600,7 @@ C_CHANGESTAT_FN(c_gwb1degree_by_attr_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[(int)attrs[tail]] =
-    exp(decay) * ((1-pow(oneexpd,b1deg+degchange)) - (1-pow(oneexpd,b1deg)));
+    exp(decay + loneexpd*b1deg) - exp(decay + loneexpd*(b1deg+degchange));
 }
 
 /*****************
@@ -610,7 +610,7 @@ C_CHANGESTAT_FN(c_gwdegree_ML_sum) {
   double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int taildeg = 0, headdeg = 0;
   int degchange = 0;
@@ -626,10 +626,8 @@ C_CHANGESTAT_FN(c_gwdegree_ML_sum) {
 
   /* *** don't forget tail -> head */    
   CHANGE_STAT[0] =
-    exp(decay) * (
-		  ((1-pow(oneexpd,taildeg+degchange)) - (1-pow(oneexpd,taildeg))) +
-		  ((1-pow(oneexpd,headdeg+degchange)) - (1-pow(oneexpd,headdeg)))
-		  );
+    exp(decay + loneexpd*taildeg) - exp(decay + loneexpd*(taildeg+degchange)) +
+    exp(decay + loneexpd*headdeg) - exp(decay + loneexpd*(headdeg+degchange));
 }
 
 /*****************
@@ -645,7 +643,7 @@ C_CHANGESTAT_FN(c_gwdegree_by_attr_ML_sum) {
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int taildeg = 0, headdeg = 0;
   int degchange = 0;
@@ -662,10 +660,10 @@ C_CHANGESTAT_FN(c_gwdegree_by_attr_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[(int)attrs[tail]] =
-    exp(decay) * ((1-pow(oneexpd,taildeg+degchange)) - (1-pow(oneexpd,taildeg)));
+    exp(decay + loneexpd*taildeg) - exp(decay + loneexpd*(taildeg+degchange));
   
   CHANGE_STAT[(int)attrs[head]] =
-    exp(decay) * ((1-pow(oneexpd,headdeg+degchange)) - (1-pow(oneexpd,headdeg)));
+    exp(decay + loneexpd*headdeg) - exp(decay + loneexpd*(headdeg+degchange));
 }
 
 /*****************
@@ -675,7 +673,7 @@ C_CHANGESTAT_FN(c_gwb2degree_ML_sum) {
   double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int b2deg = 0;
   int degchange = 0;
@@ -691,7 +689,7 @@ C_CHANGESTAT_FN(c_gwb2degree_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[0] =
-        exp(decay) * ((1-pow(oneexpd,b2deg+degchange)) - (1-pow(oneexpd,b2deg)));
+    exp(decay + loneexpd*b2deg) - exp(decay + loneexpd*(b2deg+degchange));
 }
 
 /*****************
@@ -707,7 +705,7 @@ C_CHANGESTAT_FN(c_gwb2degree_by_attr_ML_sum) {
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int b2deg = 0;
   int degchange = 0;
@@ -723,7 +721,7 @@ C_CHANGESTAT_FN(c_gwb2degree_by_attr_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[(int)attrs[head]] =
-    exp(decay) * ((1-pow(oneexpd,b2deg+degchange)) - (1-pow(oneexpd,b2deg)));
+    exp(decay + loneexpd*b2deg) - exp(decay + loneexpd*(b2deg+degchange));
 }
 
 /*****************
@@ -733,7 +731,7 @@ C_CHANGESTAT_FN(c_gwidegree_ML_sum) {
   double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int headdeg = 0;
   int degchange = 0;
@@ -749,7 +747,7 @@ C_CHANGESTAT_FN(c_gwidegree_ML_sum) {
     
   /* *** don't forget tail -> head */
   CHANGE_STAT[0] =
-    exp(decay) * ((1-pow(oneexpd,headdeg+degchange)) - (1-pow(oneexpd,headdeg)));      
+    exp(decay + loneexpd*headdeg) - exp(decay + loneexpd*(headdeg+degchange));
 }
 
 /*****************
@@ -765,7 +763,7 @@ C_CHANGESTAT_FN(c_gwidegree_by_attr_ML_sum) {
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int headdeg = 0;
   int degchange = 0;
@@ -781,7 +779,7 @@ C_CHANGESTAT_FN(c_gwidegree_by_attr_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[(int)attrs[head]] =
-    exp(decay) * ((1-pow(oneexpd,headdeg+degchange)) - (1-pow(oneexpd,headdeg)));      
+    exp(decay + loneexpd*headdeg) - exp(decay + loneexpd*(headdeg+degchange));
 }
 
 /*****************
@@ -791,7 +789,7 @@ C_CHANGESTAT_FN(c_gwodegree_ML_sum) {
   double *inputs = INPUT_PARAM;
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int taildeg = 0;
   int degchange = 0;
@@ -806,7 +804,7 @@ C_CHANGESTAT_FN(c_gwodegree_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[0] =
-    exp(decay) * ((1-pow(oneexpd,taildeg+degchange)) - (1-pow(oneexpd,taildeg)));      
+    exp(decay + loneexpd*taildeg) - exp(decay + loneexpd*(taildeg+degchange));
 }
 
 /*****************
@@ -822,7 +820,7 @@ C_CHANGESTAT_FN(c_gwodegree_by_attr_ML_sum) {
   unsigned int nml = *(inputs++);
   double decay = *(inputs++);
   double *attrs = inputs-1;
-  double oneexpd = 1.0-exp(-decay);
+  double loneexpd = log1mexp(decay);
 
   unsigned int taildeg = 0;
   int degchange = 0;
@@ -838,7 +836,7 @@ C_CHANGESTAT_FN(c_gwodegree_by_attr_ML_sum) {
     
   /* *** don't forget tail -> head */    
   CHANGE_STAT[(int)attrs[tail]] =
-    exp(decay) * ((1-pow(oneexpd,taildeg+degchange)) - (1-pow(oneexpd,taildeg)));
+    exp(decay + loneexpd*taildeg) - exp(decay + loneexpd*(taildeg+degchange));
 }
 
 /*****************

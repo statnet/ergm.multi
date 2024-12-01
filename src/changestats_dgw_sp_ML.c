@@ -441,12 +441,12 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp,*dvec;
-  double alpha, oneexpa,*cs;
+  double alpha, loneexpa,*cs;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
   alpha = INPUT_PARAM[0];       /*Get alpha*/
-  oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
+  loneexpa = log1mexp(alpha);    /*Precompute (1-exp(-alpha))*/
   type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
   maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
@@ -465,7 +465,7 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   /*Compute the gwdsp changescore*/
   for(i=0;i<maxesp;i++){
     if(cs[i]!=0.0) {                 /*Filtering to save a few pow() calls*/
-      CHANGE_STAT[0]+=(1.0-pow(oneexpa,dvec[i]))*cs[i];
+      CHANGE_STAT[0]+=exp(log1mexp(-loneexpa*dvec[i]))*cs[i];
       //Rprintf("count %f: %f\n", dvec[i], cs[i]);
     }
   }
@@ -976,12 +976,12 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp,*dvec;
-  double alpha, oneexpa,*cs;
+  double alpha, loneexpa,*cs;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
   alpha = INPUT_PARAM[0];       /*Get alpha*/
-  oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
+  loneexpa = log1mexp(alpha);    /*Precompute (1-exp(-alpha))*/
   type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
   maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs=storage;                   /*Grab memory for the ESP changescores*/
@@ -1000,7 +1000,7 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   /*Compute the gwesp changescore*/
   for(i=0;i<maxesp;i++){
     if(cs[i]!=0.0)  {                /*Filtering to save a few pow() calls*/
-      CHANGE_STAT[0]+=(1.0-pow(oneexpa,dvec[i]))*cs[i];
+      CHANGE_STAT[0]+=exp(log1mexp(-loneexpa*dvec[i]))*cs[i];
       //Rprintf("count %f: %f, ChangeStat %f\n", dvec[i], cs[i], CHANGE_STAT[0]);
     }
   }
@@ -1118,12 +1118,12 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   GET_STORAGE(double, storage);
   int type;
   Vertex i,maxesp,*dvec;
-  double alpha, oneexpa,*cs_esp,*cs_dsp;
+  double alpha, loneexpa,*cs_esp,*cs_dsp;
   
   /*Set things up*/
   CHANGE_STAT[0] = 0.0;         /*Zero the changestat*/
   alpha = INPUT_PARAM[0];       /*Get alpha*/
-  oneexpa = 1.0-exp(-alpha);    /*Precompute (1-exp(-alpha))*/
+  loneexpa = log1mexp(alpha);    /*Precompute (1-exp(-alpha))*/
   type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
   maxesp=IINPUT_PARAM[2];   /*Get the max ESP cutoff to use*/
   cs_esp=storage;     /*Grab memory for the ESP changescores*/
@@ -1161,7 +1161,7 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   /*Compute the gwnsp changescore*/
   for(i=0;i<maxesp;i++)
     if((cs_dsp[i]-cs_esp[i])!=0.0)                  /*Filtering to save a few pow() calls*/
-      CHANGE_STAT[0]+=(1.0-pow(oneexpa,dvec[i]))*(cs_dsp[i]-cs_esp[i]);
+      CHANGE_STAT[0]+=exp(log1mexp(-loneexpa*dvec[i]))*(cs_dsp[i]-cs_esp[i]);
   CHANGE_STAT[0]*=exp(alpha);
 }
 
