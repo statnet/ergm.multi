@@ -85,11 +85,12 @@ InitErgmTerm..subnets <- function(nw, arglist, ...){
 #' @param attrnames a list (or a selection index) for attributes to obtain; for combined networks, defaults to all.
 #' @param unit whether to obtain edge, vertex, or network attributes.
 #' @template ergmTerm-NetworkIDName
+#' @param store.nid whether to include columns with network ID and network name; the columns will be named with the arguments passed to `.NetworkID` and `.NetworkName`.
 #' @param ... additional arguments, currently passed to unlist()].
 #'
 #' @seealso [network::as_tibble.network()]
 #' @export
-as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName"){
+as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName", store.nid=FALSE){
   unit <- match.arg(unit)
   if(unit!="networks") return(NextMethod())
 
@@ -105,7 +106,14 @@ as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertice
   if(is.logical(attrnames) || is.numeric(attrnames)) attrnames <- na.omit(names(al)[attrnames])
   else intersect(attrnames, names(al))
 
-  al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
+  out <- al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
+
+  if(store.nid){
+    out[[.NetworkID]] <- unique(x %v% .NetworkID)
+    out[[.NetworkName]] <- unique(x %v% .NetworkName)
+  }
+
+  out
 }
 
 get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, weights=1){
@@ -168,6 +176,10 @@ assert_LHS_Networks <- function(nw, nid, term_trace = TRUE, call = if(term_trace
 #' networks have missing values, the term will stop with an
 #' error. This can be avoided by pre-filtering with `subset`, which
 #' controls which networks are affected by the term.
+#'
+#' The formula may also reference `.NetworkID` and `.NetworkName`. In
+#' particular, `~0+factor(.NetworkID)` will evaluate `formula` on each
+#' network individually.
 #'
 #' @note Care should be taken to avoid multicollinearity when using
 #'   this operator. As with the [lm()] function, `lm` formulas have an
@@ -257,7 +269,7 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
   nwl <- subnetwork_templates(nw, a$.NetworkID, a$.NetworkName)
   nwnames <- names(nwl)
   nn <- length(nwl)
-  nattrs <- as_tibble(nw, unit="networks", .NetworkID=a$.NetworkID, .NetworkName=a$.NetworkName)
+  nattrs <- as_tibble(nw, unit="networks", .NetworkID=a$.NetworkID, .NetworkName=a$.NetworkName, store.nid=TRUE)
 
   lmi <- get_lminfo(nattrs, lm=a$lm, subset=a$subset, contrasts=a$contrasts, offset=a$offset, weights=a$weights)
 

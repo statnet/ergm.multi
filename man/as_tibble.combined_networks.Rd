@@ -10,7 +10,8 @@
   ...,
   unit = c("edges", "vertices", "networks"),
   .NetworkID = ".NetworkID",
-  .NetworkName = ".NetworkName"
+  .NetworkName = ".NetworkName",
+  store.nid = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@
 \item{.NetworkID, .NetworkName}{Optional strings indicating the
 vertex attributes used to distinguish and name the networks;
 intended to be used by term developers.}
+
+\item{store.nid}{whether to include columns with network ID and network name; the columns will be named with the arguments passed to \code{.NetworkID} and \code{.NetworkName}.}
 }
 \description{
 A method to obtain a network attribute table from a

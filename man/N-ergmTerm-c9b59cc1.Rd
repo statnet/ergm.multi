@@ -47,6 +47,10 @@ statistics. If \code{lm} refers to any network attributes for which some
 networks have missing values, the term will stop with an
 error. This can be avoided by pre-filtering with \code{subset}, which
 controls which networks are affected by the term.
+
+The formula may also reference \code{.NetworkID} and \code{.NetworkName}. In
+particular, \code{~0+factor(.NetworkID)} will evaluate \code{formula} on each
+network individually.
 }
 \note{
 Care should be taken to avoid multicollinearity when using
