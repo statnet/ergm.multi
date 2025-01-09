@@ -54,7 +54,7 @@ I_CHANGESTAT_FN(i__layer_net){
   /* Set up the layer logic. */
 
   ll->commands = iinputs;
-  ll->stacks = Calloc(2*ll->commands[0], int);
+  ll->stacks = R_Calloc(2*ll->commands[0], int);
 
   /* Figure out if this layer needs to calculate reciprocal toggles. */
 
@@ -94,14 +94,14 @@ U_CHANGESTAT_FN(u__layer_net){
 F_CHANGESTAT_FN(f__layer_net){ 
   GET_AUX_STORAGE(StoreLayerLogic, ll);
   NetworkDestroy(ll->onwp);
-  Free(ll->stacks);
+  R_Free(ll->stacks);
 }
 
 /* I_CHANGESTAT_FN(i__layer_nets){ */
 /*   ALLOC_AUX_STORAGE(1, StoreNetsAndLIDAndLMapAndNL, li); */
 /*   li->nl = INPUT_PARAM[1]; */
 /*   Vertex lnnodes = N_NODES/li->nl, lbip = BIPARTITE/li->nl; */
-/*   li->nwp = Calloc(li->nl+1, Network); */
+/*   li->nwp = R_Calloc(li->nl+1, Network); */
 /*   li->lid = INPUT_PARAM+2 -1; // The -1 is because Vertex IDs count from 1. */
 /*   li->lmap = INPUT_PARAM+2+N_NODES -1; */
 /*   for(unsigned int l = 1; l <= li->nl; l++){ */
@@ -123,7 +123,7 @@ F_CHANGESTAT_FN(f__layer_net){
 /*   for(unsigned int l = 1; l <= li->nl; l++){ */
 /*     NetworkDestroy(li->nwp + l); */
 /*   } */
-/*   Free(li->nwp); */
+/*   R_Free(li->nwp); */
 /* } */
 
 I_CHANGESTAT_FN(i_OnLayer){

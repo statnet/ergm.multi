@@ -19,7 +19,7 @@ I_CHANGESTAT_FN(i__subnets){
   ALLOC_AUX_STORAGE(1, StoreSubnets, sn);
   sn->ns = *(iinputs++);
   sn->inwp = nwp;
-  sn->onwp = Calloc(sn->ns, Network *);
+  sn->onwp = R_Calloc(sn->ns, Network *);
   sn->onwp--; // The -- is because Network IDs count from 1.
 
   /* Set up the layer information. */
@@ -56,7 +56,7 @@ F_CHANGESTAT_FN(f__subnets){
   for(unsigned int i=1; i<=sn->ns; i++)
     NetworkDestroy(sn->onwp[i]);
   sn->onwp++;
-  Free(sn->onwp);
+  R_Free(sn->onwp);
 }
 
 // MultiNet: Take a weighted networkwise sum of the networks' statistics.
