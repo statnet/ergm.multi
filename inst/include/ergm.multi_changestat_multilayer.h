@@ -13,7 +13,10 @@
 #include "ergm_changestat.h"
 #include "ergm.multi_changestat_multilayer_common.do_not_include_directly.h"
 
-/* layer-aware macros eponymous to ergm_changestat.h */
+/* layer-aware macros eponymous to ergm_changestat.h
+
+   The first argument (ll) is a StoreLayerLogic struct defined below.
+ */
 #define ML_IS_OUTEDGE(ll, a,b) (EdgetreeSearch((a),(b),(ll)->onwp->outedges)!=0?1:0)
 #define ML_IS_INEDGE(ll, a,b) (EdgetreeSearch((a),(b),(ll)->onwp->inedges)!=0?1:0)
 #define ML_IS_UNDIRECTED_EDGE(ll, a,b) ML_IS_OUTEDGE((ll), MIN(a,b), MAX(a,b))
@@ -62,41 +65,73 @@ typedef struct {
   int *stack1;
 } StoreLayerLogic;
 
+/* The vertex index on the input (i.e., combined) network
+   corresponding to the vertex on the output (i.e., logical layer)
+   network. */
 #define ML_OI_TAIL(ll, l, t) ((Vertex) ((ll)->inwp->bipartite? (t) + ((l)-1)*(ll)->onwp->bipartite : (t) + ((l)-1)*(ll)->onwp->nnodes))
 #define ML_OI_HEAD(ll, l, h) ((Vertex) ((ll)->inwp->bipartite? (h) + (ll)->inwp->bipartite - (ll)->onwp->bipartite + ((l)-1)*((ll)->onwp->nnodes-(ll)->onwp->bipartite) : (h) + ((l)-1)*(ll)->onwp->nnodes))
 
+/* The vertex index and layer index on the output (i.e., logical
+   layer) network corresponding to the vertex on the input (i.e.,
+   combined) network. */
 #define ML_IO_TAIL(ll, t) ((Vertex) ((ll)->lmap[t]))
 #define ML_IO_HEAD(ll, h) ((Vertex) (ll)->lmap[h])
 #define ML_LID_TAIL(ll, t) ((Vertex) ((ll)->lid[t]))
 #define ML_LID_HEAD(ll, h) ((Vertex) ((ll)->lid[h]))
 
+/* Shorthand for getting and setting the specified edge on the input
+   network corresponding to the specified edge on the output
+   network. */
 #define ML_IGETWT(ll, l,a,b) (GetEdge(ML_OI_TAIL(ll, l, a), ML_OI_HEAD(ll, l, b), ll->inwp))
 #define ML_ISETWT(ll, l,a,b,w) (SetEdge(ML_OI_TAIL(ll, l, a), ML_OI_HEAD(ll, l, b),w,(ll)->inwp))
 
+/*
+  Layer evaluation
+
+  The three functions below are used to evaluate logical layers.
+
+  ergm_LayerLogic2() is the workhorse function that takes the focus
+    dyad (on the logical layer) and the toggled dyad (on the combined
+    network) and returns an int whose value depends on the task:
+
+    LL_ASIS: Just evaluate as is; ttail and thead are ignored.
+
+    LL_DIFF: Difference between a hypothetical toggle of (ttail,thead)
+      and its current state.
+   
+    LL_ENCODE: A binary encoding of the pre- and post-toggle state:
+      asis*1 + toggled*2, which can be extracted using a mask
+      (output&1 and (output&2)!=0).
+
+    LL_POST: Post-toggle value.
+
+  ergm_LayerLogic() is a shortcut when the same dyad is being looked
+    up as being toggled.
+
+  ergm_LayerLogic_affects() has two functions:
+
+    1) If tasked with LL_ENCODE, it encodes the pre- and post-toggle
+      state for both the dyad on the logical layer corresponding to
+      the toggled dyad on the combined network *and* its opposite
+      (head,tail), since some layer logic operations can reference the
+      reverse dyad.
+
+    2) Otherwise, it saves the list of dyads on the logical layer
+      affected by the toggle and returns their count.
+ */
+
+typedef enum{LL_ASIS, LL_DIFF, LL_ENCODE, LL_POST} LayerLogicTask;
 
 /*
-  Network logic language:
-  
+  Layer logic language:
+
   com > 0: reference to layer; look up dyad value and push
 
   com == 0: numeric literal; push value of next command
 
   see lookup table in R/InitErgmTerm.multilayer.R
-    pack.LayerLogic_formula_as_double() for com < 0
-
-  change = 0 a.k.a. FALSE: Just evaluate as is.
-
-  change = 1 a.k.a. TRUE: Difference between a hypothetical toggle of
-    (tail,head) and its current state.
-   
-  change = 2: "encode": Instead of the difference return: a binary
-    "encoding" of both: asis*1 + toggled*2
-
-  change = 3: Return the post-toggle network.
-
- */
-
-typedef enum{LL_ASIS, LL_DIFF, LL_ENCODE, LL_POST} LayerLogicTask;
+    test_eval.LayerLogic() for com < 0
+*/
 
 #define ergm_UNOP(op)				\
   {						\
@@ -187,7 +222,6 @@ typedef enum{LL_ASIS, LL_DIFF, LL_ENCODE, LL_POST} LayerLogicTask;
       *(++stack1) = fun(x1!=0, y1!=0);		\
     }						\
     break;}
-
 
 static inline int ergm_LayerLogic2(Vertex ltail, Vertex lhead, // Dyad whose value/change to evaluate within the logical layer.
 				   Vertex ttail, Vertex thead, // Dyad to toggle on LHS network.
@@ -283,10 +317,10 @@ static inline int ergm_LayerLogic(Vertex tail, Vertex head, // Dyad to toggle an
 				   StoreLayerLogic *ll, // Layer Logic
 				   LayerLogicTask change
 				  ){
-  return ergm_LayerLogic2(tail, head, tail, head, ll, change);
+  return ergm_LayerLogic2(ML_IO_TAIL(ll, tail), ML_IO_HEAD(ll, head), tail, head, ll, change);
 }
 
-// change = 2 -> asis_th + toggled_th*2 + asis_ht*4 + toggled_ht*8
+// change = LL_ENCODE -> asis_th + toggled_th*2 + asis_ht*4 + toggled_ht*8
 static inline unsigned int ergm_LayerLogic_affects(Vertex ttail, Vertex thead, // Dyad to toggle on LHS network.
 						   StoreLayerLogic *ll, // Layer Logic
 						   LayerLogicTask change,
