@@ -557,3 +557,17 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
   }
   o
 }
+
+#' @noRd
+#' @importFrom networkLite as.networkLite
+#' @export
+as.networkLite.combined_networks <- function(x, ...){
+  if(!is.null(x %n% ".subnetcache")){
+    snc <- x %n% ".subnetcache"
+    snc[[1]] <- lapply(snc[[1]], as.networkLite)
+    x %n% ".subnetcache" <- snc
+  }
+  class(x) <- class(x)[-which(class(x) == "combined_networks")[1]]
+  x <- as.networkLite(x)
+  structure(x, class = c("combined_networks", class(x)))
+}
