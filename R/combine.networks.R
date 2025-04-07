@@ -567,7 +567,8 @@ as.networkLite.combined_networks <- function(x, ...){
     snc[[1]] <- lapply(snc[[1]], as.networkLite)
     x %n% ".subnetcache" <- snc
   }
-  class(x) <- class(x)[-which(class(x) == "combined_networks")[1]]
+  extra_classes <- class(x)[seq_len(which(class(x) == "combined_networks")[1])]
+  class(x) <- class(x)[-seq_len(which(class(x) == "combined_networks")[1])]
   x <- as.networkLite(x)
-  structure(x, class = c("combined_networks", class(x)))
+  structure(x, class = c(extra_classes, class(x)))
 }
