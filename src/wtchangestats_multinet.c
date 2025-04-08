@@ -38,7 +38,7 @@ WtI_CHANGESTAT_FN(i__wtsubnets){
       lnnodes = *(iinputs++);
     }
 
-    sn->onwp[i] = WtNetworkInitialize(NULL, NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);
+    sn->onwp[i] = WtNetworkInitialize(NULL, NULL, NULL, 0, lnnodes, DIRECTED, lbip);
   }
   
   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, w, {

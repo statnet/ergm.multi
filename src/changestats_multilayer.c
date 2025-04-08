@@ -49,7 +49,7 @@ I_CHANGESTAT_FN(i__layer_net){
     iinputs += ll->nl;
   }else ll->symm = NULL;
 
-  ll->onwp = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);
+  ll->onwp = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip);
   
   /* Set up the layer logic. */
 
@@ -118,7 +118,7 @@ F_CHANGESTAT_FN(f__layer_net){
 /*   li->lid = INPUT_PARAM+2 -1; // The -1 is because Vertex IDs count from 1. */
 /*   li->lmap = INPUT_PARAM+2+N_NODES -1; */
 /*   for(unsigned int l = 1; l <= li->nl; l++){ */
-/*     li->nwp[l] = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL); */
+/*     li->nwp[l] = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip); */
 /*   } */
   
 /*   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, { */

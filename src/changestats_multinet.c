@@ -38,7 +38,7 @@ I_CHANGESTAT_FN(i__subnets){
       lnnodes = *(iinputs++);
     }
 
-    sn->onwp[i] = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip, 0, 0, NULL);
+    sn->onwp[i] = NetworkInitialize(NULL, NULL, 0, lnnodes, DIRECTED, lbip);
   }
   
   EXEC_THROUGH_NET_EDGES_PRE(t, h, e, {
