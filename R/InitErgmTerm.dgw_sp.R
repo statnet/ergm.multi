@@ -8,117 +8,6 @@
 #  Copyright 2003-2024 Statnet Commons
 ################################################################################
 
-#  ------------------------------------------------------------------ 
-#   Description of the input and output parameters of the  
-#   InitErgmTerm.xxx function, where xxx is the name of your term
-#  ------------------------------------------------------------------ 
-#
-#  INPUTS:
-#  Each InitErgmTerm function takes three arguments:
-#	  		nw: The network of interest
-#      arglist: The list of arguments passed to the term xxx
-#         ... : There may be other arguments passed by 
-#               ergm_model, so each InitErgmTerm function 
-#               must include the ... argument
-#  These inputs are automatically supplied by ergm_model.
-#
-#  OUTPUTS:
-#  Each InitErgmTerm function should return a list.  
-#     REQUIRED LIST ITEMS:
-#          name: This names the C changestats function for term xxx, 
-#                but does so by excluding the d_ prefix. The 
-#                changestats function is named d_xxxy and 'name' is
-#                consequently "xxxy". For example, the b1starmix
-#                term has 2 changestats functions based on
-#                whether the homophily argument is set. These are
-#                d_b1starmix and d_b1starmixhomophily. The 'name' 
-#                returned by InitErgmTerm.b1starmix is then one of 
-#                "b1starmix" or "b1starmixhomophily" as appropriate.
-#    coef.names: Vector of names for the coefficients (parameters)
-#                as they will be reported in the output.
-#       pkgname: This names the package containing the C changestats
-#                function d_[name]. The default is "ergm", which means
-#                that if you have code that exists as part of the 
-#                (say) "ergm.userterms" package, you MUST specify 
-#                pkgname="ergm.userterms"
-#
-#    OPTIONAL LIST ITEMS:
-#        inputs: Vector of (double-precision numeric) inputs that the 
-#                changestat function called d_'name' may require.
-#                The default is NULL; no inputs are required.  But it
-#                MUST be a vector!  Thus, if some of the inputs are,  
-#                say, matrices, they must be "flattened" to vectors; if 
-#                some are categorical character-valued variables, they
-#                must be converted to numbers. Optionally, the inputs 
-#                vector may have an attribute named "ParamsBeforeCov",
-#                which is the number of input parameters preceding the 
-#                covariate vector in 'inputs'.  This is necessary for 
-#                compatibility with some of the existing d_xxx changestats 
-#                functions in ergm, but is not necessary in general.
-#    dependence: Logical variable telling whether addition of this term to
-#                the model makes the model into a dyadic dependence model.
-#                If none of the terms sets dependence==TRUE, then the model
-#                is assumed to be a dyadic independence model, which means
-#                that the pseudolikelihood estimate coincides with the
-#                maximum likelihood estimate.  The default value is TRUE.
-#  emptynwstats: Vector of values (if nonzero) for the statistics evaluated
-#                on the empty network.  If all are zero for this term, this
-#                argument may be omitted.  For example, the degree0 term 
-#                would require 'emptynwstats' since degree0 = number of 
-#                nodes for the empty network.
-#        params: For curved exponential family model terms only, a list of 
-#                (numeric) initial values for the parameters of  
-#                curved exponential family model terms. Each item in the  
-#                list should be named with the corresponding parameter name 
-#                (one or more of these will probably coincide with the 
-#                 coef.names).  For example, the gwesp term returns 
-#                params=list(gwesp=NULL,gwesp.decay=decay), where decay
-#                was specified as an argument to the gwesp term. 
-#           map: For curved exponential family model terms only, a function 
-#                giving the map from the canonical parameters, theta,
-#                associated with the statistics for this term, to eta, 
-#                the corresponding curved parameters.  The length of eta 
-#                is the same as the length of the 'params' list above.
-#                The function takes two arguments:  theta and length(eta).
-#      gradient: For curved exponential family model terms only, a function 
-#                giving the gradient of the 'map'. If theta has length p 
-#                and eta has length q, then gradient should return a
-#                p by q matrix. This function takes two arguments:  theta 
-#                and length(eta).
-#
-
-
-#  ------------------------------------------------------------------------- 
-#   Description of the input parameters to the d_xxxy changestats function, 
-#   where xxxy corresponds to the 'name' returned by InitErgmTerm.xxx.
-#  -------------------------------------------------------------------------- 
-#
-#  INPUTS:
-#  Each d_xxxy function takes five arguments:
-#	    ntoggles: the number of toggles as described in 
-#                 "ergm.userterms: A template package"
-#          heads: a pointer to the array of the head nodes of the 
-#                 proposed edges to be toggled
-#          tails: a pointer to the array of the tail nodes of the
-#                 proposed edges to be toggled
-#            mtp: a pointer to the model, which includes the following:
-#                 dstats      : a pointer to the array of changestats,
-#                               macro-ed as CHANGE_STAT
-#                 nstats      : the length of 'dstats', macro-ed as
-#                               N_CHANGE_STATS
-#                 inputparams : a pointer to the vector of input 
-#                               parameters. This is supplied by the
-#                               'inputs' returned by InitErgmTerm.xxx
-#                               and is macro-ed as INPUT_PARAM
-#                 ninputparams: the length of 'inputparams', macro-ed
-#                               as N_INPUT_PARAMS
-#            nwp: a pointer to the network.  This includes several 
-#                 components and several macros exist for accessing
-#                 these. See the changestat.h file for a list of these
-#                 components and their macros. 
-#  These inputs are automatically supplied to the d_xxxy function by the 
-#  network_stats_wrapper function 
-
 .spcache.auxL <- function(type, Ls.path, L.in_order){
   type <- toupper(type)
   base_env(as.formula(as.call(list(as.name('~'), as.call(list(as.name('.spcache.netL'),type=if(type=='ITP')'OTP' else type,Ls.path=Ls.path,L.in_order=L.in_order))))))
@@ -175,9 +64,49 @@
 }
 
 no_layer_err <- function(instead){
-  ergm_Init_abort(paste("No layer specification found. Use", sQuote(instead), "instead."))
+  ergm_Init_abort(paste("No layer specification found. Use", sQuote(paste0(instead, "()")), "instead."))
 }
 
+wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp = TRUE, ...) {
+  # Construct and call the ergm term with only the arguments it
+  # supports.
+  not_ergm <- c("L.base", "Ls.path", "L.in_order")
+  totransfer <- setdiff(names(a)[!attr(a, "missing")[names(a)]], not_ergm)
+  cl <- as.call(c(ergm_name, a[totransfer]))
+  trm <- call.ErgmTerm(cl, nw = nw, cache.sp = cache.sp, ...)
+
+  # If null, return null.
+  if (is.null(trm)) return(NULL)
+
+  # Infer the type and construct layer info.
+  type <- c("UTP", "OTP", "ITP", "RTP", "OSP", "ISP")[trm$iinputs[1] + 1]
+  linfo <- .sp.handle_layers(nw, a, type, has_base, cache.sp)
+
+  if(length(linfo)) nw <- linfo$nw1
+
+  .emptynwstats <-
+    if (d0 && any(a$d == 0)) {
+      if (is.bipartite(nw)) {
+        nb1 <- get.network.attribute(nw, "bipartite")
+        nb2 <- network.size(nw) - nb1
+        replace(numeric(length(a$d)), a$d == 0, choose(nb1, 2) + choose(nb2, 2))
+      } else {
+        replace(numeric(length(a$d)), a$d == 0, network.dyadcount(nw, FALSE))
+      }
+    }
+
+  # Replace the parts that are different for the layered term.
+  if (length(linfo))
+    within(trm, {
+      name <- paste0(name, linfo$name_suffix)
+      pkgname <- "ergm.multi"
+      coef.names <- linfo$coef.namewrap(coef.names)
+      auxiliaries <- linfo$auxiliaries
+      iinputs <- c(linfo$any_order, iinputs)
+      emptynwstats <- .emptynwstats
+    })
+  else no_layer_err(ergm_name)
+}
 
 ################################################################################
 #Term to count ESP statistics, where the shared partners may be any of
@@ -216,36 +145,14 @@ no_layer_err <- function(instead){
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
-InitErgmTerm.despL<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.despL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula","formula,list","logical"),
                       defaultvalues = list(NULL,"OTP",NULL,NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE,FALSE))
-  d<-a$d
-  ld<-length(d)
-  if(ld==0){return(NULL)}
-  
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code for esp; valid types are:",paste(type.vec, collapse=","))
-  dname<-"esp"
-  if(is.directed(nw)){
-    conam <- paste("esp",type,sep=".")
-    typecode<-which(type==type.vec)
-    dname <- "desp"
-  }else{
-    dname <- "desp"
-    conam<-"esp"
-    type<-"UTP"
-    typecode<-0
-  }
 
-  linfo <- .sp.handle_layers(nw, a, type, TRUE, cache.sp)
-  
-  if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste(conam,d,sep="")), auxiliaries=linfo$auxiliaries, iinputs=c(linfo$any_order,typecode,d), minval=0)
-  else no_layer_err("desp()")
+  wrap_ergm_sp_call("esp", nw, a, TRUE, ...)
 }
 
 #' @templateVar name despL
@@ -297,62 +204,14 @@ InitErgmTerm.espL <- InitErgmTerm.despL
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
-InitErgmTerm.dgwespL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
+InitErgmTerm.dgwespL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE,FALSE))
-  if(!is.null(a$alpha)){
-    stop("For consistency with gw*degree terms, in all gw*sp and dgw*sp terms the argument ", sQuote("alpha"), " has been renamed to " ,sQuote("decay"), ".", call.=FALSE)
-  }
-  
-  decay<-a$decay;fixed<-a$fixed
-  cutoff<-a$cutoff
-  decay=decay[1] # Not sure why anyone would enter a vector here, but...
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code for gwesp; valid types are:",paste(type.vec, collapse=","))
-  dname<-"desp"
-  if(!is.directed(nw)){  
-    type <- "UTP"
-    typecode<-0
-    basenam<-paste("gwesp",sep=".")
-  }else{
-    typecode<-which(type==type.vec)
-    basenam<-paste("gwesp",type,sep=".")
-  }
-  
-  linfo <- .sp.handle_layers(nw, a, type, TRUE, cache.sp)
-  
-  if(!fixed){ # This is a curved exponential family model
-    if(!is.null(a$decay)) warning("In term 'dgwesp': decay parameter 'decay' passed with 'fixed=FALSE'. 'decay' will be ignored. To specify an initial value for 'decay', use the 'init' control parameter.", call.=FALSE)
 
-    maxesp <- min(cutoff,network.size(nw)-2)
-    d <- 1:maxesp
-    ld<-length(d)
-    if(ld==0){return(NULL)}
-    params<-list(gwesp=NULL,gwesp.decay=decay)
-    names(params)<-c(basenam,paste(basenam,"decay",sep="."))
-
-    if(length(linfo)) c(list(name=paste0(dname,linfo$name_suffix),
-                             coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("esp.",type,"#",d,sep="") else paste("esp#",d,sep="")),auxiliaries=linfo$auxiliaries,
-                             iinputs=c(linfo$any_order,typecode,d), params=params), GWDECAY)
-    else no_layer_err("dgwesp()")
-  }else{
-    if(is.null(a$decay)) stop("Term 'dgwesp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
-
-    dname<-"dgwesp"
-    maxesp <- min(cutoff,network.size(nw)-2)
-    if(is.directed(nw))
-      coef.names <- paste(paste("gwesp",type,"fixed.",sep="."),decay, sep="")
-    else
-      coef.names <- paste("gwesp.fixed.",decay,sep="")
-
-    if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=decay, iinputs=c(linfo$any_order,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else no_layer_err("dgwesp()")
-  }
+  wrap_ergm_sp_call("gwesp", nw, a, TRUE, ...)
 }
 
 #' @templateVar name dgwespL
@@ -398,49 +257,14 @@ InitErgmTerm.gwespL <- InitErgmTerm.dgwespL
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
-InitErgmTerm.ddspL<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.ddspL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula,list","logical"),
                       defaultvalues = list(NULL,"OTP",NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE))
-  d<-a$d
-  ld<-length(d)
-  if(ld==0){return(NULL)}
-  
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code for sp; valid types are:",paste(type.vec, collapse=","))
-  dname<-"ddsp"
-  if(is.directed(nw)){
-    conam <- paste("dsp",type,sep=".")
-    typecode<-which(type==type.vec)
-    dname <- "ddsp"
-  }else{
-    conam <- paste("dsp",sep=".")
-    type<-"UTP"
-    typecode<-0
-  }
 
-  linfo <- .sp.handle_layers(nw, a, type, FALSE, cache.sp)
-  if(length(linfo)) nw <- linfo$nw1
-  
-  if (any(d==0)) {
-    emptynwstats <- rep(0, length(d))
-    if(is.bipartite(nw)){
-      nb1 <- get.network.attribute(nw, "bipartite")
-      nb2 <- network.size(nw) - nb1
-      emptynwstats[d==0] <- nb1*(nb1-1)/2 + nb2*(nb2-1)/2
-    }else{
-      emptynwstats[d==0] <- network.dyadcount(nw,FALSE)
-    }
-  }else{
-    emptynwstats <- NULL
-  }
-  
-  if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste0(conam,d)), auxiliaries=linfo$auxiliaries, iinputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else no_layer_err("ddsp()")
+  wrap_ergm_sp_call("dsp", nw, a, FALSE, TRUE, ...)
 }
 
 #' @templateVar name ddspL
@@ -480,61 +304,8 @@ InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula,list","logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE))
-  if(!is.null(a$alpha)){
-    stop("For consistency with gw*degree terms, in all gw*sp and dgw*sp terms the argument ", sQuote("alpha"), " has been renamed to " ,sQuote("decay"), ".", call.=FALSE)
-  }
-  
-  decay<-a$decay;fixed<-a$fixed
-  cutoff<-a$cutoff
-  decay=decay[1] # Not sure why anyone would enter a vector here, but...
-  
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code; valid types are:",paste(type.vec, collapse=","))
-  dname<-"ddsp"
-  
-  if(!is.directed(nw)){  
-    type <- "UTP"
-    basenam<-"gwdsp"
-    typecode<-0
-  }else{
-    typecode<-which(type==type.vec)
-    basenam<-paste("gwdsp",type,sep=".")
-  }
 
-  linfo <- .sp.handle_layers(nw, a, type, FALSE, cache.sp)
-  
-  if(!fixed){ # This is a curved exponential family model
-    if(!is.null(a$decay)) warning("In term 'dgwdsp': decay parameter 'decay' passed with 'fixed=FALSE'. 'decay' will be ignored. To specify an initial value for 'decay', use the 'init' control parameter.", call.=FALSE)
-
-    #   d <- 1:(network.size(nw)-1)
-    maxesp <- min(cutoff,network.size(nw)-2)
-    d <- 1:maxesp
-    ld<-length(d)
-    if(ld==0){return(NULL)}
-    
-    params<-list(gwdsp=NULL,gwdsp.decay=decay)
-    names(params)<-c(basenam,paste(basenam,"decay",sep="."))
-    
-    if(length(linfo)) c(list(name=paste0(dname,linfo$name_suffix),
-                             coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("dsp.",type,"#",d,sep="") else paste("dsp#",d,sep="")),
-                             iinputs=c(linfo$any_order,typecode,d), params=params,
-                             auxiliaries = linfo$auxiliaries), GWDECAY)
-    else no_layer_err("dgwdsp()")
-  }else{
-    if(is.null(a$decay)) stop("Term 'dgwdsp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
-
-    dname<-"dgwdsp"
-    maxesp <- min(cutoff,network.size(nw)-2)
-    if (is.directed(nw)) 
-      coef.names <- paste("gwdsp",type,"fixed",decay,sep=".")
-    else
-      coef.names <- paste("gwdsp.fixed",decay,sep=".")
-    
-    if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=decay, iinputs=c(linfo$any_order,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else no_layer_err("dgwdspL()")
-  }
+  wrap_ergm_sp_call("gwdsp", nw, a, FALSE, ...)
 }
 
 #' @templateVar name dgwdspL
@@ -582,47 +353,14 @@ InitErgmTerm.gwdspL <- InitErgmTerm.dgwdspL
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
-InitErgmTerm.dnspL<-function(nw, arglist, cache.sp=TRUE, ...) {
+InitErgmTerm.dnspL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","character","formula","formula,list","logical"),
                       defaultvalues = list(NULL,"OTP",NULL,NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE,FALSE))
-  d<-a$d
-  ld<-length(d)
-  if(ld==0){return(NULL)}
-  
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code for sp; valid types are:",paste(type.vec, collapse=","))
-  dname<-"dnsp"
-  if(is.directed(nw)){
-    conam <- paste("nsp",type,sep=".")
-    typecode<-which(type==type.vec)
-  }else{
-    conam<-"nsp"
-    type<-"UTP"
-    typecode<-0
-  }
 
-  linfo <- .sp.handle_layers(nw, a, type, TRUE, cache.sp)
-  if(length(linfo)) nw <- linfo$nw1
-
-  if (any(d==0)) {
-    emptynwstats <- rep(0, length(d))
-    if(is.bipartite(nw)){
-      nb1 <- get.network.attribute(nw, "bipartite")
-      nb2 <- network.size(nw) - nb1
-      emptynwstats[d==0] <- nb1*(nb1-1)/2 + nb2*(nb2-1)/2
-    }else{
-      emptynwstats[d==0] <- network.dyadcount(nw,FALSE)
-    }
-  }else{
-    emptynwstats <- NULL
-  }
-  if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(paste0(conam,d)), auxiliaries=linfo$auxiliaries, iinputs=c(linfo$any_order,typecode,d), minval=0, emptynwstats=emptynwstats)
-  else no_layer_err("dnspL()")
+  wrap_ergm_sp_call("nsp", nw, a, TRUE, TRUE, ...)
 }
 
 #' @templateVar name dnspL
@@ -657,67 +395,14 @@ InitErgmTerm.nspL <- InitErgmTerm.dnspL
 #' @concept directed
 #' @concept undirected
 #' @concept layer-aware
-InitErgmTerm.dgwnspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
+InitErgmTerm.dgwnspL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
                       vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE,FALSE))
-  if(!is.null(a$alpha)){
-    stop("For consistency with gw*degree terms, in all gw*sp and dgw*sp terms the argument ", sQuote("alpha"), " has been renamed to " ,sQuote("decay"), ".", call.=FALSE)
-  }
-  
-  decay<-a$decay;fixed<-a$fixed
-  cutoff<-a$cutoff
-  decay=decay[1] # Not sure why anyone would enter a vector here, but...
-  
-  type<-toupper(a$type[1])
-  type.vec<-c("OTP","ITP","RTP","OSP","ISP")
-  if(!(type%in%type.vec))
-    stop("Illegal type code; valid types are:",paste(type.vec, collapse=","))
-  dname<-"dnsp"
-  
-  if(!is.directed(nw)){  
-    type <- "UTP"
-    basenam<-"gwdsp"
-    typecode<-0
-  }else{
-    typecode<-which(type==type.vec)
-    basenam<-paste("gwnsp",type,sep=".")
-  }
-  
-  linfo <- .sp.handle_layers(nw, a, type, TRUE, cache.sp)
 
-  if(!fixed){ # This is a curved exponential family model
-    if(!is.null(a$decay)) warning("In term 'dgwnsp': decay parameter 'decay' passed with 'fixed=FALSE'. 'decay' will be ignored. To specify an initial value for 'decay', use the 'init' control parameter.", call.=FALSE)
-
-    #   d <- 1:(network.size(nw)-1)
-    maxesp <- min(cutoff,network.size(nw)-2)
-    d <- 1:maxesp
-    ld<-length(d)
-    if(ld==0){return(NULL)}
-    
-    params<-list(gwnsp=NULL,gwnsp.decay=decay)
-    names(params)<-c(basenam,paste(basenam,"decay",sep="."))
-    
-    if(length(linfo)) c(list(name=paste0(dname,linfo$name_suffix),
-                             coef.names=linfo$coef.namewrap(if(is.directed(nw)) paste("nsp.",type,"#",d,sep="") else paste("nsp#",d,sep="")),
-                             iinputs=c(linfo$any_order,typecode,d), params=params,
-                             auxiliaries = linfo$auxiliaries), GWDECAY)
-    else no_layer_err("dgwnsp()")
-  }else{
-    if(is.null(a$decay)) stop("Term 'dgwnsp' with 'fixed=TRUE' requires a decay parameter 'decay'.", call.=FALSE)
-
-    dname<-"dgwnsp"
-    maxesp <- min(cutoff,network.size(nw)-2)
-    if (is.directed(nw)) 
-      coef.names <- paste("gwnsp",type,"fixed",decay,sep=".")
-    else
-      coef.names <- paste("gwnsp.fixed",decay,sep=".")
-    
-    if(length(linfo)) list(name=paste0(dname,linfo$name_suffix), coef.names=linfo$coef.namewrap(coef.names), inputs=decay, iinputs=c(linfo$any_order,typecode,maxesp), auxiliaries=linfo$auxiliaries)
-    else no_layer_err("dgwnspL()")
-  }
+  wrap_ergm_sp_call("gwnsp", nw, a, TRUE, ...)
 }
 
 #' @templateVar name dgwnspL
