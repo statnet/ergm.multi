@@ -10,6 +10,8 @@
 #include "changestats_dgw_sp_ML.h"
 #include "changestats.h"
 
+#define L2RTPERR error("RTP type is not supported by layered triadic terms at this time.")
+
 #define all_calcs(term)                         \
   dvec_calc(term ## _ML)                               \
        dist_calc(term ## _ML)                          \
@@ -51,6 +53,7 @@
         }                                                               \
       });                                                               \
   }
+
 
 #define spd_args tail,head,mtp,nwp,spcache,ll0,ll1,ll2,ll3,any_order,N_CHANGE_STATS,CHANGE_STAT
 
@@ -143,17 +146,17 @@ C_CHANGESTAT_FN(c_ddsp_ML) {
   StoreLayerLogic *ll3 = NULL;
   StoreStrictDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  unsigned int type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   Vertex *dvec=(Vertex *) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
 
-  /*Obtain the DSP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP: dspUTP_ML_calc(sp_args); break;
-  case ESPOTP: dspOTP_ML_calc(sp_args); break;
-  case ESPITP: dspITP_ML_calc(sp_args); break;
-  /* case ESPRTP: dspRTP_ML_calc(sp_args); break; */
-  case ESPOSP: dspOSP_ML_calc(sp_args); break;
-  case ESPISP: dspISP_ML_calc(sp_args); break;
+  case L2UTP: dspUTP_ML_calc(sp_args); break;
+  case L2OTP: dspOTP_ML_calc(sp_args); break;
+  case L2ITP: dspITP_ML_calc(sp_args); break;
+  case L2RTP: L2RTPERR; break;
+  case L2OSP: dspOSP_ML_calc(sp_args); break;
+  case L2ISP: dspISP_ML_calc(sp_args); break;
   }
   /*We're done!  (Changestats were written in by the calc routine.)*/  
 }
@@ -167,16 +170,16 @@ C_CHANGESTAT_FN(c_ddspdist_ML) {
   StoreLayerLogic *ll3 = NULL;
   StoreStrictDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  unsigned int type=IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
 
-  /*Obtain the DSP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP: dspUTP_ML_dist_calc(spd_args); break;
-  case ESPOTP: dspOTP_ML_dist_calc(spd_args); break;
-  case ESPITP: dspITP_ML_dist_calc(spd_args); break;
-  /* case ESPRTP: dspRTP_ML_dist_calc(spd_args); break; */
-  case ESPOSP: dspOSP_ML_dist_calc(spd_args); break;
-  case ESPISP: dspISP_ML_dist_calc(spd_args); break;
+  case L2UTP: dspUTP_ML_dist_calc(spd_args); break;
+  case L2OTP: dspOTP_ML_dist_calc(spd_args); break;
+  case L2ITP: dspITP_ML_dist_calc(spd_args); break;
+  case L2RTP: L2RTPERR; break;
+  case L2OSP: dspOSP_ML_dist_calc(spd_args); break;
+  case L2ISP: dspISP_ML_dist_calc(spd_args); break;
   }
   /*We're done!  (Changestats were written in by the calc routine.)*/
 }
@@ -187,7 +190,7 @@ C_CHANGESTAT_FN(c_ddspdist_ML) {
 *****************/
 
 /*
-  Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; the specific type of ESP to be employed is determined by the type argument (INPUT_PARAM[1]).  Type codes are as follows (where (i,j) is the focal edge):
+  Note that d_gwesp is a meta-function for all geometrically weighted DSP stats; the specific type of DSP to be employed is determined by the type argument (INPUT_PARAM[1]).  Type codes are as follows (where (i,j) is the focal edge):
 
   OTP (0) - Outgoing two-path (i->k->j)
   ITP (1) - Incoming two-path (i<-k<-j)
@@ -207,17 +210,17 @@ C_CHANGESTAT_FN(c_dgwdsp_ML) {
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   double alpha = INPUT_PARAM[0];       /*Get alpha*/
   double loneexpa = log1mexp(alpha);    /*Precompute log(1-exp(-alpha))*/
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   double cumchange = 0;
 
   /*Obtain the DSP changescores (by type)*/
   switch(type){
-    case ESPUTP: cumchange = dspUTP_ML_gw_calc(gwsp_args); break;
-    case ESPOTP: cumchange = dspOTP_ML_gw_calc(gwsp_args); break;
-    case ESPITP: cumchange = dspITP_ML_gw_calc(gwsp_args); break;
-    /* case ESPRTP: dspRTP_ML_gw_calc(gwsp_args); break; */
-    case ESPOSP: cumchange = dspOSP_ML_gw_calc(gwsp_args); break;
-    case ESPISP: cumchange = dspISP_ML_gw_calc(gwsp_args); break;
+    case L2UTP: cumchange = dspUTP_ML_gw_calc(gwsp_args); break;
+    case L2OTP: cumchange = dspOTP_ML_gw_calc(gwsp_args); break;
+    case L2ITP: cumchange = dspITP_ML_gw_calc(gwsp_args); break;
+    case L2RTP: L2RTPERR; break;
+    case L2OSP: cumchange = dspOSP_ML_gw_calc(gwsp_args); break;
+    case L2ISP: cumchange = dspISP_ML_gw_calc(gwsp_args); break;
   }
 
   CHANGE_STAT[0] = exp(alpha) * cumchange;
@@ -259,17 +262,17 @@ C_CHANGESTAT_FN(c_desp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   Vertex *dvec = (Vertex*) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
 
-  /*Obtain the ESP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-    case ESPUTP: espUTP_ML_calc(sp_args); break;
-    case ESPOTP: espOTP_ML_calc(sp_args); break;
-    case ESPITP: espITP_ML_calc(sp_args); break;
-    /* case ESPRTP: espRTP_ML_calc(sp_args); break; */
-    case ESPOSP: espOSP_ML_calc(sp_args); break;
-    case ESPISP: espISP_ML_calc(sp_args); break;
+    case L2UTP: espUTP_ML_calc(sp_args); break;
+    case L2OTP: espOTP_ML_calc(sp_args); break;
+    case L2ITP: espITP_ML_calc(sp_args); break;
+    case L2RTP: L2RTPERR; break;
+    case L2OSP: espOSP_ML_calc(sp_args); break;
+    case L2ISP: espISP_ML_calc(sp_args); break;
   }
   /*We're done!  (Changestats were written in by the calc routine.)*/
 }
@@ -283,16 +286,16 @@ C_CHANGESTAT_FN(c_despdist_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
 
-  /*Obtain the ESP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP: espUTP_ML_dist_calc(spd_args); break;
-  case ESPOTP: espOTP_ML_dist_calc(spd_args); break;
-  case ESPITP: espITP_ML_dist_calc(spd_args); break;
-  /* case ESPRTP: espRTP_ML_dist_calc(spd_args); break; */
-  case ESPOSP: espOSP_ML_dist_calc(spd_args); break;
-  case ESPISP: espISP_ML_dist_calc(spd_args); break;
+  case L2UTP: espUTP_ML_dist_calc(spd_args); break;
+  case L2OTP: espOTP_ML_dist_calc(spd_args); break;
+  case L2ITP: espITP_ML_dist_calc(spd_args); break;
+  case L2RTP: L2RTPERR; break;
+  case L2OSP: espOSP_ML_dist_calc(spd_args); break;
+  case L2ISP: espISP_ML_dist_calc(spd_args); break;
   }
   /*We're done!  (Changestats were written in by the calc routine.)*/
 }
@@ -323,17 +326,17 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   double alpha = INPUT_PARAM[0];       /*Get alpha*/
   double loneexpa = log1mexp(alpha);    /*Precompute (1-exp(-alpha))*/
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   double cumchange = 0;
 
-  /*Obtain the ESP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-    case ESPUTP: cumchange = espUTP_ML_gw_calc(gwsp_args); break;
-    case ESPOTP: cumchange = espOTP_ML_gw_calc(gwsp_args); break;
-    case ESPITP: cumchange = espITP_ML_gw_calc(gwsp_args); break;
-    /* case ESPRTP: cumchange = espRTP_ML_gw_calc(gwsp_args); break; */
-    case ESPOSP: cumchange = espOSP_ML_gw_calc(gwsp_args); break;
-    case ESPISP: cumchange = espISP_ML_gw_calc(gwsp_args); break;
+    case L2UTP: cumchange = espUTP_ML_gw_calc(gwsp_args); break;
+    case L2OTP: cumchange = espOTP_ML_gw_calc(gwsp_args); break;
+    case L2ITP: cumchange = espITP_ML_gw_calc(gwsp_args); break;
+    case L2RTP: L2RTPERR; break;
+    case L2OSP: cumchange = espOSP_ML_gw_calc(gwsp_args); break;
+    case L2ISP: cumchange = espISP_ML_gw_calc(gwsp_args); break;
   }
 
   CHANGE_STAT[0] = exp(alpha) * cumchange;
@@ -368,37 +371,33 @@ C_CHANGESTAT_FN(c_dnsp_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   Vertex *dvec = (Vertex*) IINPUT_PARAM+2;           /*Get the pointer to the ESP stats list*/
 
-  /*Obtain the DSP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP: 
+  case L2UTP:
     espUTP_ML_calc(sp_args);
     NEGATE_CHANGE_STATS;
     dspUTP_ML_calc(sp_args);
     break;
-  case ESPOTP: 
+  case L2OTP:
     espOTP_ML_calc(sp_args);
     NEGATE_CHANGE_STATS;
     dspOTP_ML_calc(sp_args);
     break;
-  case ESPITP: 
+  case L2ITP:
     espITP_ML_calc(sp_args);
     NEGATE_CHANGE_STATS;
     dspITP_ML_calc(sp_args);
     break;
-  /* case ESPRTP:  */
-  /*   espRTP_ML_calc(sp_args); */
-  /*   NEGATE_CHANGE_STATS; */
-  /*   dspRTP_ML_calc(sp_args); */
-  /*   break; */
-  case ESPOSP: 
+  case L2RTP: L2RTPERR; break;
+  case L2OSP:
     espOSP_ML_calc(sp_args);
     NEGATE_CHANGE_STATS;
     dspOSP_ML_calc(sp_args);
     break;
-  case ESPISP: 
+  case L2ISP:
     espISP_ML_calc(sp_args);
     NEGATE_CHANGE_STATS;
     dspISP_ML_calc(sp_args);
@@ -416,36 +415,32 @@ C_CHANGESTAT_FN(c_dnspdist_ML) {
   GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
 
-  /*Obtain the DSP changescores (by type)*/
+  /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP:
+  case L2UTP:
     espUTP_ML_dist_calc(spd_args);
     NEGATE_CHANGE_STATS;
     dspUTP_ML_dist_calc(spd_args);
     break;
-  case ESPOTP:
+  case L2OTP:
     espOTP_ML_dist_calc(spd_args);
     NEGATE_CHANGE_STATS;
     dspOTP_ML_dist_calc(spd_args);
     break;
-  case ESPITP:
+  case L2ITP:
     espITP_ML_dist_calc(spd_args);
     NEGATE_CHANGE_STATS;
     dspITP_ML_dist_calc(spd_args);
     break;
-  /* case ESPRTP:  */
-  /*   espRTP_ML_dist_calc(spd_args); */
-  /*   NEGATE_CHANGE_STATS; */
-  /*   dspRTP_ML_dist_calc(spd_args); */
-  /*   break; */
-  case ESPOSP:
+  case L2RTP: L2RTPERR; break;
+  case L2OSP:
     espOSP_ML_dist_calc(spd_args);
     NEGATE_CHANGE_STATS;
     dspOSP_ML_dist_calc(spd_args);
     break;
-  case ESPISP:
+  case L2ISP:
     espISP_ML_dist_calc(spd_args);
     NEGATE_CHANGE_STATS;
     dspISP_ML_dist_calc(spd_args);
@@ -460,7 +455,7 @@ C_CHANGESTAT_FN(c_dnspdist_ML) {
 *****************/
 
 /*
-  Note that d_gwesp is a meta-function for all geometrically weighted ESP stats; the specific type of ESP to be employed is determined by the type argument (INPUT_PARAM[1]).  Type codes are as follows (where (i,j) is the focal edge):
+  Note that d_gwesp is a meta-function for all geometrically weighted NSP stats; the specific type of NSP to be employed is determined by the type argument (INPUT_PARAM[1]).  Type codes are as follows (where (i,j) is the focal edge):
 
   OTP (0) - Outgoing two-path (i->k->j)
   ITP (1) - Incoming two-path (i<-k<-j)
@@ -479,30 +474,58 @@ C_CHANGESTAT_FN(c_dgwnsp_ML) {
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   double alpha = INPUT_PARAM[0];       /*Get alpha*/
   double loneexpa = log1mexp(alpha);    /*Precompute (1-exp(-alpha))*/
-  int type = IINPUT_PARAM[1];     /*Get the ESP type code to be used*/
+  L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
   double cumchange = 0;
 
   /*Obtain the changescores (by type)*/
   switch(type){
-  case ESPUTP:
+  case L2UTP:
     cumchange = dspUTP_ML_gw_calc(gwsp_args) - espUTP_ML_gw_calc(gwsp_args);
     break;
-  case ESPOTP:
+  case L2OTP:
     cumchange = dspOTP_ML_gw_calc(gwsp_args) - espOTP_ML_gw_calc(gwsp_args);
     break;
-  case ESPITP:
+  case L2ITP:
     cumchange = dspITP_ML_gw_calc(gwsp_args) - espITP_ML_gw_calc(gwsp_args);
     break;
-  /* case ESPRTP: */
-  /*   cumchange = dspRTP_ML_gw_calc(gwsp_args) - espRTP_ML_gw_calc(gwsp_args); */
-  /*   break; */
-  case ESPOSP:
+  case L2RTP: L2RTPERR; break;
+  case L2OSP:
     cumchange = dspOSP_ML_gw_calc(gwsp_args) - espOSP_ML_gw_calc(gwsp_args);
     break;
-  case ESPISP:
+  case L2ISP:
     cumchange = dspISP_ML_gw_calc(gwsp_args) - espISP_ML_gw_calc(gwsp_args);
     break;
   }
 
   CHANGE_STAT[0] = exp(alpha) * cumchange;
+}
+
+
+/*****************
+ changestat: c_ddspbwrap
+*****************/
+C_CHANGESTAT_FN(c_ddspbwrap_ML) {
+  c_ddsp_ML(tail, head, mtp, nwp, edgestate);
+
+  // correct for double counting of directed vs. undirected dyads
+  for(int ind = 0; ind < N_CHANGE_STATS; ind++) CHANGE_STAT[ind] /= 2.0;
+}
+
+
+C_CHANGESTAT_FN(c_ddspdistbwrap_ML) {
+  c_ddspdist_ML(tail, head, mtp, nwp, edgestate);
+
+  // correct for double counting of directed vs. undirected dyads
+  for(int ind = 0; ind < N_CHANGE_STATS; ind++) CHANGE_STAT[ind] /= 2.0;
+}
+
+
+/*****************
+ changestat: c_dgwdspbwrap
+*****************/
+C_CHANGESTAT_FN(c_dgwdspbwrap_ML) {
+  c_dgwdsp_ML(tail, head, mtp, nwp, edgestate);
+
+  // correct for double counting of directed vs. undirected dyads
+  CHANGE_STAT[0] /= 2.0;
 }

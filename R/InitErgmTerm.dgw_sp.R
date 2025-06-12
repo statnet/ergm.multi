@@ -86,13 +86,15 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
 
   .emptynwstats <-
     if (d0 && any(a$d == 0)) {
-      if (is.bipartite(nw)) {
-        nb1 <- b1.size(nw)
-        nb2 <- network.size(nw) - nb1
-        replace(numeric(length(a$d)), a$d == 0, choose(nb1, 2) + choose(nb2, 2))
-      } else {
-        replace(numeric(length(a$d)), a$d == 0, network.dyadcount(nw, FALSE))
-      }
+      n <-
+        if (is.bipartite(nw))
+          switch(type,
+                 UTP = network.size(nw),
+                 OSP = b1.size(nw),
+                 ISP = b2.size(nw))
+        else network.size(nw)
+      replace(dbl_along(a$d), a$d == 0,
+              choose(n, 2L) * (is.directed(nw) + 1L))
     }
 
   # Replace the parts that are different for the layered term.
@@ -107,6 +109,7 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
     })
   else no_layer_err(ergm_name)
 }
+
 
 ################################################################################
 #Term to count ESP statistics, where the shared partners may be any of
@@ -413,3 +416,135 @@ InitErgmTerm.dgwnspL<-function(nw, arglist, gw.cutoff=30, ...) {
 #' # binary: gwnspL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
 #' #                Ls.path=NULL, L.in_order=FALSE)
 InitErgmTerm.gwnspL <- InitErgmTerm.dgwnspL
+
+
+################################################################################
+
+#' @templateVar name b1dspL
+#' @title Dyadwise shared partners for dyads in the first bipartition on layers
+#' @description This term adds one
+#'   network statistic to the model for each element in `d`; the \eqn{i}th
+#'   such statistic equals the number of dyads in the first bipartition with exactly
+#'   `d[i]` shared partners. (Those shared partners, of course, must be members
+#'   of the second bipartition.) This term can only be used with bipartite networks.
+#'
+#' @usage
+#' # binary: b1dsp(d, Ls.path=NULL)
+#'
+#' @param d a vector of distinct integers.
+#' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-cache-sp
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept layer-aware
+InitErgmTerm.b1dspL <- function(nw, arglist, cache.sp=TRUE, ...){
+  a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
+                      varnames = c("d", "Ls.path"),
+                      vartypes = c("numeric", "formula,list"),
+                      defaultvalues = list(NULL, NULL),
+                      required = c(TRUE, FALSE))
+
+  wrap_ergm_sp_call("b1dsp", nw, a, FALSE, TRUE, ...)
+}
+
+################################################################################
+
+#' @templateVar name gwb1dsp
+#' @title Geometrically weighted dyadwise shared partner distribution for dyads in the first bipartition on layers
+#' @description This term adds one network statistic to the model equal to the geometrically
+#'   weighted dyadwise shared partner distribution for dyads in the first bipartition with decay parameter
+#'   `decay` parameter, which should be non-negative. This term can only be used with bipartite networks.
+#'
+#' @usage
+#' # binary: gwb1dsp(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
+#'
+#' @templateVar multiplicand shared partner counts
+#' @template ergmTerm-gw-decay-fixed
+#' @templateVar underlying b1dsp
+#' @template ergmTerm-gw-cutoff
+#' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-cache-sp
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept curved
+#' @concept layer-aware
+InitErgmTerm.gwb1dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
+  a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
+                      varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
+                      vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
+                      defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
+                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+
+  wrap_ergm_sp_call("gwb1dsp", nw, a, FALSE, ...)
+}
+
+################################################################################
+
+#' @templateVar name b2dspL
+#' @title Dyadwise shared partners for dyads in the second bipartition on layers
+#' @description This term adds one network statistic to the model for each element in `d` ; the \eqn{i} th
+#'   such statistic equals the number of dyads in the second bipartition with exactly
+#'   `d[i]` shared partners. (Those shared partners, of course, must be members
+#'   of the first bipartition.) This term can only be used with bipartite networks.
+#'
+#' @usage
+#' # binary: b2dsp(d, Ls.path=NULL)
+#'
+#' @param d a vector of distinct integers
+#' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-cache-sp
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept layer-aware
+InitErgmTerm.b2dspL <- function(nw, arglist, cache.sp=TRUE, ...){
+  a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
+                      varnames = c("d", "Ls.path"),
+                      vartypes = c("numeric", "formula,list"),
+                      defaultvalues = list(NULL, NULL),
+                      required = c(TRUE, FALSE))
+
+  wrap_ergm_sp_call("b2dsp", nw, a, FALSE, TRUE, ...)
+}
+
+################################################################################
+
+#' @templateVar name gwb2dspL
+#' @title Geometrically weighted dyadwise shared partner distribution for dyads in the second bipartition on layers
+#' @description This term adds one network statistic to the model equal to the geometrically
+#'   weighted dyadwise shared partner distribution for dyads in the second bipartition with decay parameter
+#'   `decay` parameter, which should be non-negative. This term can only be used with bipartite networks.
+#'
+#' @usage
+#' # binary: gwb2dsp(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
+#'
+#' @templateVar multiplicand shared partner counts
+#' @template ergmTerm-gw-decay-fixed
+#' @templateVar underlying b2dsp
+#' @template ergmTerm-gw-cutoff
+#' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-cache-sp
+#' @template ergmTerm-general
+#'
+#' @concept bipartite
+#' @concept undirected
+#' @concept curved
+#' @concept layer-aware
+InitErgmTerm.gwb2dsp<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
+  a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
+                      varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
+                      vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
+                      defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
+                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+
+  wrap_ergm_sp_call("gwb2dsp", nw, a, FALSE, ...)
+}
