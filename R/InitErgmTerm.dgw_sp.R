@@ -87,7 +87,7 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
   .emptynwstats <-
     if (d0 && any(a$d == 0)) {
       if (is.bipartite(nw)) {
-        nb1 <- get.network.attribute(nw, "bipartite")
+        nb1 <- b1.size(nw)
         nb2 <- network.size(nw) - nb1
         replace(numeric(length(a$d)), a$d == 0, choose(nb1, 2) + choose(nb2, 2))
       } else {

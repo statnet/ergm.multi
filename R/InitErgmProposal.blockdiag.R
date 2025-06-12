@@ -109,7 +109,7 @@
 #' @keywords internal
 #' @export
 ergm_block_diag_samp_info <- function(nw, a){
-  bip <- nw %n% "bipartite"
+  bip <- b1.size(nw)
   if(bip){
     ea <- a[seq_len(bip)]
     aa <- a[bip+seq_len(network.size(nw)-bip)]
@@ -135,7 +135,9 @@ ergm_block_diag_samp_info <- function(nw, a){
     w <- cumsum(a$lengths*(a$lengths-1)) # cumulative block weights ~ # dyads in the block
     w <- w/max(w)
     # Note that this automagically takes care of singleton blocks by giving them weight 0.
-    out <- list(nblk=as.integer(length(w)),  pos=as.integer(b), cumwt=as.double(w), ndyads=sum(as.double(a$lengths*(a$lengths-1)/(if(is.directed(nw)) 1 else 2))))
+    out <- list(nblk = as.integer(length(w)),  pos = as.integer(b),
+                cumwt = as.double(w),
+                ndyads = sum(choose(a$lengths, 2L) * (1L + is.directed(nw))))
   }
   structure(out, class="ergm_block_diag_samp_info")
 }

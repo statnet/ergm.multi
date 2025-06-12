@@ -163,7 +163,7 @@ InitErgmTerm.b1degreeL <- function(nw, arglist, ...) {
                        defaultvalues = list(NULL, NULL, NULL, NULL),
                        required = c(TRUE, FALSE, FALSE, FALSE))
   ### Process the arguments
-  nb1 <- get.network.attribute(nw, "bipartite")
+  nb1 <- b1.size(nw)
   if (!is.null(a$by)) {  # CASE 1:  a$by GIVEN
     nodecov <- get.node.attr(nw, a$by)[seq_len(nb1)]
     u <- NVL(a$levels, sort(unique(nodecov)))
@@ -236,7 +236,7 @@ InitErgmTerm.b2degreeL <- function(nw, arglist, ...) {
                        defaultvalues = list(NULL, NULL, NULL, NULL),
                        required = c(TRUE, FALSE, FALSE, FALSE))
   ### Process the arguments
-  nb1 <- get.network.attribute(nw, "bipartite")
+  nb1 <- b1.size(nw)
   n <- network.size(nw)
   if (!is.null(a$by)) {  # CASE 1:  a$by GIVEN
     nodecov <- get.node.attr(nw, a$by)[-seq_len(nb1)]
@@ -332,7 +332,7 @@ InitErgmTerm.degreeL<-function(nw, arglist, ...) {
     }
   } else {
     if (any(d==0)) {
-      emptynwstats <- rep(0, length(d))
+      emptynwstats <- dbl_along(d)
       emptynwstats[d==0] <- network.size(nw)
     }
   }
@@ -409,7 +409,7 @@ InitErgmTerm.gwb1degreeL<-function(nw, arglist, gw.cutoff=30, ...) {
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; fixed<-a$fixed; attrname<-a$attrname
   cutoff<-a$cutoff
-  nb1 <- get.network.attribute(nw,"bipartite")
+  nb1 <- b1.size(nw)
 # d <- 1:(network.size(nw) - nb1)
   maxesp <- min(cutoff, network.size(nw)-nb1)
 
@@ -502,7 +502,7 @@ InitErgmTerm.gwb2degreeL<-function(nw, arglist, gw.cutoff=30,  ...) {
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
   decay<-a$decay; fixed<-a$fixed; attrname<-a$attrname
   cutoff<-a$cutoff
-  nb1 <- get.network.attribute(nw,"bipartite")
+  nb1 <- b1.size(nw)
 # d <- 1:nb1
   maxesp <- min(cutoff,nb1)
   d <- 1:maxesp
@@ -845,7 +845,7 @@ InitErgmTerm.idegreeL<-function(nw, arglist, ...) {
     }
   } else {
     if (any(d==0)) {
-      emptynwstats <- rep(0, length(d))
+      emptynwstats <- dbl_along(d)
       emptynwstats[d==0] <- network.size(nw)
     }
   }
@@ -1057,7 +1057,7 @@ InitErgmTerm.odegreeL<-function(nw, arglist, ...) {
     }
   } else {
     if (any(d==0)) {
-      emptynwstats <- rep(0, length(d))
+      emptynwstats <- dbl_along(d)
       emptynwstats[d==0] <- network.size(nw)
     }
   }

@@ -217,7 +217,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
                upper = cbind(pmin(el[,1],el[,2]),pmax(el[,1],el[,2])),
                lower = cbind(pmax(el[,1],el[,2]),pmin(el[,1],el[,2])))
   
-  o <- network.initialize(network.size(x), directed=TRUE, bipartite=x%n%"bipartite", loops=has.loops(x), hyper=is.hyper(x), multiple=is.multiplex(x))
+  o <- network.initialize(network.size(x), directed = TRUE,
+                          bipartite = b1.size(x), loops = has.loops(x),
+                          hyper = is.hyper(x), multiple = is.multiplex(x))
   o <- network.edgelist(el, o)
   nvattr.copy.network(o, x)
 }
@@ -482,7 +484,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   }
 
   # nwl may now be a list with networks of heterogeneous bipartitedness.
-  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0L)
+  bip <- sapply(nwl, b1.size) %>% sapply(NVL, 0L)
   blockout <- if(all_identical(bip)) rep(FALSE, length(nwl)) else bip
 
   nwl <- Map(function(nw, b){
