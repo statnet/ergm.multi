@@ -58,8 +58,8 @@
 ##          n <- network.size(lhs.nw)
 ##          storage.mode(n) <- "integer"
 ##          a <- c(ergm_get_vattr(attr, lhs.nw)) # Strip attributes, which confuse rle().
-##          if(NVL(lhs.nw%n%"bipartite",0)){
-##            bip <- lhs.nw %n% "bipartite"
+##          if(NVL(lhs.b1.size(nw),0)){
+##            bip <- lhs.b1.size(nw)
 ##            ea <- a[seq_len(bip)]
 ##            aa <- a[bip+seq_len(n-bip)]
 ##            if(length(rle(ea)$lengths)!=length(unique(rle(ea)$values)) || length(rle(aa)$lengths)!=length(unique(rle(aa)$values))) stop("Current implementation of block-diagonal sampling requires that the blocks of the egos and the alters be contiguous. See ", sQuote("ergmConstraint?blockdiag"), " for more information.")

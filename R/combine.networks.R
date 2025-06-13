@@ -234,7 +234,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   attrset <- if(keep.unshared.attr) union else intersect
 
   ns <- sapply(nwl, network.size)
-  es <- sapply(nwl, "%n%", "bipartite")
+  es <- sapply(nwl, b1.size)
   eblks <- c(0, cumsum(es))
   bip <- eblks[length(eblks)]
   ablks <- cumsum(c(bip, ns-es))
@@ -537,7 +537,7 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
 .block_vertexmap <- function(nw, by=nw %n% ".blockID.vattr", same_dim=FALSE){
   a <- .peek_vattrv(nw, by)
   n <- length(a)
-  bip <- nw %n% "bipartite"
+  bip <- b1.size(nw)
   if(NVL(bip,0)){
     ea <- a[seq_len(bip)]
     aa <- a[bip+seq_len(n-bip)]

@@ -19,10 +19,11 @@ InitErgmTerm..spcache.netL<-function(nw, arglist, ...){
 
   type <- match.arg(tolower(a$type), c("otp","osp","isp","utp")) # ITP not included, because it's just OTP with direction reversed.
 
-  if(is.directed(nw)==(type=="utp")) stop("Type UTP may only be used with undirected networks, the others only with directed.")
+  if (is.directed(nw) == (type == "utp")
+      && !(is.bipartite(nw) && type %in% c("osp", "isp")))
+    stop("Type UTP may only be used with undirected networks, OSP and ISP with bipartite or directed, and the rest only with directed.")
 
   dname <- paste0("_",type,"_wtnet")
-  
   linfo <- .sp.handle_layers(nw, a, type, FALSE)
 
   

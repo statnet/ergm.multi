@@ -217,7 +217,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
                upper = cbind(pmin(el[,1],el[,2]),pmax(el[,1],el[,2])),
                lower = cbind(pmax(el[,1],el[,2]),pmin(el[,1],el[,2])))
   
-  o <- network.initialize(network.size(x), directed=TRUE, bipartite=x%n%"bipartite", loops=has.loops(x), hyper=is.hyper(x), multiple=is.multiplex(x))
+  o <- network.initialize(network.size(x), directed = TRUE,
+                          bipartite = b1.size(x), loops = has.loops(x),
+                          hyper = is.hyper(x), multiple = is.multiplex(x))
   o <- network.edgelist(el, o)
   nvattr.copy.network(o, x)
 }
@@ -482,7 +484,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   }
 
   # nwl may now be a list with networks of heterogeneous bipartitedness.
-  bip <- sapply(nwl, `%n%`, "bipartite") %>% sapply(NVL, 0L)
+  bip <- sapply(nwl, b1.size) %>% sapply(NVL, 0L)
   blockout <- if(all_identical(bip)) rep(FALSE, length(nwl)) else bip
 
   nwl <- Map(function(nw, b){
@@ -1032,4 +1034,121 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
 
   iinputs <- c(typeID, a$distinct)
   list(name="twostarL", coef.names=coef.names, iinputs=iinputs, auxiliaries=auxiliaries, minval=0, dependence=TRUE)
+}
+
+################################################################################
+
+#' @templateVar name mutualL
+#' @title Mutuality
+#' @description In binary ERGMs, equal to the number of
+#'   pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
+#'   and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
+#'
+#' @details This term can only be used with directed networks.
+#'
+#' @usage
+#' # binary: mutualL(same=NULL, diff=FALSE, by=NULL, keep=NULL, Ls=NULL)
+#' @param same optional argument. If passed the name of a vertex attribute,
+#'   only mutual pairs that match on the attribute are counted. Only one of `same`
+#'   or `by` may be used. If both parameters are passed, `same` takes precedent. This
+#'   parameter is affected by `diff`.
+#' @param diff separate counts for each unique matching value can be obtained by using
+#'   `diff=TRUE` with `same`.
+#' @param by each node is counted separately for each mutual pair in which it
+#'   occurs and the counts are tabulated by unique values of the attribute if
+#'   passed the name of a vertex attribute. This means that the sum of the mutual statistics when `by` is used
+#'   will equal twice the standard mutual statistic. Only one of `same`
+#'   or `by` may be used. If both parameters are passed, `same` takes precedent. This
+#'   parameter is not affected by `diff`.
+#' @param keep a numerical vector to specify which statistics should be kept whenever the `mutual` term would
+#'   ordinarily result in multiple statistics.
+#' @templateVar Ls.howmany one or two
+#' @templateVar Ls.interp . If given, the statistic will count the number of dyads where a tie in `Ls[[1]]` reciprocates a tie in `Ls[[2]]` and vice versa. (Note that dyad that has mutual ties in `Ls[[1]]` and in `Ls[[2]]` will add 2 to this statistic.) If a formula is given, it is replicated.
+#' @template ergmTerm-Ls
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept frequently-used
+#' @concept layer-aware
+InitErgmTerm.mutualL<-function (nw, arglist, ...) {
+  ## Check the network and arguments to make sure they are appropriate.
+  a <- check.ErgmTerm(nw, arglist, directed=TRUE, bipartite=NULL,
+                      varnames = c("same", "by", "diff", "keep", "Ls"),
+                      vartypes = c("character", "character", "logical", "numeric", "formula,list"),
+                      defaultvalues = list(NULL, NULL, FALSE, NULL, NULL),
+                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
+
+  assert_LHS_Layer(nw)
+
+  ## Process the arguments
+  if (!is.null(a$same) || !is.null(a$by)) {
+    if (!is.null(a$same)) {
+     attrname <- a$same
+     if (!is.null(a$by)) 
+       warning("Ignoring 'by' argument to mutual because 'same' exists", call.=FALSE)
+    }else{
+     attrname <- a$by
+    }
+    nodecov <- get.node.attr(nw, attrname)
+    u <- NVL(a$levels, sort(unique(nodecov)))
+    if (!is.null(a$keep)) {
+      u <- u[a$keep]
+    }
+    #   Recode to numeric
+    nodecov <- match(nodecov,u,nomatch=length(u)+1)
+    # All of the "nomatch" should be given unique IDs so they never match:
+    dontmatch <- nodecov==(length(u)+1)
+    nodecov[dontmatch] <- length(u) + (1:sum(dontmatch))
+    ui <- seq(along=u)
+  }
+
+  ### Construct the list to return
+  if (!is.null(a$same) || !is.null(a$by)) {
+    if (is.null(a$same)) {
+      coef.names <- paste("mutual.by", attrname, u, sep=".")
+      inputs <- c(ui, nodecov)
+    }else{
+     if (a$diff) {
+      coef.names <- paste("mutual.same", attrname, u, sep=".")
+      inputs <- c(ui, nodecov)
+     }else{ 
+      coef.names <- paste("mutual", attrname, sep=".")
+      inputs <- nodecov
+     }
+    }
+    if (is.null(a$same) && !is.null(a$by)) {
+     name <- "mutual_by_attr"
+    }else{
+     name <- "mutual"
+    }
+  }else{
+     name <- "mutual"
+     coef.names <- "mutual"
+     inputs <- NULL
+  }
+
+  maxval <- network.dyadcount(nw,FALSE)/2
+
+  Ls <- .set_layer_namemap(a$Ls, nw)
+  if(is(Ls,"formula")) Ls <- list(Ls)
+  L1 <- Ls[[1]]
+  L2 <- Ls[[2]]
+  if(!is.null(L1) || !is.null(L2)){
+    NVL(L1) <- L2
+    NVL(L2) <- L1
+    auxiliaries <- .mk_.layer.net_auxform(L1)
+    aux2 <- .mk_.layer.net_auxform(L2)
+    auxiliaries[[2]] <- call("+", auxiliaries[[2]], aux2[[2]])
+    name <- paste(name, "ML", sep="_")
+    coef.names <- .lspec_coef.namewrap(if(L1==L2) list(L1) else list(L1,L2))(coef.names)
+    maxval <- maxval*2
+  }else auxiliaries <- NULL
+  
+  list(name=name,                      #name: required
+       coef.names = coef.names,        #coef.names: required
+       inputs=inputs,
+       auxiliaries = auxiliaries,
+       minval = 0,
+       maxval = maxval) 
 }
