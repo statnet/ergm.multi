@@ -2,10 +2,10 @@
 % Please edit documentation in R/InitErgmTerm.dgw_sp.R
 \name{gwb2dspL-ergmTerm}
 \alias{gwb2dspL-ergmTerm}
-\alias{InitErgmTerm.gwb2dsp}
+\alias{InitErgmTerm.gwb2dspL}
 \title{Geometrically weighted dyadwise shared partner distribution for dyads in the second bipartition on layers}
 \usage{
-# binary: gwb2dsp(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
+# binary: gwb2dspL(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
 }
 \arguments{
 \item{decay}{nonnegative decay parameter for the shared partner counts; required if \code{fixed=TRUE} and ignored with a warning otherwise.}
@@ -38,6 +38,9 @@ weighted dyadwise shared partner distribution for dyads in the second bipartitio
 \code{decay} parameter, which should be non-negative. This term can only be used with bipartite networks.
 }
 \note{
+This term does not support multilayer networks with
+heterogeneous bipartedness. This may change in the future.
+
 This term takes an additional term option (see
 \code{\link[ergm:ergm-options]{options?ergm}}), \code{cache.sp}, controlling whether
 the implementation will cache the number of shared partners for

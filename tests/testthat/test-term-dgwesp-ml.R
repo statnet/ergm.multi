@@ -46,6 +46,18 @@ dspL <- function(x, Ls.path1, Ls.path2=Ls.path1, ...){
   tabulate(match(dspL, x),length(x))
 }
 
+b1dspL <- function(x, Ls.path1, Ls.path2=Ls.path1, ...){
+  TP <- OSP(Ls.path1, Ls.path2, ...)
+  dspL <- dediag(TP, NA)[upper.tri(TP)]
+  tabulate(match(dspL, x),length(x))
+}
+
+b2dspL <- function(x, Ls.path1, Ls.path2=Ls.path1, ...){
+  TP <- ISP(Ls.path1, Ls.path2, ...)
+  dspL <- dediag(TP, NA)[upper.tri(TP)]
+  tabulate(match(dspL, x),length(x))
+}
+
 nspL <- function(x, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   TP <- UTP(Ls.path1, Ls.path2, ...)
   L.base[L.base==1] <- NA # I.e., those with base=1 don't count at all.
@@ -112,6 +124,18 @@ gwdspL <- function(decay, n, Ls.path1, Ls.path2=Ls.path1, ...){
 gwnspL <- function(decay, n, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   w <- GW(decay,n)
   sp <- nspL(1:n, L.base, Ls.path1, Ls.path2, ...)
+  sum(w*sp)
+}
+
+gwb1dspL <- function(decay, n, Ls.path1, Ls.path2=Ls.path1, ...){
+  w <- GW(decay,n)
+  sp <- b1dspL(1:n, Ls.path1, Ls.path2, ...)
+  sum(w*sp)
+}
+
+gwb2dspL <- function(decay, n, Ls.path1, Ls.path2=Ls.path1, ...){
+  w <- GW(decay,n)
+  sp <- b2dspL(1:n, Ls.path1, Ls.path2, ...)
   sum(w*sp)
 }
 
@@ -342,7 +366,7 @@ test_that(paste("Multilayer dgw*sp statistics for homogeneously directed network
                     ## dgwnspL(decay,fixed=TRUE,type="ITP",L.base=~`2`,Ls.path=c(~`2`,~`3`),L.in_order=FALSE)+
                     ## dgwnspL(decay,fixed=TRUE,type="OSP",L.base=~`2`,Ls.path=c(~`2`,~`3`))+
                     ## dgwnspL(decay,fixed=TRUE,type="ISP",L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 , coef = numeric(450),
+                 , coef = setNames(0, ""),
                   control=ctrl,
                   nsim=200)
 
@@ -706,7 +730,7 @@ test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed netwo
                     ## dgwnspL(decay,fixed=TRUE,type="ITP",L.base=~`2`,Ls.path=c(~`2`,~`3`),L.in_order=FALSE)+
                     ## dgwnspL(decay,fixed=TRUE,type="OSP",L.base=~`2`,Ls.path=c(~`2`,~`3`))+
                     ## dgwnspL(decay,fixed=TRUE,type="ISP",L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 , coef = numeric(450),
+                 , coef = setNames(0, ""),
                   control=ctrl,
                   nsim=200)
 
@@ -951,7 +975,7 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
                     ## dgwdspL(decay,fixed=TRUE,Ls.path=c(~`2`,~`3`))+
                     ## # dnspL distinct base and one layer
                     ## dgwnspL(decay,fixed=TRUE,L.base=~`2`,Ls.path=c(~`2`,~`3`))
-                 , coef = numeric(75),
+                 , coef = setNames(0, ""),
                   control=ctrl,
                   nsim=200)
 
@@ -1018,4 +1042,78 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
 
   expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
+
+  ### Bipartite.
+  n <- 10
+  b1 <- 4
+  b2 <- n - b1
+  nw1 <- nw2 <- nw3 <- network.initialize(n, dir = FALSE, bipartite = b1)
+  lnw <- Layer(nw1,nw2,nw3)
+
+  test_that(paste("Multilayer dgw*sp statistics for bipartite networks",sptxt), {
+    sim <- simulate(lnw~
+                      ## b1
+                      b1dspL(0:n,Ls.path=c(~`2`,~`3`))+
+                      # dspL base and path distinct
+                      b1dspL(0:n,Ls.path=c(~`2`,~`2`))+
+                      # dspL base and path same
+                      b1dspL(0:n,Ls.path=c(~`2`,~`2`))+
+                      # dspL distinct base and one layer
+                      b1dspL(0:n,Ls.path=c(~`2`,~`3`))+
+                      # Geometrically weighted
+                      # dspL distinct layers
+                      gwb1dspL(decay,fixed=TRUE,Ls.path=c(~`2`,~`3`))+
+                      ## b2
+                      b2dspL(0:n,Ls.path=c(~`2`,~`3`))+
+                      # dspL base and path distinct
+                      b2dspL(0:n,Ls.path=c(~`2`,~`2`))+
+                      # dspL base and path same
+                      b2dspL(0:n,Ls.path=c(~`2`,~`2`))+
+                      # dspL distinct base and one layer
+                      b2dspL(0:n,Ls.path=c(~`2`,~`3`))+
+                      # Geometrically weighted
+                      # dspL distinct layers
+                      gwb2dspL(decay,fixed=TRUE,Ls.path=c(~`2`,~`3`))
+                  , coef = setNames(0, ""),
+                    control=ctrl,
+                  nsim=200)
+
+  stats <- sapply(sim,
+                  function(nw){
+                    n <- network.size(nw)/3
+                    m <- as.matrix(nw)
+                    m1 <- m[seq_len(b1),seq_len(b2)]
+                    m2 <- m[seq_len(b1)+b1,seq_len(b2)+b2]
+                    m3 <- m[seq_len(b1)+b1*2,seq_len(b2)+b2*2]
+
+                    c(
+                      ## b1
+                      # dspL distinct layers
+                      b1dspL(0:n,Ls.path1=m2,Ls.path2=m3),
+                      # dspL base and path distinct
+                      b1dspL(0:n,Ls.path1=m2,Ls.path2=m2),
+                      # dspL base and path same
+                      b1dspL(0:n,Ls.path1=m2,Ls.path2=m2),
+                      # dspL distinct base and one layer
+                      b1dspL(0:n,Ls.path1=m2,Ls.path2=m3),
+                      # Geometrically weighted
+                      # dspL distinct layers
+                      gwb1dspL(decay,n,Ls.path1=m2,Ls.path2=m3),
+                      ## b2
+                      # dspL distinct layers
+                      b2dspL(0:n,Ls.path1=m2,Ls.path2=m3),
+                      # dspL base and path distinct
+                      b2dspL(0:n,Ls.path1=m2,Ls.path2=m2),
+                      # dspL base and path same
+                      b2dspL(0:n,Ls.path1=m2,Ls.path2=m2),
+                      # dspL distinct base and one layer
+                      b2dspL(0:n,Ls.path1=m2,Ls.path2=m3),
+                      # Geometrically weighted
+                      # dspL distinct layers
+                      gwb2dspL(decay,n,Ls.path1=m2,Ls.path2=m3)
+                    )
+                  }) %>% t()
+
+    expect_equal(attr(sim, "stats"), stats, ignore_attr=TRUE)
+  })
 }

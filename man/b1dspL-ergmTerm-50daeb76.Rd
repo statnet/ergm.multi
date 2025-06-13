@@ -5,7 +5,7 @@
 \alias{InitErgmTerm.b1dspL}
 \title{Dyadwise shared partners for dyads in the first bipartition on layers}
 \usage{
-# binary: b1dsp(d, Ls.path=NULL)
+# binary: b1dspL(d, Ls.path=NULL)
 }
 \arguments{
 \item{d}{a vector of distinct integers.}
@@ -29,6 +29,9 @@ such statistic equals the number of dyads in the first bipartition with exactly
 of the second bipartition.) This term can only be used with bipartite networks.
 }
 \note{
+This term does not support multilayer networks with
+heterogeneous bipartedness. This may change in the future.
+
 This term takes an additional term option (see
 \code{\link[ergm:ergm-options]{options?ergm}}), \code{cache.sp}, controlling whether
 the implementation will cache the number of shared partners for

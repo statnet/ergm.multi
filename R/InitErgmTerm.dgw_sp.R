@@ -51,7 +51,7 @@
     out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux3[[2]])
   }
   if(cache.sp){
-    aux4 <- .spcache.auxL(type, c(L.path1, L.path2), a$L.in_order)
+    aux4 <- .spcache.auxL(type, c(L.path1, L.path2), a$L.in_order %||% FALSE)
     out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux4[[2]])
   }
   
@@ -429,10 +429,12 @@ InitErgmTerm.gwnspL <- InitErgmTerm.dgwnspL
 #'   of the second bipartition.) This term can only be used with bipartite networks.
 #'
 #' @usage
-#' # binary: b1dsp(d, Ls.path=NULL)
+#' # binary: b1dspL(d, Ls.path=NULL)
 #'
 #' @param d a vector of distinct integers.
 #' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-bipartite-note
 #'
 #' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
@@ -452,20 +454,22 @@ InitErgmTerm.b1dspL <- function(nw, arglist, cache.sp=TRUE, ...){
 
 ################################################################################
 
-#' @templateVar name gwb1dsp
+#' @templateVar name gwb1dspL
 #' @title Geometrically weighted dyadwise shared partner distribution for dyads in the first bipartition on layers
 #' @description This term adds one network statistic to the model equal to the geometrically
 #'   weighted dyadwise shared partner distribution for dyads in the first bipartition with decay parameter
 #'   `decay` parameter, which should be non-negative. This term can only be used with bipartite networks.
 #'
 #' @usage
-#' # binary: gwb1dsp(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
+#' # binary: gwb1dspL(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
 #'
 #' @templateVar multiplicand shared partner counts
 #' @template ergmTerm-gw-decay-fixed
 #' @templateVar underlying b1dsp
 #' @template ergmTerm-gw-cutoff
 #' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-bipartite-note
 #'
 #' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
@@ -479,7 +483,7 @@ InitErgmTerm.gwb1dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
                       varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
                       vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
-                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 
   wrap_ergm_sp_call("gwb1dsp", nw, a, FALSE, ...)
 }
@@ -494,10 +498,12 @@ InitErgmTerm.gwb1dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 #'   of the first bipartition.) This term can only be used with bipartite networks.
 #'
 #' @usage
-#' # binary: b2dsp(d, Ls.path=NULL)
+#' # binary: b2dspL(d, Ls.path=NULL)
 #'
 #' @param d a vector of distinct integers
 #' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-bipartite-note
 #'
 #' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
@@ -524,13 +530,15 @@ InitErgmTerm.b2dspL <- function(nw, arglist, cache.sp=TRUE, ...){
 #'   `decay` parameter, which should be non-negative. This term can only be used with bipartite networks.
 #'
 #' @usage
-#' # binary: gwb2dsp(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
+#' # binary: gwb2dspL(decay=0, fixed=FALSE, cutoff=30, Ls.path=NULL)
 #'
 #' @templateVar multiplicand shared partner counts
 #' @template ergmTerm-gw-decay-fixed
 #' @templateVar underlying b2dsp
 #' @template ergmTerm-gw-cutoff
 #' @template ergmTerm-Ls-path
+#'
+#' @template ergmTerm-bipartite-note
 #'
 #' @template ergmTerm-cache-sp
 #' @template ergmTerm-general
@@ -539,12 +547,12 @@ InitErgmTerm.b2dspL <- function(nw, arglist, cache.sp=TRUE, ...){
 #' @concept undirected
 #' @concept curved
 #' @concept layer-aware
-InitErgmTerm.gwb2dsp<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
+InitErgmTerm.gwb2dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
                       varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
                       vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
-                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+                      required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 
   wrap_ergm_sp_call("gwb2dsp", nw, a, FALSE, ...)
 }
