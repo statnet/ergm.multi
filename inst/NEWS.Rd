@@ -64,6 +64,85 @@
 
 %% }
 
+\section{Changes in version 0.3.0}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item{
+        \code{\link{b1dsp}()}, \code{\link{b2dsp}()}, \code{\link{gwb1dsp}()}, and \code{\link{gwb2dsp}()} terms have been added, paralleling their \CRANpkg{ergm} counterparts.
+      }
+    }
+  }
+
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item{
+        Multilayer and multinetwork terms and functions such as \code{\link{gofN}()}, will now produce a sensible message if passed networks without multilayer and/or multinetwork metadata they require. Thanks to GitHub user \code{@liluqi1991} for flagging this issue.
+      }
+      \item{
+        \code{\link{gwespL}()}, \code{\link{espL}()}, and other terms from that family now correctly recycle their \code{Ls.twopath=} argument: if only one layer specification is given, it is used for both legs of the two-path.
+      }
+      \item{
+        Layer logic implementation was reversing the arguments of noncommutative operators and functions.
+      }
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item{
+        \code{\link{Layer}()} now consistently uses the network and vertex attributes from the first observed layer for everything, and ignores and/or overwrites those of the other layers.
+      }
+      \item{
+        When nesting network-combiners such as \code{\link{Networks}()} and \code{\link{Layer}()}, it is now an error to attempt to reference them out of order. That is, \code{Networks(Layer(...))~L(~N(...))} is no longer allowed, since the multilayer specification is performed within the multinetwork.
+      }
+      \item{
+        \code{\link{Layer}()} and \code{\link{Networks}()} documentation now informs the user that the resulting data structure's vertex and network attributes should be treated as read-only. This may change in the future.
+      }
+      \item{
+        Support for \CRANpkg{networkLite} and other alternative implementations of \CRANpkg{network}'s API has been added.
+      }
+      \item{
+        \code{\link{gwespL}()}, \code{\link{gwdspL}()}, \code{\link{gwnspL}()}, when \code{fixed=FALSE} and other functions using a \code{cutoff} now terminate with an error if they encounter a network that exceeds it.
+      }
+      \item{
+        \code{*degreeL()} family of terms has been removed. It never worked correctly and does not have a clear use case.
+      }
+    }
+  }
+
+  \subsection{C-LEVEL FACILITIES}{
+    \itemize{
+      \item{
+        A number of improvements and optimisations to the multilayer API.
+      }
+      \item{
+        The exported Layer Logic API has been documented.
+      }
+    }
+  }
+
+  %% \subsection{UTILITIES}{
+  %%   \itemize{
+  %%     \item Likewise, "UTILITIES" is probably unnecessary.
+  %%   }
+  %% }
+
+  %% \subsection{INSTALLATION}{
+  %%   \itemize{
+  %%     \item ... as is "INSTALLATION".
+  %%   }
+  %% }
+
+  %% \subsection{PACKAGE INSTALLATION}{
+  %%   \itemize{
+  %%     \item ditto.
+  %%   }
+  %% }
+
+}
+
 
 \section{Changes in version 0.2.1}{
 
