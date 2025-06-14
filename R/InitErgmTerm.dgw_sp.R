@@ -58,7 +58,6 @@
   out$any_order <- if(type=="UTP" || (type%in%c("OSP","ISP") && !has_base)) TRUE else !a$L.in_order
   out$coef.namewrap <- .lspec_coef.namewrap(list(pth=c(L.path1,if(L.path2!=L.path1)L.path2),bse=if(has_base) L.base,inord=a$L.in_order))
   out$name_suffix <- "_ML"
-  out$nw1 <- subnetwork_templates(nw, ".LayerID", ".LayerName")[[1]] # Needed for emptynwstats.
 
   out
 }
@@ -68,12 +67,15 @@ no_layer_err <- function(instead){
 }
 
 wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp = TRUE, ...) {
+  # A "representative" layer network.
+  nw1 <- subnetwork_templates(nw, ".LayerID", ".LayerName")[[1]]
+
   # Construct and call the ergm term with only the arguments it
   # supports.
   not_ergm <- c("L.base", "Ls.path", "L.in_order")
   totransfer <- setdiff(names(a)[!attr(a, "missing")[names(a)]], not_ergm)
   cl <- as.call(c(ergm_name, a[totransfer]))
-  trm <- call.ErgmTerm(cl, nw = nw, cache.sp = cache.sp, ...)
+  trm <- call.ErgmTerm(cl, nw = nw1, cache.sp = cache.sp, ...)
 
   # If null, return null.
   if (is.null(trm)) return(NULL)
@@ -81,21 +83,6 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
   # Infer the type and construct layer info.
   type <- c("UTP", "OTP", "ITP", "RTP", "OSP", "ISP")[trm$iinputs[1] + 1]
   linfo <- .sp.handle_layers(nw, a, type, has_base, cache.sp)
-
-  if(length(linfo)) nw <- linfo$nw1
-
-  .emptynwstats <-
-    if (d0 && any(a$d == 0)) {
-      n <-
-        if (is.bipartite(nw))
-          switch(type,
-                 UTP = network.size(nw),
-                 OSP = b1.size(nw),
-                 ISP = b2.size(nw))
-        else network.size(nw)
-      replace(dbl_along(a$d), a$d == 0,
-              choose(n, 2L) * (is.directed(nw) + 1L))
-    }
 
   # Replace the parts that are different for the layered term.
   if (length(linfo))
@@ -105,7 +92,6 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
       coef.names <- linfo$coef.namewrap(coef.names)
       auxiliaries <- linfo$auxiliaries
       iinputs <- c(linfo$any_order, iinputs)
-      emptynwstats <- .emptynwstats
     })
   else no_layer_err(ergm_name)
 }
