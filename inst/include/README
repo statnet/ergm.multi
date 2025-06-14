@@ -1,8 +1,9 @@
 USAGE
 
-These files are exported by ergm via R's LinkingTo: API, and allow
-other R packages to extend ergm's functionality. To make use of them,
-add the following dependencies to your package's DESCRIPTION file:
+These files are exported by ergm.multi via R's LinkingTo: API, and
+allow other R packages to extend ergm.multi's functionality. To make
+use of them, add the following dependencies to your package's
+DESCRIPTION file:
 
 Depends: ergm.multi
 LinkingTo: ergm.multi
@@ -20,4 +21,5 @@ ergm.multi package. (See citation(ergm.multi) for instructions.)
 
 STABILITY
 
-Currently, the APIs are subject to change, and are planned to be declared stable at version 1.0.
+Currently, the APIs are subject to change, and are planned to be
+declared stable at version 1.0.

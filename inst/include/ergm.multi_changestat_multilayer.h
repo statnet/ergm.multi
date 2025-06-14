@@ -11,7 +11,7 @@
 #define _ERGM_MULTI_CHANGESTAT_MULTILAYER_H_
 
 #include "ergm_changestat.h"
-#include "ergm.multi_changestat_multilayer_common.do_not_include_directly.h"
+#include "inc/ergm.multi_changestat_multilayer_common.do_not_include_directly.h"
 
 /* layer-aware macros eponymous to ergm_changestat.h
 
