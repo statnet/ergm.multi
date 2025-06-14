@@ -10,27 +10,23 @@
 \arguments{
 \item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of two Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation){} specifying the layers of interest.}
 
-\item{type}{determines what is counted:
-\enumerate{
-\item \emph{"any"} Number of configurations
-\eqn{(i-j), (i-k)}{(i,j), (i,k)} , where
-\eqn{(i-j)}{(i,j)} is in logical layer \code{Ls[[1]]}
-and \eqn{(i-k)}{(i,k)} is in logical layer \code{Ls[[2]]} .
-\item \emph{"out"} Number of configurations
+\item{type}{if the network is directed, an argument to determine which configurations are counted:
+\describe{
+\item{\code{"out"}}{Number of configurations
 \eqn{(i{\rightarrow}j), (i{\rightarrow}k)}{(i,j), (i,k)}, where
 \eqn{(i{\rightarrow}j)}{(i,j)} is in logical layer \code{Ls[[1]]}
-and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer \code{Ls[[2]]}.
-\item \emph{"in"} Number of configurations
+and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer \code{Ls[[2]]}.}
+\item{\code{"in"}}{Number of configurations
 \eqn{(j{\rightarrow}i), (k{\rightarrow}i)}{(j,i), (k,i)}, where
 \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer \code{Ls[[1]]}
-and \eqn{(k{\rightarrow}i)}{(k,i)} is in logical layer \code{Ls[[2]]}.
-\item \emph{"path"} Number of configurations
+and \eqn{(k{\rightarrow}i)}{(k,i)} is in logical layer \code{Ls[[2]]}.}
+\item{\code{"path"}}{Number of configurations
 \eqn{(j{\rightarrow}i), (i{\rightarrow}k)}{(j,i), (i,k)}, where
 \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer \code{Ls[[1]]}
-and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer \code{Ls[[2]]}.
+and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer \code{Ls[[2]]}.}
 }
 
-At this time, \code{"any"} is only supported for undirected networks, and if the network is undirected, \code{type} is ignored and \code{"any"} is assumed.}
+This argument is ignored for undirected networks.}
 
 \item{distinct}{if \code{TRUE}, \eqn{j} and \eqn{k} above are required to
 be distinct. That is, the constituent edges may not be coincident or

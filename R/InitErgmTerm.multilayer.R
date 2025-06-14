@@ -976,25 +976,27 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 #' @templateVar Ls.howmany two
 #' @templateVar Ls.interp {} specifying the layers of interest.
 #' @template ergmTerm-Ls
-#' @param type determines what is counted:
-#'   1) *"any"* Number of configurations
-#'   \eqn{(i-j), (i-k)}{(i,j), (i,k)} , where
-#'   \eqn{(i-j)}{(i,j)} is in logical layer `Ls[[1]]`
-#'   and \eqn{(i-k)}{(i,k)} is in logical layer `Ls[[2]]` .
-#'   2) *"out"* Number of configurations
+#' @param type if the network is directed, an argument to determine which configurations are counted:
+#'   \describe{
+## #'   \item{`"any"`}{Number of configurations
+## #'   \eqn{(i-j), (i-k)}{(i,j), (i,k)}, where
+## #'   \eqn{(i-j)}{(i,j)} is in logical layer `Ls[[1]]`
+## #'   and \eqn{(i-k)}{(i,k)} is in logical layer `Ls[[2]]`.}
+#'   \item{`"out"`}{Number of configurations
 #'   \eqn{(i{\rightarrow}j), (i{\rightarrow}k)}{(i,j), (i,k)}, where
 #'   \eqn{(i{\rightarrow}j)}{(i,j)} is in logical layer `Ls[[1]]`
-#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.
-#'   3) *"in"* Number of configurations
+#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.}
+#'   \item{`"in"`}{Number of configurations
 #'   \eqn{(j{\rightarrow}i), (k{\rightarrow}i)}{(j,i), (k,i)}, where
 #'   \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer `Ls[[1]]`
-#'   and \eqn{(k{\rightarrow}i)}{(k,i)} is in logical layer `Ls[[2]]`.
-#'   4) *"path"* Number of configurations
+#'   and \eqn{(k{\rightarrow}i)}{(k,i)} is in logical layer `Ls[[2]]`.}
+#'   \item{`"path"`}{Number of configurations
 #'   \eqn{(j{\rightarrow}i), (i{\rightarrow}k)}{(j,i), (i,k)}, where
 #'   \eqn{(j{\rightarrow}i)}{(j,i)} is in logical layer `Ls[[1]]`
-#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.
+#'   and \eqn{(i{\rightarrow}k)}{(i,k)} is in logical layer `Ls[[2]]`.}
+#'   }
 #'
-#'   At this time, `"any"` is only supported for undirected networks, and if the network is undirected, `type` is ignored and `"any"` is assumed.
+#'   This argument is ignored for undirected networks.
 #'
 #' @param distinct if `TRUE`, \eqn{j} and \eqn{k} above are required to
 #'   be distinct. That is, the constituent edges may not be coincident or
@@ -1010,15 +1012,19 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
                       varnames = c("Ls", "type", "distinct"),
                       vartypes = c("formula,list", "character", "logical"),
                       defaultvalues = list(NULL, NULL, TRUE),
-                      required = c(TRUE, TRUE, FALSE))
+                      required = c(TRUE, FALSE, FALSE))
 
   assert_LHS_Layer(nw)
 
   TYPES <- c("any", "out", "in", "path")
   TYPEREP <- setNames(c("--", "<>", "><", ">>"), TYPES)
-  type <- match.arg(tolower(a$type), TYPES)
-  if(!is.directed(nw)) type <- "any"
-  else if(type == "any") ergm_Init_abort(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
+
+  type <- a$type
+  if (!is.directed(nw)) type <- "any"
+  else if (is.null(type)) ergm_Init_stop(sQuote("type"), " argument is required for directed networks")
+
+  type <- match.arg(tolower(type), TYPES)
+  if (type == "any" && is.directed(nw)) ergm_Init_abort(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
   typeID <- match(type, TYPES) - 1L
 
   Ls <- .set_layer_namemap(a$Ls, nw)
