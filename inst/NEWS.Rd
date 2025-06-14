@@ -109,13 +109,19 @@
       \item{
         \code{*degreeL()} family of terms has been removed. It never worked correctly and does not have a clear use case.
       }
+      \item{
+        \code{blockdiag} and \code{blockdiagTNT} proposals have been removed, as their performance is no better than the \code{DyadGen}-based dyadic constraint proposals.
+      }
+      \item{
+        \code{\link[twostarL-ergmTerm]{twostarL}()} no longer require the \code{type=} argument if called on an undirected network.
+      }
     }
   }
 
   \subsection{C-LEVEL FACILITIES}{
     \itemize{
       \item{
-        A number of improvements and optimisations to the multilayer API.
+        A number of improvements and optimizations to the multilayer API.
       }
       \item{
         The exported Layer Logic API has been documented.
