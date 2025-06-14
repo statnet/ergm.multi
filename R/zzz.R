@@ -29,7 +29,6 @@
 
   eval(COLLATE_ALL_MY_CONTROLS_EXPR)
 
-  .RegisterProposals()
   .RegisterKeywords()
   .RegisterCombiners()
 }
@@ -54,11 +53,6 @@ NULL
 snctrl <- statnet.common::snctrl
 eval(UPDATE_MY_SCTRL_EXPR)
 ## END boilerplate: should be kept in sync with statnet.common.
-
-.RegisterProposals <- function(){
-  ergm_proposal_table("c", "Bernoulli", "|bd|bdmax&blockdiag", 0, "random", "blockdiag")
-  ergm_proposal_table("c", "Bernoulli", "|bd|bdmax&blockdiag&sparse", 1, "TNT", "blockdiagTNT")
-}
 
 .RegisterKeywords <- function() {
   ergm_keyword(name="layer-aware", short="layer", description="operates on multilayer network constructs", popular=TRUE, package="ergm.multi")
