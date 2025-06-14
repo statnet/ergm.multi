@@ -12,10 +12,6 @@
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
-/* FIXME: 
-   Check these declarations against the C/Fortran source code.
-*/
-
 /* .Call calls */
 extern SEXP mean_var_wrapper(SEXP, SEXP);
 extern SEXP vars_wrapper(SEXP, SEXP);
