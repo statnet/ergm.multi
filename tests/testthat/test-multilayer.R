@@ -69,8 +69,8 @@ test_that("twostarL statistics for undirected networks", {
   lnw <- Layer(nw1, nw2)
 
   sim <- suppressWarnings(simulate(lnw~
-                    twostarL(c(~`1`,~`2`), "any",FALSE)+
-                    twostarL(c(~`1`,~`2`), "any", TRUE),
+                    twostarL(c(~`1`,~`2`), distinct = FALSE)+
+                    twostarL(c(~`1`,~`2`)),
                   control=ctrl,
                   nsim=200))
 
