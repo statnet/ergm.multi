@@ -14,7 +14,7 @@ InitWtErgmTerm..subnets <- function(...){
   # diagnostic messages.
   f <- InitErgmTerm..subnets
   #' @importFrom utils modifyList
-  modifyList(f(...), list(name="_wtsubnets"))
+  modifyList(f(...), list(name="_Wtsubnets"))
 }
 
 # Arguments and outputs are identical to the binary version, except for the C routine names.
@@ -30,8 +30,8 @@ InitWtErgmTerm.N <- function(...){
   f <- InitErgmTerm.N
   term <- f(...)
   term$name <- switch(term$name,
-                      MultiNet = "wtMultiNet",
-                      MultiNets = "wtMultiNets")
+                      MultiNet = "WtMultiNet",
+                      MultiNets = "WtMultiNets")
   term
 }
 
