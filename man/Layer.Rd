@@ -110,9 +110,7 @@ For example, if LHS is \code{Layer(A=nwA, B=nwB)}, both \code{~`2`} and
 \code{nwB}.
 
 Transpose function \code{\link[=t]{t()}} applied to a directed layer will reverse
-the direction of all relations (transposing the sociomatrix). Unlike the
-others, it can only be used on an observed layer directly. For example,
-\code{~t(`1`)&t(`2`)} is valid but \code{~t(`1`&`2`)} is not.
+the direction of all relations (transposing the sociomatrix).
 
 At this time, logical expressions that produce complete graphs from empty
 graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.

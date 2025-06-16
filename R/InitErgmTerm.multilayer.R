@@ -327,9 +327,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' \code{nwB}.
 #'
 #' Transpose function [t()] applied to a directed layer will reverse
-#' the direction of all relations (transposing the sociomatrix). Unlike the
-#' others, it can only be used on an observed layer directly. For example,
-#' \code{~t(`1`)&t(`2`)} is valid but \code{~t(`1`&`2`)} is not.
+#' the direction of all relations (transposing the sociomatrix).
 #'
 #' At this time, logical expressions that produce complete graphs from empty
 #' graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.
@@ -632,6 +630,8 @@ LL_STOP <- -.Machine$integer.max
 LL_IDEMPOTENT <- c("&", "&&", "|", "||")
 LL_TAUTOLOGICAL <- c("==", ">=", "<=")
 LL_CONTRADICTORY <- c("!=", "xor", "<", ">")
+LL_INVOLUTION <- c("-")
+LL_TOGGLE <- c("t")
 
 #' Internal representation of Layer Logic
 #'
@@ -685,18 +685,26 @@ sub.ergm_LayerLogic <- function(x){
            )
   }
 
-  simplify <- function(call){
+  simplify <- function(call, flags = setNames(rep(FALSE, length(LL_TOGGLE)), LL_TOGGLE)) {
     if(is.call(call)){
       op <- as.character(call[[1]])
 
-      call[-1] <- lapply(call[-1], simplify)
+      if (op %in% LL_TOGGLE) {
+        flags[[op]] <- !flags[[op]]
+        call <- simplify(call[[2]], flags)
+      } else call[-1] <- lapply(call[-1], simplify, flags)
 
       if(op %in% LL_IDEMPOTENT && all_identical(as.list(call)[-1])) call[[2]]
       else if(op %in% LL_TAUTOLOGICAL && all_identical(as.list(call)[-1])) TRUE
       else if(op %in% LL_CONTRADICTORY && length(call)%%2==0 && all_identical(as.list(call)[-1])) FALSE
+      else if(op %in% LL_INVOLUTION && length(call) == 2 && length(call[[2]]) == 2 && call[[2]][[1]] == op) call[[2]][[2]]
       else call
     }else{
-      lidSub(call)
+      call <- lidSub(call)
+      for(flag in names(flags)[flags])
+        if(is.name(call))
+          call <- call(flag, call)
+      call
     }
   }
 
