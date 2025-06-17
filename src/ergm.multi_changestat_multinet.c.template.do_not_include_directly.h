@@ -42,7 +42,7 @@ ETYPE(I_CHANGESTAT_FN)(ETYPE(i__, subnets)){
             EXEC_THROUGH_NET_EDGES_PRE(t, h, e, w, {
                ETYPE(SetEdge)(MN_IO_TAIL(sn, t), MN_IO_HEAD(sn, h), w, sn->onwp[MN_SID_TAIL(sn, t)]);
              }),
-           EXEC_THROUGH_NET_EDGES_PRE(t, e, h, {
+            EXEC_THROUGH_NET_EDGES_PRE(t, h, e, {
                ToggleKnownEdge(MN_IO_TAIL(sn, t), MN_IO_HEAD(sn, h),sn->onwp[MN_SID_TAIL(sn, t)], FALSE);
              })
            );
