@@ -874,9 +874,10 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
 
 .layers_expand_dot <- function(ll){
   if(is(ll, "formula")) ll <- list(ll)
-  nl <- length(attr(ll[[1]], "namemap"))
+  nm <- attr(ll[[1]], "namemap")
+  nl <- length(nm)
   # Replace . with all layers.
-  do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f))))
+  .set_layer_namemap(do.call(c, lapply(ll, function(f) if(f[[length(f)]]=='.') .all_layers_terms(nl, LHS = if(length(f)==3) f[[2]]) else list(as.formula(f)))), nm)
 }
 
 #' @templateVar name L
