@@ -1167,3 +1167,52 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
        minval = 0,
        maxval = maxval) 
 }
+
+
+#' @templateVar name hammingL
+#' @title Hamming distance between pairs of lairs
+#' @description Models marginal dependence of layers within each dyad
+#'   by counting their hamming distances.
+#'
+#'   The term adds one statistic to the model, equalling the sum over
+#'   all distinct pairs of specified layers of their hamming distances.
+#'
+#' @details A positive coefficient induces negative dependence and a negative
+#'   one induces positive dependence.
+#'
+#' @usage
+#' # binary: hammingL(Ls=~.)
+#'
+#' @templateVar Ls.howmany at least two
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept undirected
+#' @concept layer-aware
+InitErgmTerm.hammingL <- function(nw, arglist, ...){
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("Ls"),
+                      vartypes = c("formula,list"),
+                      defaultvalues = list(empty_env(~.)),
+                      required = c(FALSE))
+
+  assert_LHS_Layer(nw)
+
+  Ls <- .set_layer_namemap(a$Ls, nw)
+  if(is(Ls, "formula")) Ls <- list(Ls)
+  Ls.dotexp <- .layers_expand_dot(Ls)
+  if(length(Ls.dotexp) < 2L) ergm_Init_stop("multiple layers are required")
+  lls <- lapply(Ls.dotexp, to_ergm_Cdouble)
+  deps <- lapply(lls, .depends_on_layers)
+  auxiliaries <- .mk_.layer.net_auxform(Ls)
+
+  affects <- map(seq_len(max(nw%v%".LayerID")),
+                 function(l) which(map_lgl(deps, function(d) l %in% d)))
+
+  iinputs <- c(cumsum(c(0, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1)
+
+  list(name="hammingL", coef.names = paste0('hammingL(',despace(deparse(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
+}

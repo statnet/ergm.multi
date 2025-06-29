@@ -436,3 +436,67 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
       }
     }
 }
+
+/*****************
+ changestat: c_hammingL
+*****************/
+C_CHANGESTAT_FN(c_hammingL){
+  /* Obtain the list of layers (to be compared) that are potentially
+     affected by the toggle. */
+  Vertex *rdeps = (Vertex *) IINPUT_PARAM;
+  StoreLayerLogic *ll0 = AUX_STORAGE;
+  Vertex tl = ML_LID_TAIL(ll0, tail), nl = N_AUX;
+  Vertex *affected = rdeps + rdeps[tl - 1],
+    n_affected = rdeps[tl] - rdeps[tl - 1];
+
+  /* If none affected, no change. */
+  if(n_affected == 0) return;
+
+  /* Find out if we need reciprocal ties. */
+  Rboolean need_ht = FALSE;
+  for(Vertex i = 0; i < n_affected; i++) {
+    Vertex l = affected[i];
+    GET_AUX_STORAGE(l, StoreLayerLogic, ll);
+    if(ll->need_ht){
+      need_ht = TRUE;
+      break;
+    }
+  }
+
+  Rboolean th_before[nl], th_after[nl],
+    ht_before[need_ht ? nl : 1], ht_after[need_ht ? nl : 1];
+
+  /* Evaluate old states. */
+  for(Vertex l = 0; l < nl; l++) {
+    GET_AUX_STORAGE(l, StoreLayerLogic, ll);
+    Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
+    th_before[l] = ML_GETWT(ll, lt, lh);
+    if(need_ht) ht_before[l] = ML_GETWT(ll, lh, lt);
+  }
+
+  memcpy(th_after, th_before, nl * sizeof(Rboolean));
+  if(need_ht) memcpy(ht_after, ht_before, nl * sizeof(Rboolean));
+
+  /* Update new states where applicable. */
+  for(Vertex i = 0; i < n_affected; i++) {
+    Vertex l = affected[i];
+    GET_AUX_STORAGE(l, StoreLayerLogic, ll);
+    Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
+    th_after[l] = ergm_LayerLogic2(lt, lh, tail, head, ll, LL_POST);
+    if(need_ht) ht_after[l] = ergm_LayerLogic2(lh, lt, tail, head, ll, LL_POST);
+  }
+
+  /* Calculate the changes in Hamming distances. */
+  for(Vertex i = 0; i < n_affected; i++) {
+    Vertex l1 = affected[i];
+    if(th_after[l1] != th_before[l1])
+      for(Vertex l2 = 0; l2 < nl; l2++)
+        if(l1 != l2)
+          CHANGE_STAT[0] += (th_after[l1] != th_after[l2]) - (th_before[l1] != th_before[l2]);
+
+    if(need_ht && ht_after[l1] != ht_before[l1])
+      for(Vertex l2 = 0; l2 < nl; l2++)
+        if(l1 != l2)
+          CHANGE_STAT[0] += (ht_after[l1] != ht_after[l2]) - (ht_before[l1] != ht_before[l2]);
+  }
+}
