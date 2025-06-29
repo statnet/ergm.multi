@@ -8,14 +8,25 @@
 #  Copyright 2003-2025 Statnet Commons
 ################################################################################
 data(samplk)
+samplkl <- list(samplk1, samplk2, samplk3)
+
+cmb <- function(l) {
+  l <- lapply(l, as.matrix)
+  n <- length(l)
+  m <- Reduce(`+`, l)
+  diag(m) <- NA
+  sum(lfactorial(m) + lfactorial(n - m) - lfactorial(n), na.rm = TRUE)
+}
 
 test_that("3-layer CMBL summary", {
-  (layer <- summary(Layer(samplk1, samplk2, samplk3)~CMBL))
-  m1 <- as.matrix(samplk1)
-  m2 <- as.matrix(samplk2)
-  m3 <- as.matrix(samplk3)
-  msum <- m1 + m2 + m3
-  diag(msum) <- NA
-  (logic <- sum(lfactorial(msum) + lfactorial(3-msum) - lfactorial(3), na.rm=TRUE))
-  expect_equal(layer, logic, ignore_attr=TRUE)
+  layer <- summary(Layer(samplkl) ~ CMBL)
+  logic <- cmb(samplkl)
+  expect_equal(layer, logic, ignore_attr = TRUE)
+})
+
+test_that("6-layer hammingL summary with repeated layers", {
+  lsel <- sample.int(3, 6, replace = TRUE)
+  layer <- summary(Layer(samplkl[lsel]) ~ CMBL)
+  logic <- cmb(samplkl[lsel])
+  expect_equal(layer, logic, ignore_attr = TRUE)
 })
