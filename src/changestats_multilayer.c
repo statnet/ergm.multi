@@ -437,13 +437,16 @@ C_CHANGESTAT_FN(c_mutual_by_attr_ML) {
     }
 }
 
+typedef enum {LAYER_DIST_HAMMING = 0, LAYER_DIST_ENTRAINMENT = 1} LayerDistType;
+
 /*****************
- changestat: c_hammingL
+ changestat: c_pairwisedistL
 *****************/
-C_CHANGESTAT_FN(c_hammingL){
+C_CHANGESTAT_FN(c_pairwisedistL){
   /* Obtain the list of layers (to be compared) that are potentially
      affected by the toggle. */
-  Vertex *rdeps = (Vertex *) IINPUT_PARAM;
+  LayerDistType type = *IINPUT_PARAM;
+  Vertex *rdeps = ((Vertex *) IINPUT_PARAM) + 1;
   StoreLayerLogic *ll0 = AUX_STORAGE;
   Vertex tl = ML_LID_TAIL(ll0, tail), nl = N_AUX;
   Vertex *affected = rdeps + rdeps[tl - 1],
@@ -492,11 +495,26 @@ C_CHANGESTAT_FN(c_hammingL){
     if(th_after[l1] != th_before[l1])
       for(Vertex l2 = 0; l2 < nl; l2++)
         if(l1 != l2)
-          CHANGE_STAT[0] += (th_after[l1] != th_after[l2]) - (th_before[l1] != th_before[l2]);
+          switch(type){
+          case LAYER_DIST_HAMMING:
+            CHANGE_STAT[0] += (th_after[l1] != th_after[l2]) - (th_before[l1] != th_before[l2]);
+            break;
+          case LAYER_DIST_ENTRAINMENT:
+            CHANGE_STAT[0] += (th_after[l1] && th_after[l2]) - (th_before[l1] && th_before[l2]);
+            break;
+          }
 
     if(need_ht && ht_after[l1] != ht_before[l1])
       for(Vertex l2 = 0; l2 < nl; l2++)
         if(l1 != l2)
-          CHANGE_STAT[0] += (ht_after[l1] != ht_after[l2]) - (ht_before[l1] != ht_before[l2]);
+          switch(type){
+          case LAYER_DIST_HAMMING:
+            CHANGE_STAT[0] += (ht_after[l1] != ht_after[l2]) - (ht_before[l1] != ht_before[l2]);
+            break;
+          case LAYER_DIST_ENTRAINMENT:
+            CHANGE_STAT[0] += (ht_after[l1] && ht_after[l2]) - (ht_before[l1] && ht_before[l2]);
+            break;
+          default: error("This should not happen.");
+          }
   }
 }

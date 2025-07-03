@@ -1175,7 +1175,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 #'   by counting their hamming distances.
 #'
 #'   The term adds one statistic to the model, equalling the sum over
-#'   all distinct pairs of specified layers of their hamming distances.
+#'   all distinct pairs of specified layers of their Hamming distances.
 #'
 #' @details A positive coefficient induces negative dependence and a negative
 #'   one induces positive dependence.
@@ -1212,7 +1212,41 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
   affects <- map(seq_len(max(nw%v%".LayerID")),
                  function(l) which(map_lgl(deps, function(d) l %in% d)))
 
-  iinputs <- c(cumsum(c(0, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1)
+  iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)
 
-  list(name="hammingL", coef.names = paste0('hammingL(',despace(deparse(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="pairwisedistL", coef.names = paste0('hammingL(',despace(deparse(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
+}
+
+
+#' @templateVar name entrainmentL
+#' @title Entrainment between pairs of lairs
+#' @description Models marginal dependence of layers within each dyad
+#'   by counting edges they have in common.
+#'
+#'   The term adds one statistic to the model, equalling the sum over
+#'   all distinct pairs of specified layers of their common edges.
+#'
+#' @details This is similar to `L(~edges, c(~A & B, ~A & C, ~B & C))`
+#'   but more efficient for multiple layers.
+#'
+#' @usage
+#' # binary: entrainmentL(Ls=~.)
+#'
+#' @templateVar Ls.howmany at least two
+#' @templateVar Ls.interp .
+#' @template ergmTerm-Ls
+#'
+#' @template ergmTerm-general
+#'
+#' @concept directed
+#' @concept undirected
+#' @concept layer-aware
+InitErgmTerm.entrainmentL <- function(...){
+  # Rename the function to avoid the extra nesting level in the
+  # diagnostic messages.
+  f <- InitErgmTerm.hammingL
+  term <- f(...)
+  term$coef.names <- gsub("^hammingL", "entrainmentL", term$coef.names)
+  term$iinputs[1] <- 1L
+  term
 }

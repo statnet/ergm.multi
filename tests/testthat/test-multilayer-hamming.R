@@ -32,3 +32,26 @@ test_that("6-layer hammingL summary with repeated layers", {
   logic <- ham(samplkl[lsel])
   expect_equal(layer, logic, ignore_attr = TRUE)
 })
+
+
+ent <- function(l) {
+  l <- lapply(l, as.matrix)
+  sapply(seq_along(l), function(i)
+    sapply(seq_len(i - 1L), function(j)
+      sum(l[[i]] & l[[j]]))) |>
+    unlist() |>
+    sum()
+}
+
+test_that("3-layer entrainmentL summary", {
+  layer <- summary(Layer(samplkl) ~ entrainmentL(~.))
+  logic <- ent(samplkl)
+  expect_equal(layer, logic, ignore_attr = TRUE)
+})
+
+test_that("6-layer entrainmentL summary with repeated layers", {
+  lsel <- sample.int(3, 6, replace = TRUE)
+  layer <- summary(Layer(samplkl[lsel]) ~ entrainmentL)
+  logic <- ent(samplkl[lsel])
+  expect_equal(layer, logic, ignore_attr = TRUE)
+})
