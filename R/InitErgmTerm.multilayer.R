@@ -585,8 +585,11 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
   # value depends on more than one other layer value.
   dependence <- length(.depends_on_layers(ll))>1
   
-  if(test_eval.LayerLogic(ll, FALSE)) stop("Layer specifications that produce edges on the output layer for empty input layers are not supported at this time.", call.=FALSE)
-  
+  if (test_eval.LayerLogic(ll, FALSE))
+    ergm_Init_stop("Layer specification ", sQuote(deparse1(a$L)),
+                   " outputs edges when all input layers are empty.",
+                   " This is not supported at this time.", call. = FALSE)
+
   list(name="_layer_net", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)), if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1]), ll), dependence=dependence)
 }
 
@@ -678,9 +681,18 @@ sub.ergm_LayerLogic <- function(x){
            character =,
            name = {
              l <- as.character(l)
-             if(regexpr('^[0-9]+$',l)!=-1) as.name(as.integer(l))
-             else if(l %in% names(namemap)) as.name(namemap[l])
-             else stop("Unrecognised symbol ",sQuote(l)," in layer logic.", call.=FALSE)
+             if (regexpr('^[0-9]+$', l) != -1) {
+               l <- as.integer(l)
+               if (l > length(namemap))
+                 ergm_Init_stop("Layer specification ", sQuote(deparse1(x)),
+                                " references layer ", sQuote(l),
+                                " on a network with only ", length(namemap),
+                                " layers.")
+               as.name(l)
+             } else if (l %in% names(namemap)) as.name(namemap[l])
+             else ergm_Init_stop("Layer specification ", sQuote(deparse1(x)),
+                                 "contains an unrecognised symbol ", sQuote(l),
+                                 ".")
            }
            )
   }
