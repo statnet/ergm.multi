@@ -303,7 +303,8 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
     df <- as_tibble(nwl[[b]], attrname = TRUE, unit = "edge", na.rm = FALSE)
     names <- rep(list(as.list(names(df)[-(1:2)])), nrow(df))
     vals <- transpose(df[,-(1:2)])
-    list(tails = df[[1]]+eblks[b], heads = df[[2]]-es[b]+ablks[b], names = names, vals = vals)
+    remap <- function(i) i + ifelse(i <= es[b], eblks[b], -es[b] + ablks[b])
+    list(tails = remap(df[[1]]), heads = remap(df[[2]]), names = names, vals = vals)
   }) %>% transpose()
 
   out <- add.edges(out, unlist(el$tails), unlist(el$heads), names.eval=do.call(c, el$names), vals.eval=do.call(c, el$vals))
