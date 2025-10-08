@@ -661,7 +661,7 @@ toString.ergm_LayerLogic <- function(x, ...){
   fmt <- function(x){
     class(x) <- keep(class(x), `!=`, "ergm_LayerLogic")
     switch(class(x),
-           formula = despace(deparse(if(length(x)==2) x[[2]] else x)),
+           formula = despace(deparse1(if(length(x)==2) x[[2]] else x)),
            character = x,
            list = paste0('(',paste(sapply(x,fmt),collapse=","),')'),
            as.character(x))
@@ -981,7 +981,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
   auxiliaries <- .mk_.layer.net_auxform(Ls)
   nltrms <- length(list_rhs.formula(auxiliaries))
 
-  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse(Ls)),')'), iinputs=nltrms, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse1(Ls)),')'), iinputs=nltrms, dependence=TRUE, auxiliaries = auxiliaries)
 }
 
 ################################################################################
@@ -1226,7 +1226,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
 
   iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)
 
-  list(name="pairwisedistL", coef.names = paste0('hammingL(',despace(deparse(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="pairwisedistL", coef.names = paste0('hammingL(',despace(deparse1(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
 }
 
 

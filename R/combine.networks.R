@@ -377,7 +377,7 @@ split.network <- function(x, f, drop = FALSE, sep = ".", lex.order = FALSE, ...)
 {
   ### NOTE: This is taken from the split.default() implementation, but is trivial.
   if(!missing(...))
-    .NotYetUsed(deparse(...), error = FALSE)
+    .NotYetUsed(deparse1(...), error = FALSE)
   if(is.list(f))
     f <- interaction(f, drop = drop, sep = sep, lex.order = lex.order)
   else if (!is.factor(f))

@@ -413,9 +413,9 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
   xlab <- NVL(xlab,
               switch(class(against),
                      character = against,
-                     formula = deparse(do.call(substitute, list(ult(against), list(.fitted=as.name("Fitted values")))),width.cutoff=500L),
+                     formula = deparse1(do.call(substitute, list(ult(against), list(.fitted=as.name("Fitted values")))),width.cutoff=500L),
                      `NULL` = "Fitted values",
-                     despace(deparse(substitute(against),width.cutoff=500L))))
+                     despace(deparse1(substitute(against),width.cutoff=500L))))
 
   np <- sum(attr(x,"subset"))
   for(gpar in c("col", "bg", "pch", "cex", "id.label")){
@@ -660,8 +660,8 @@ summary.gofN <- function(object, by=NULL, ...){
       nattrs <- as_tibble(attr(object,"nw"), unit="networks")[attr(object,"subset"),]
     
     byname <- switch(class(by),
-                     formula = despace(deparse(by[[length(by)]])),
-                     despace(deparse(substitute(by))))
+                     formula = despace(deparse1(by[[length(by)]])),
+                     despace(deparse1(substitute(by))))
     byval <- switch(class(by),
                     formula = eval(by[[length(by)]], envir = nattrs, enclos = environment(by)),
                     by)
