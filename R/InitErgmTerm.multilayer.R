@@ -648,7 +648,7 @@ LL_TOGGLE <- c("t")
 #' @keywords internal
 #' @export
 ergm_LayerLogic <- function(formula, namemap=NULL){
-  ## TODO: Check whether we should verify that this is a formula.
+  if (!is(formula, "formula")) ergm_Init_stop(sQuote(deparse(formula)), " is not a formula.")
   structure(formula, namemap=namemap, class=if(is(formula,"ergm_LayerLogic")) class(formula) else c("ergm_LayerLogic", class(formula)))
 }
 
