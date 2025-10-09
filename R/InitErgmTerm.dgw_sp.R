@@ -22,9 +22,9 @@
 
   if(is(a$Ls.path,"formula")) a$Ls.path <- list(a$Ls.path)
   if(length(a$Ls.path) == 1) a$Ls.path <- rep(a$Ls.path, 2)
-  L.path1 <- NVL3(a$Ls.path[[1]], .set_layer_namemap(., namemap))
-  L.path2 <- NVL3(a$Ls.path[[2]], .set_layer_namemap(., namemap))
-  L.base <- NVL3(a$L.base, .set_layer_namemap(., namemap))
+  L.path1 <- NVL3(a$Ls.path[[1]], ergm_LayerLogic(., namemap))
+  L.path2 <- NVL3(a$Ls.path[[2]], ergm_LayerLogic(., namemap))
+  L.base <- NVL3(a$L.base, ergm_LayerLogic(., namemap))
 
   if(is.null(L.path1) && is.null(L.path2) && is.null(L.base)) return(out)
 
@@ -34,7 +34,7 @@
   NVL(L.path2) <- NVL(L.path1, L.base)
   if(has_base) NVL(L.base) <- NVL(L.path1, L.path2)
   
-  layer0 <- .set_layer_namemap(
+  layer0 <- ergm_LayerLogic(
     if(has_base)
       as.formula(call("~",call("|",call("|", L.path1[[2]], L.path2[[2]]),L.base[[2]])))
     else

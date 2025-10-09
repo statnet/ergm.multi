@@ -2,23 +2,30 @@
 % Please edit documentation in R/InitErgmTerm.multilayer.R
 \name{ergm_LayerLogic}
 \alias{ergm_LayerLogic}
+\alias{ergm_LayerLogic.default}
+\alias{ergm_LayerLogic.formula}
+\alias{ergm_LayerLogic.list}
 \alias{toString.ergm_LayerLogic}
 \alias{to_ergm_Cdouble.ergm_LayerLogic}
 \title{Internal representation of Layer Logic}
 \usage{
-ergm_LayerLogic(formula, namemap = NULL)
+ergm_LayerLogic(x, namemap = NULL, ...)
+
+\method{ergm_LayerLogic}{default}(x, namemap = NULL, ...)
+
+\method{ergm_LayerLogic}{formula}(x, namemap = NULL, ...)
+
+\method{ergm_LayerLogic}{list}(x, namemap = NULL, ...)
 
 \method{toString}{ergm_LayerLogic}(x, ...)
 
 \method{to_ergm_Cdouble}{ergm_LayerLogic}(x, ...)
 }
 \arguments{
-\item{formula}{A Layer Logic formula.}
+\item{x}{An \code{ergm_LayerLogic} object.}
 
 \item{namemap}{A character vector giving the names of the layers
-referenced, or \code{NULL}.}
-
-\item{x}{An \code{ergm_LayerLogic} object.}
+referenced, a \code{\link[network:network]{network}} with layer metadata, or \code{NULL}.}
 
 \item{...}{Additional arguments, currently unused.}
 }
@@ -30,6 +37,16 @@ A structure with nonce class
 \description{
 Internal representation of Layer Logic
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{ergm_LayerLogic(default)}: default method; tries to convert the
+specification to a formula.
+
+\item \code{ergm_LayerLogic(formula)}: a method for formulas.
+
+\item \code{ergm_LayerLogic(list)}: a method for lists: evaluate on each element.
+
+}}
 \section{Methods (by generic)}{
 \itemize{
 \item \code{toString(ergm_LayerLogic)}: A method to generate coefficient names
