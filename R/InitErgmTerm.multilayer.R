@@ -677,7 +677,9 @@ ergm_LayerLogic.list <- function(x, namemap = NULL, ...) {
 #' @param ... Additional arguments, currently unused.
 #' @export
 toString.ergm_LayerLogic <- function(x, ...) {
-  despace(deparse1(if (length(x) == 2) x[[2]] else x))
+  if (length(x) == 2) x <- x[[2]]
+  if (is.character(x) && length(x) == 1L) x <- as.name(x) # Solitary layer name.
+  despace(deparse1(x))
 }
 
 # Substitute numeric layer IDs for layer names and simplify some common trivial expressions (e.g., a | a => a).
