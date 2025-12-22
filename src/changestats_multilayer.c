@@ -146,7 +146,7 @@ I_CHANGESTAT_FN(i_OnLayer){
   ALLOC_STORAGE(nml, Model*, ms);
 
   for(unsigned int ml=0; ml<nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     ms[ml] = ModelInitialize(getListElement(mtp->R, "submodel"), NULL, ll->onwp, FALSE);
   }
   DELETE_IF_UNUSED_IN_SUBMODELS(u_func, ms, nml);
@@ -160,7 +160,7 @@ C_CHANGESTAT_FN(c_OnLayer){
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     Vertex at[2], ah[2];
     unsigned int nt = ergm_LayerLogic_affects(tail, head, ll, LL_DIFF, at, ah);
     if(nt){
@@ -178,7 +178,7 @@ Z_CHANGESTAT_FN(z_OnLayer){
 
   // Find the affected models.
   for(unsigned int ml=0; ml < nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     ZStats(ll->onwp, ms[ml], FALSE);
     for(unsigned int i=0; i<N_CHANGE_STATS; i++)
       CHANGE_STAT[i] += ms[ml]->workspace[i] * w[ml];
@@ -189,7 +189,7 @@ F_CHANGESTAT_FN(f_OnLayer){
   GET_STORAGE(Model*, ms);
   unsigned int nml = *IINPUT_PARAM;
   for(unsigned int ml=0; ml<nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     ModelDestroy(ll->onwp, ms[ml]);
   }
 }
@@ -207,7 +207,7 @@ C_CHANGESTAT_FN(c_layerCMB){
   /* Determine whether we need to check the reciprocating dyads. */
   Rboolean need_ht = FALSE;
   for(unsigned int ml=0; ml < nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     if(ll->need_ht){
       need_ht = TRUE;
       break;
@@ -215,7 +215,7 @@ C_CHANGESTAT_FN(c_layerCMB){
   }
 
   for(unsigned int ml=0; ml < nml; ml++){
-    GET_AUX_STORAGE_NUM(StoreLayerLogic, ll, ml);
+    GET_AUX_STORAGE(ml, StoreLayerLogic, ll);
     Vertex lt = ML_IO_TAIL(ll, tail), lh = ML_IO_HEAD(ll, head);
     unsigned int v = ergm_LayerLogic2(lt, lh, tail, head, ll, LL_ENCODE);
     if(v&1) oldct_th++; // Pre-toggle edge present.
@@ -240,8 +240,8 @@ C_CHANGESTAT_FN(c_twostarL) {
   unsigned int typeID = IINPUT_PARAM[0];
   unsigned int distinct = IINPUT_PARAM[1];
   
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 1);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll2);
   
   Vertex lt = ML_IO_TAIL(ll1, tail), lh = ML_IO_HEAD(ll1, head);
 
@@ -366,8 +366,8 @@ C_CHANGESTAT_FN(c_twostarL) {
  anything -> (1,1) = +1
 *****************/
 C_CHANGESTAT_FN(c_mutual_ML){
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 1);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll2);
   
   double matchval;
   int j, ninputs, noattr;
@@ -410,8 +410,8 @@ C_CHANGESTAT_FN(c_mutual_ML){
  changestat: d_mutual_by_attr_ML
 *****************/
 C_CHANGESTAT_FN(c_mutual_by_attr_ML) { 
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 1);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll2);
 
   int j, ninputs;
 

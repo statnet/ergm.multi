@@ -140,9 +140,9 @@ all_calcs2(dspISP)
 */
 C_CHANGESTAT_FN(c_ddsp_ML) { 
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
   StoreLayerLogic *ll3 = NULL;
   StoreStrictDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
@@ -164,9 +164,9 @@ C_CHANGESTAT_FN(c_ddsp_ML) {
 
 C_CHANGESTAT_FN(c_ddspdist_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
   StoreLayerLogic *ll3 = NULL;
   StoreStrictDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
@@ -202,9 +202,9 @@ C_CHANGESTAT_FN(c_ddspdist_ML) {
 */
 C_CHANGESTAT_FN(c_dgwdsp_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
   StoreLayerLogic *ll3 = NULL;
   StoreStrictDyadMapUInt *spcache = N_AUX>=4 ? AUX_STORAGE_NUM(3) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
@@ -256,10 +256,10 @@ all_calcs(espISP)
 */
 C_CHANGESTAT_FN(c_desp_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
@@ -280,10 +280,10 @@ C_CHANGESTAT_FN(c_desp_ML) {
 
 C_CHANGESTAT_FN(c_despdist_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
@@ -318,10 +318,10 @@ C_CHANGESTAT_FN(c_despdist_ML) {
 */
 C_CHANGESTAT_FN(c_dgwesp_ML) { 
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   double alpha = INPUT_PARAM[0];       /*Get alpha*/
@@ -365,10 +365,10 @@ C_CHANGESTAT_FN(c_dgwesp_ML) {
 #define NEGATE_CHANGE_STATS for(unsigned int i = 0; i < N_CHANGE_STATS; i++) CHANGE_STAT[i] *= -1;
 C_CHANGESTAT_FN(c_dnsp_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
@@ -409,10 +409,10 @@ C_CHANGESTAT_FN(c_dnsp_ML) {
 
 C_CHANGESTAT_FN(c_dnspdist_ML) {
   /*Set things up*/
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   L2Type type = (L2Type) IINPUT_PARAM[1];     /*Get the L2 type code to be used*/
@@ -466,10 +466,10 @@ C_CHANGESTAT_FN(c_dnspdist_ML) {
   Only one type may be specified per esp term.  The default, OTP, retains the original behavior of esp/gwesp.  In the case of undirected graphs, OTP should be used (the others assume a directed network memory structure, and are not safe in the undirected case).
 */
 C_CHANGESTAT_FN(c_dgwnsp_ML) {
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 0);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll3, 3);
+  GET_AUX_STORAGE(0, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll2);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll3);
   StoreStrictDyadMapUInt *spcache = N_AUX>=5 ? AUX_STORAGE_NUM(4) : NULL;
   Rboolean any_order = (Rboolean) IINPUT_PARAM[0];
   double alpha = INPUT_PARAM[0];       /*Get alpha*/

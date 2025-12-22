@@ -18,9 +18,9 @@
 
 I_CHANGESTAT_FN(i__otp_wtnet_ML){
   StoreStrictDyadMapUInt *spcache = AUX_STORAGE = kh_init(StrictDyadMapUInt);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
   
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
@@ -33,9 +33,9 @@ I_CHANGESTAT_FN(i__otp_wtnet_ML){
 
 U_CHANGESTAT_FN(u__otp_wtnet_ML){
   GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
@@ -81,9 +81,9 @@ F_CHANGESTAT_FN(f__otp_wtnet_ML){
 
 I_CHANGESTAT_FN(i__osp_wtnet_ML){
   StoreStrictDyadMapUInt *spcache = AUX_STORAGE = kh_init(StrictDyadMapUInt);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
@@ -96,9 +96,9 @@ I_CHANGESTAT_FN(i__osp_wtnet_ML){
 
 U_CHANGESTAT_FN(u__osp_wtnet_ML){
   GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
@@ -129,9 +129,9 @@ F_CHANGESTAT_FN(f__osp_wtnet_ML){
 
 I_CHANGESTAT_FN(i__isp_wtnet_ML){
   StoreStrictDyadMapUInt *spcache = AUX_STORAGE = kh_init(StrictDyadMapUInt);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i->j
@@ -144,9 +144,9 @@ I_CHANGESTAT_FN(i__isp_wtnet_ML){
 
 U_CHANGESTAT_FN(u__isp_wtnet_ML){
   GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
@@ -177,9 +177,9 @@ F_CHANGESTAT_FN(f__isp_wtnet_ML){
 
 I_CHANGESTAT_FN(i__utp_wtnet_ML){
   StoreStrictDyadMapUInt *spcache = AUX_STORAGE = kh_init(StrictDyadMapUInt);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   ML_EXEC_THROUGH_NET_EDGES(ll0, i, j, e1, { // Since i-j
@@ -196,9 +196,9 @@ I_CHANGESTAT_FN(i__utp_wtnet_ML){
 
 U_CHANGESTAT_FN(u__utp_wtnet_ML){
   GET_AUX_STORAGE(StoreStrictDyadMapUInt, spcache);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll0, 1);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll1, 2);
-  GET_AUX_STORAGE_NUM(StoreLayerLogic, ll2, 3);
+  GET_AUX_STORAGE(1, StoreLayerLogic, ll0);
+  GET_AUX_STORAGE(2, StoreLayerLogic, ll1);
+  GET_AUX_STORAGE(3, StoreLayerLogic, ll2);
   bool any_order=IINPUT_PARAM[0];
 
   SETUP_update_spcache;
