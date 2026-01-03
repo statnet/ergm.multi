@@ -177,6 +177,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       out <- set.network.attribute(out, a, vl)
     }
   }
+  sna[[blockID.vattr]]$..class <- lapply(nwl, class)
   out %n% ".subnetattr" <- sna
 
   # Concatenate vertex attributes.
@@ -278,6 +279,7 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
       out <- set.network.attribute(out, a, vl)
     }
   }
+  sna[[blockID.vattr]]$..class <- lapply(nwl, class)
   out %n% ".subnetattr" <- sna
 
   # Concatenate vertex attributes.
@@ -448,10 +450,10 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
     nwl <- split(nw, f)
 
     for(i in seq_along(nwl)){
-      class(nwl[[i]]) <- class(nwl[[i]])[-seq_len(min(which(class(nwl[[i]])=="combined_networks")))]
+      class(nwl[[i]]) <- sna$..class[[i]]
       for(nattr in c(".subnetattr", ".subnetcache", ".blockID.vattr", ".blockName.vattr"))
         delete.network.attribute(nwl[[i]], nattr)
-      for(nattr in names(sna))
+      for(nattr in setdiff(names(sna), "..class"))
         nwl[[i]] %n% nattr <- sna[[nattr]][[i]]
     }
   }
