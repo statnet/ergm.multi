@@ -2,9 +2,12 @@
 % Please edit documentation in R/InitErgmTerm.multinet.R
 \name{Networks}
 \alias{Networks}
+\alias{unNetworks}
 \title{A multinetwork network representation.}
 \usage{
 Networks(...)
+
+unNetworks(object)
 }
 \arguments{
 \item{...}{network specification, in one of two formats:
@@ -12,6 +15,8 @@ Networks(...)
 \item An (optionally named) list of networks with same directedness and bipartedness (but possibly different sizes).
 \item Several networks as (optionally named) arguments.
 }}
+
+\item{object}{a multinetwork network returned by \code{Networks()}}
 }
 \value{
 A \code{\link[network:network]{network}} object comprising the provided networks, with multinetwork metadata.
@@ -22,6 +27,8 @@ Due to certain optimizations, the resulting \code{\link[network:network]{network
 A function for specifying the LHS of a multi-network
 (a.k.a. multilevel) ERGM. Typically used in conjunction with the
 \code{\link[=N-ergmTerm]{N()}} term operator.
+
+\code{unNetworks()} extracts the networks into a list.
 }
 \examples{
 

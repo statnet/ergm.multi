@@ -546,6 +546,25 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   nw
 }
 
+#' @rdname Layer
+#' @description `unLayer()` extracts the layers as a list of networks.
+#'
+#' @param object a multilayer network returned by `Layer()`
+#'
+#' @export
+unLayer <- function(object) {
+  if (object %n% ".blockID.vattr" != ".LayerID")
+    stop("The specified network is not a multilayer network at the top level.")
+
+  uncombine_network(object) |>
+    map(ergmlhs_remove_blockdiag, ".LayerID") |>
+    map_if(function(nw) all(replace(nw %v% ".undirected", is.na, FALSE)),
+           function(nw) ergm_symmetrize(nw, rule = "upper")) |>
+    map(delete.vertex.attribute, ".undirected") |>
+    map_if(function(nw) any(replace(nw %v% ".bipartite", is.na, 0L) != 0L),
+           function(nw) set.network.attribute(nw, "bipartite", (nw %v% ".bipartite")[1L])) |>
+    map(delete.vertex.attribute, ".bipartite")
+}
 
 ## InitErgmTerm..layer.nets <- function(nw, arglist, ...){
 ##   a <- check.ErgmTerm(nw, arglist,

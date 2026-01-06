@@ -40,3 +40,26 @@ combine_ergmlhs <- function(nwl, ignore.settings=c()){
   }
   l
 }
+
+#' Remove a [`blockdiag`][blockdiag-ergmConstraint] constraint for a
+#' specific vertex attribute from an [`%ergmlhs%`] formula if it's
+#' absent in the network.
+#'
+#' @param nw a [`network`]
+#' @param vattr a vertex attribute name
+#'
+#' @return a [`network`] with an updated `%ergmlhs% "constraints"`.
+#' @keywords internal
+#' @export
+ergmlhs_remove_blockdiag <- function(nw, vattr) {
+  if (! vattr %in% list.vertex.attributes(nw)) {
+    nw %ergmlhs% "constraints" <- filter_rhs.formula(nw %ergmlhs% "constraints", function(trm)
+      ! identical(trm, call("blockdiag", vattr)))
+
+    ## TODO: filter_rhs.formula() should probably return NULL when it
+    ## deleted all the terms, so if this is ever the case, the
+    ## following could be removed.
+    if (length(nw %ergmlhs% "constraints") < 2) nw %ergmlhs% "constraints" <- NULL
+  }
+  nw
+}

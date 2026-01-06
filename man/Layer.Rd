@@ -2,9 +2,12 @@
 % Please edit documentation in R/InitErgmTerm.multilayer.R
 \name{Layer}
 \alias{Layer}
+\alias{unLayer}
 \title{A multilayer network representation.}
 \usage{
 Layer(..., .symmetric = NULL, .bipartite = NULL, .active = NULL)
+
+unLayer(object)
 }
 \arguments{
 \item{...}{layer specification, in one of three formats:
@@ -32,6 +35,8 @@ treated as bipartite and how many mode 1 vertices there are.}
 
 \item{.active}{An optional list with a \link[ergm:nodal_attributes]{nodal attribute specification} (\code{? nodal_attributes}) for each
 layer, specifying which nodes on each layer \emph{may} have ties.}
+
+\item{object}{a multilayer network returned by \code{Layer()}}
 }
 \value{
 A \code{\link[network:network]{network}} object comprising the provided layers, with layer metadata.
@@ -42,6 +47,8 @@ Due to certain optimizations, the resulting \code{\link[network:network]{network
 A function for specifying the LHS of a multilayer
 (a.k.a. multiplex, a.k.a. multirelational, a.k.a. multivariate)
 ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
+
+\code{unLayer()} extracts the layers as a list of networks.
 }
 \note{
 The resulting network will be the "least common denominator"

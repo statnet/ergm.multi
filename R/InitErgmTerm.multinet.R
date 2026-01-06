@@ -64,6 +64,20 @@ Networks <- function(...){
   nw
 }
 
+#' @rdname Networks
+#' @description `unNetworks()` extracts the networks into a list.
+#'
+#' @param object a multinetwork network returned by `Networks()`
+#'
+#' @export
+unNetworks <- function(object) {
+  if (object %n% ".blockID.vattr" != ".NetworkID")
+    stop("The specified network is not a sample of disjoint networks at the top level.")
+
+  uncombine_network(object) |> map(ergmlhs_remove_blockdiag, ".NetworkID")
+}
+
+
 InitErgmTerm..subnets <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("attrname"),
