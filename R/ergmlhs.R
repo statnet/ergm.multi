@@ -54,7 +54,7 @@ combine_ergmlhs <- function(nwl, ignore.settings=c()){
 ergmlhs_remove_blockdiag <- function(nw, vattr) {
   if (! vattr %in% list.vertex.attributes(nw)) {
     nw %ergmlhs% "constraints" <- filter_rhs.formula(nw %ergmlhs% "constraints", function(trm)
-      ! identical(trm, call("blockdiag", vattr)))
+      ! identical(trm, call("blockdiag", vattr, noncontig = "split")))
 
     ## TODO: filter_rhs.formula() should probably return NULL when it
     ## deleted all the terms, so if this is ever the case, the

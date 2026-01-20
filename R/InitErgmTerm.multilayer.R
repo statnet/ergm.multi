@@ -534,9 +534,9 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
-        base_env(~blockdiag(".LayerID"))
+        base_env(~blockdiag(".LayerID", noncontig = "split"))
       else
-        append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag",".LayerID")), TRUE)
+        append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag", ".LayerID", noncontig = "split")), TRUE)
   
   if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
   if(any(blockout!=0)||!is.null(.active)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)

@@ -56,9 +56,9 @@ Networks <- function(...){
 
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
-        base_env(~blockdiag(".NetworkID"))
+        base_env(~blockdiag(".NetworkID", noncontig = "split"))
       else
-        append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag",".NetworkID")), TRUE)
+        append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag", ".NetworkID", noncontig = "split")), TRUE)
   if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]]%ergmlhs%"obs.constraints"
 
   nw
