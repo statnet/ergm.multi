@@ -22,7 +22,7 @@ network.layercount <- function(x, ...) {
 }
 
 .same_constraints <- function(nwl, nattr){
-  map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
+  map(nwl, `%ergmlhs%`, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
 }
 
 .varying_attributes <- function(nwl, lister, getter, type, ignore = c()){
