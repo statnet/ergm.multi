@@ -10,6 +10,17 @@
 ## TODO: LL-Constrained proposals.
 ## TODO: Check that noncommutative LL operators work as intended.
 
+#' Number of layers in a combined network.
+#'
+#' @param x a combined network returned by [combine_networks()]
+#'
+#' @export
+#' @keywords internal
+network.layercount <- function(x, ...) {
+  assert_LHS_Layer(x)
+  max(get_combining_attr(x, ".LayerID"))
+}
+
 .same_constraints <- function(nwl, nattr){
   map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
 }
@@ -36,9 +47,9 @@
 }
 
 .layer_namemap <- function(nw){
-  nwnames <- .peek_vattrv(nw, ".LayerName", missing="NULL")
+  nwnames <- get_combining_attr(nw, ".LayerName", missing="NULL")
   if(is.numeric(nwnames)) nwnames <- NULL
-  nwids <- .peek_vattrv(nw, ".LayerID")
+  nwids <- get_combining_attr(nw, ".LayerID")
 
   o <- structure(nwids, names=nwnames)
   o[!duplicated(o)]
@@ -62,7 +73,7 @@
 }
 
 assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
-  if(anyNA(.peek_vattrv(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
+  if(anyNA(get_combining_attr(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
 }
 
 #' Construct a "view" of a network.
@@ -1252,7 +1263,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
   deps <- lapply(lls, .depends_on_layers)
   auxiliaries <- .mk_.layer.net_auxform(Ls)
 
-  affects <- map(seq_len(max(nw%v%".LayerID")),
+  affects <- map(seq_len(network.layercount(nw)),
                  function(l) which(map_lgl(deps, function(d) l %in% d)))
 
   iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)

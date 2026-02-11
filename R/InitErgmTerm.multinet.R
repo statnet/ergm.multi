@@ -167,7 +167,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 }
 
 assert_LHS_Networks <- function(nw, nid, term_trace = TRUE, call = if(term_trace) NULL else rlang::caller_env()){
-  if(anyNA(.peek_vattrv(nw, nid))){
+  if(anyNA(get_combining_attr(nw, nid))){
     msg <- paste0("The LHS of the model is not a multi-network ", sQuote("Networks()"), " construct.")
     if(term_trace) ergm_Init_abort(msg, call=call)
     else abort(msg, call=call)

@@ -117,7 +117,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
 
   nw <- object$network
   assert_LHS_Networks(nw, ".NetworkID", term_trace=FALSE)
-  nnets <- length(unique(.peek_vattrv(nw, ".NetworkID")))
+  nnets <- length(unique(get_combining_attr(nw, ".NetworkID")))
 
   if(is.numeric(subset)) subset <- unwhich(subset, nnets)
   subset <- rep(subset, length.out=nnets)

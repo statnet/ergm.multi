@@ -338,12 +338,20 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   out
 }
 
-
-.peek_vattrv <- function(nw, vattr, missing=c("NA","NULL")){
+#' In a combined network, obtain the top-level attribute vector on which it was combined.
+#'
+#' @param x a [combine_networks()] network
+#' @param attrname a string
+#' @param missing what to return if the attribute is not found
+#'
+#' @keywords internal
+#' @export
+get_combining_attr <- function(x, attrname, missing = c("NA", "NULL")) {
   missing <- match.arg(missing)
-  if(missing=="NULL" && ! vattr%in%list.vertex.attributes(nw)) return(NULL)
+  if (missing == "NULL"
+      && ! attrname %in% list.vertex.attributes(x)) return(NULL)
 
-  av <- get.vertex.attribute(nw, vattr, unlist=FALSE)
+  av <- get.vertex.attribute(x, attrname, unlist = FALSE)
   sapply(av, "[", 1)
 }
 
@@ -538,7 +546,7 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
 #'
 #' @noRd
 .block_vertexmap <- function(nw, by=nw %n% ".blockID.vattr", same_dim=FALSE){
-  a <- .peek_vattrv(nw, by)
+  a <- get_combining_attr(nw, by)
   n <- length(a)
   bip <- b1.size(nw)
   if(NVL(bip,0)){

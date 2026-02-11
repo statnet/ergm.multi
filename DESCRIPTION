@@ -41,7 +41,7 @@ Description: A set of extensions for the 'ergm' package to fit multilayer/multip
 License: GPL-3 + file LICENSE
 URL: https://statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.3.2.9000
+RoxygenNote: 7.3.3.9000
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
