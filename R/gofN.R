@@ -420,10 +420,11 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
   np <- sum(attr(x,"subset"))
   for(gpar in c("col", "bg", "pch", "cex", "id.label")){
     a <- get(gpar)
-    a <- switch(class(a),
+    a <- switch(class(a)[1],
                 AsIs = a,
                 character = nattrs[[a]],
                 formula = eval(a[[length(a)]], envir = nattrs, enclos = environment(a)),
+                NULL = list(NULL),
                 a)
     a <- rep_len(a, np)
     assign(gpar, a)
@@ -486,7 +487,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
     nn <- sum(!is.na(summ$pearson))
     ez <- qnorm((nn+.5)/(nn+1)) # Extreme standard normal quantile appropriate to the sample size.
     ei <- !is.na(summ$pearson) & rank(-abs(summ$pearson), ties.method="min")<=id.n & abs(summ$pearson)>ez
-    NVL(id.label) <- seq_along(summ$pearson)
+    id.label[map_lgl(id.label, is.null)] <- seq_along(summ$pearson)[map_lgl(id.label, is.null)]
 
     NVL(againstval) <- summ$fitted
     resid.plotter <- if(is.factor(againstval)) boxplot.smooth else points.smooth
