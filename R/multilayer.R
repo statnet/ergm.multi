@@ -218,6 +218,8 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
 #' @param x a [`network`] object.
 #' @param rule a string specifying how the network is to be
 #'   constructed.
+#'
+#' @noRd
 direct.network <- function(x, rule=c("both", "upper", "lower")){
   rule <- match.arg(rule)
 
