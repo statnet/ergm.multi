@@ -63,7 +63,7 @@
 }
 
 no_layer_err <- function(instead){
-  ergm_Init_abort(paste("No layer specification found. Use", sQuote(paste0(instead, "()")), "instead."))
+  ergm_Init_stop(paste("No layer specification found. Use", sQuote(paste0(instead, "()")), "instead."))
 }
 
 wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp = TRUE, ...) {

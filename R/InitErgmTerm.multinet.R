@@ -58,7 +58,7 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
 assert_LHS_Networks <- function(nw, nid, term_trace = TRUE, call = if(term_trace) NULL else rlang::caller_env()){
   if(anyNA(get_combining_attr(nw, nid))){
     msg <- paste0("The LHS of the model is not a multi-network ", sQuote("Networks()"), " construct.")
-    if(term_trace) ergm_Init_abort(msg, call=call)
+    if (term_trace) ergm_Init_abort(msg, call=call)
     else abort(msg, call=call)
   }
 }
@@ -193,14 +193,14 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
   nstats <-  ms %>% map_int(nparam, canonical=TRUE)
 
   # Check for MANOVA style matrix.
-  if(!all_identical(nparams)) ergm_Init_abort("N() operator only supports models with the same numbers of parameters for every network. This may change in the future.")
-  if(!all_identical(ms %>% map(param_names, canonical=FALSE))) ergm_Init_warn("Subnetwork models have different parameter names but the same parameter vector lengths; this may indicate specification problems.")
+  if (!all_identical(nparams)) ergm_Init_stop("N() operator only supports models with the same numbers of parameters for every network. This may change in the future.")
+  if (!all_identical(ms %>% map(param_names, canonical=FALSE))) ergm_Init_warning("Subnetwork models have different parameter names but the same parameter vector lengths; this may indicate specification problems.")
   nparam <- nparams[1]
 
   # Extract offsets and weights.
   offset <- model.offset(xf) %>% NVL(numeric(nm)) %>% matrix(nrow=nm, ncol=nparam) # offset is actually an nm*q matrix.
   weights <- model.weights(xf)
-  if(!all(weights==1)) ergm_Init_abort("Network-level weights different from 1 are not supported at this time.")
+  if (!all(weights==1)) ergm_Init_stop("Network-level weights different from 1 are not supported at this time.")
 
   # Model parameters.
   params <- rep(list(NULL), nparam*ncol(xm))
@@ -211,7 +211,7 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .NetworkID=".
     else ergm_mk_std_op_namewrap('N',a$label)
   )(rep(param_names(ms[[1]], canonical=FALSE), each=ncol(xm)), parnames)
   if(any(ms[[1]]$etamap$offsettheta))
-    ergm_Init_abort("The ERGM ", sQuote("formula="), " argument of an ", sQuote("N()"),
+    ergm_Init_stop("The ERGM ", sQuote("formula="), " argument of an ", sQuote("N()"),
                     " operator may not have offsets. See ", sQuote("ergmTerm?N"),
                     " section on fixing parameters for details.")
   if(with(ms[[1]]$etamap,

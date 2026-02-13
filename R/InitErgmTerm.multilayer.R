@@ -72,7 +72,7 @@ network.layercount <- function(x, ...) {
   if (collapse) ergm_mk_std_op_namewrap("L", reprs) else reprs
 }
 
-assert_LHS_Layer <- function(nw, errfn = ergm_Init_abort){
+assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
   if(anyNA(get_combining_attr(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
 }
 
@@ -1090,7 +1090,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   else if (is.null(type)) ergm_Init_stop(sQuote("type"), " argument is required for directed networks")
 
   type <- match.arg(tolower(type), TYPES)
-  if (type == "any" && is.directed(nw)) ergm_Init_abort(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
+  if (type == "any" && is.directed(nw)) ergm_Init_stop(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
   typeID <- match(type, TYPES) - 1L
 
   Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
@@ -1258,7 +1258,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
 
   Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
   Ls.dotexp <- .layers_expand_dot(Ls)
-  if(length(Ls.dotexp) < 2L) ergm_Init_stop("multiple layers are required")
+  if (length(Ls.dotexp) < 2L) ergm_Init_stop("multiple layers are required")
   lls <- lapply(Ls.dotexp, to_ergm_Cdouble)
   deps <- lapply(lls, .depends_on_layers)
   auxiliaries <- .mk_.layer.net_auxform(Ls)
