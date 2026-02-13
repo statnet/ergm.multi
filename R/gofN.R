@@ -120,7 +120,7 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   nnets <- length(unique(get_combining_attr(nw, ".NetworkID")))
 
   if(is.numeric(subset)) subset <- unwhich(subset, nnets)
-  subset <- rep(subset, length.out=nnets)
+  subset <- rep_len(subset, nnets)
 
   stats <- stats.obs <- NULL
 
@@ -425,7 +425,7 @@ plot.gofN <- function(x, against=NULL, which=1:2, col=1, pch=1, cex=1, bg=0, ...
                 character = nattrs[[a]],
                 formula = eval(a[[length(a)]], envir = nattrs, enclos = environment(a)),
                 a)
-    a <- rep(a, length.out=np)
+    a <- rep_len(a, np)
     assign(gpar, a)
   }
 

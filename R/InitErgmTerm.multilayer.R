@@ -1148,7 +1148,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   if (type == "any" && is.directed(nw)) ergm_Init_stop(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
   typeID <- match(type, TYPES) - 1L
 
-  Ls <- ergm_LayerLogic(rep(enlist(a$Ls), length.out = 2), nw)
+  Ls <- ergm_LayerLogic(rep_len(enlist(a$Ls), 2), nw)
   coef.names <- paste0("twostarL(",
                        map_chr(Ls, toString) |> paste0(collapse=TYPEREP[type]),
                        if(a$distinct) ",distinct",

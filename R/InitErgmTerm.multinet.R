@@ -26,13 +26,13 @@ get_lminfo <- function(nattrs, lm=~1, subset=TRUE, contrasts=NULL, offset=NULL, 
     if(mode(subset) %in% c("expression", "call")) eval(if(is(subset, "formula")) subset[[2]] else subset, envir = nattrs, enclos = environment(lm))
     else subset
   subset <- unwhich(switch(mode(subset),
-                           logical = which(rep(subset, length.out = nn)),
+                           logical = which(rep_len(subset, nn)),
                            numeric = subset),
                     nn)
 
   weights <- if(mode(weights) %in% c("expression", "call")) eval(if(is(weights, "formula")) weights[[2]] else weights, envir = nattrs, enclos = environment(lm))
              else weights
-  weights <- rep(weights, length.out=nn)
+  weights <- rep_len(weights, nn)
 
   offset <- if(mode(offset) %in% c("expression", "call")) eval(if(is(offset, "formula")) offset[[2]] else offset, envir = nattrs, enclos = environment(lm))
              else offset
