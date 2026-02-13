@@ -46,30 +46,29 @@ network.layercount <- function(x, ...) {
   length(extra_attrs) || any(differing)
 }
 
-.layer_namemap <- function(nw){
-  nwnames <- get_combining_attr(nw, ".LayerName", missing="NULL")
-  if(is.numeric(nwnames)) nwnames <- NULL
-  nwids <- get_combining_attr(nw, ".LayerID")
+.layer_namemap <- function(nw) {
+  if (is(nw, "network")) {
+    nwnames <- get_combining_attr(nw, ".LayerName", missing = "NULL")
+    if (is.numeric(nwnames)) nwnames <- NULL
+    nwids <- get_combining_attr(nw, ".LayerID")
 
-  o <- structure(nwids, names=nwnames)
-  o[!duplicated(o)]
+    o <- structure(nwids, names = nwnames %||% as.character(nwids))
+    o[!duplicated(o)]
+  } else nw
 }
 
-.lspec_coef.namewrap <- function(Llist, collapse=TRUE){
+.lspec_coef.name <- function(Llist){
   fmt <- function(x) {
-    if (is.null(x)) ""
-    else if (is.vector(x)) {
-      if (length(x) > 1) paste0("(", paste(sapply(x, fmt), collapse = ","), ")")
-      else if (is.list(x) || is.expression(x)) fmt(x[[1]])
-      else toString(x)
-    } else toString(x)
+    if (hasAttr(x, "repr")) attr(x, "repr")
+    else if (length(x) > 1) paste0("(", paste(sapply(x, fmt), collapse = ","), ")")
+    else if (is.list(x) || is.expression(x)) fmt(x[[1]])
+    else toString(x)
   }
-  reprs <- sapply(seq_along(Llist), function(l) {
-    name <- names(Llist)[l]
-    s <- fmt(Llist[[l]])
-    if (NVL(name, "") != "") paste0(name, "=", s) else s
+  Llist |>
+    compact() |>
+    imap_chr(function(l, i) {
+    if (is.character(i) && i != "") paste0(i, "=", fmt(l)) else fmt(l)
   })
-  if (collapse) ergm_mk_std_op_namewrap("L", reprs) else reprs
 }
 
 assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
@@ -668,38 +667,52 @@ LL_TOGGLE <- c("t")
 
 #' Internal representation of Layer Logic
 #'
-#' @param x A Layer Logic formula.
+#' @param x An object.
 #' @param namemap A character vector giving the names of the layers
 #'   referenced, a [`network`] with layer metadata, or `NULL`.
 #'
 #' @return A structure with nonce class
-#'   `c("ergm_LayerLogic",class(formula))`, comprising the input
+#'   `c("ergm_LayerLogic", class(formula))`, comprising the input
 #'   `formula` and an attribute `namemap` containing the `namemap`.
 #' @keywords internal
 #' @export
-ergm_LayerLogic <- function(x, namemap = NULL, ...) UseMethod("ergm_LayerLogic")
+ergm_LayerLogic <- function(x, ...) UseMethod("ergm_LayerLogic")
 
 #' @describeIn ergm_LayerLogic default method; tries to convert the
 #'   specification to a formula.
 #' @export
-ergm_LayerLogic.default <- function(x, namemap = NULL, ...) {
-  ergm_LayerLogic(as.formula(x, baseenv()), namemap = namemap, ...)
+ergm_LayerLogic.default <- function(x, ...) {
+  ergm_LayerLogic(as.formula(x, baseenv()), ...)
 }
+
+#' @describeIn ergm_LayerLogic optionally overwrite `namemap`.
+#' @export
+ergm_LayerLogic.ergm_LayerLogic <- function(x, namemap = attr(x, "namemap"), ...) ergm_LayerLogic.formula(x, namemap = .layer_namemap(namemap))
 
 #' @describeIn ergm_LayerLogic a method for formulas.
 #' @export
-ergm_LayerLogic.formula <- function(x, namemap = NULL, ...) {
-  if (is.network(namemap)) namemap <- .layer_namemap(namemap)
-  structure(x, namemap = namemap,
-            class = if (is(x, "ergm_LayerLogic")) class(x)
-                    else c("ergm_LayerLogic", class(x)))
+ergm_LayerLogic.formula <- function(x, namemap, ...) {
+  namemap <- .layer_namemap(namemap)
+
+  if (ult(x) == ".") .all_layers(namemap, LHS = if (length(x) == 3) x[[2]])
+  else {
+    o <- structure(x, namemap = namemap,
+                   class = if (is(x, "ergm_LayerLogic")) class(x)
+                           else c("ergm_LayerLogic", class(x)))
+
+    o <- structure(o,
+                   repr = toString.ergm_LayerLogic(x),
+                   auxiliaries = .mk_.layer.net_auxform(o),
+                   depends = to_ergm_Cdouble(o) |> .depends_on_layers())
+
+    structure(o,
+              nlayers = length(list_rhs.formula(attr(o, "auxiliaries"))))
+  }
 }
 
-#' @describeIn ergm_LayerLogic a method for lists: evaluate on each element.
+#' @describeIn ergm_LayerLogic a method for lists: construct an [ergm_LayerLogics()] object.
 #' @export
-ergm_LayerLogic.list <- function(x, namemap = NULL, ...) {
-  lapply(x, ergm_LayerLogic, namemap = namemap, ...)
-}
+ergm_LayerLogic.list <- function(x, namemap = NULL, ...) ergm_LayerLogics(x, namemap = namemap, ...)
 
 #' @describeIn ergm_LayerLogic A method to generate coefficient names
 #'   associated with the Layer Logic.
@@ -707,10 +720,66 @@ ergm_LayerLogic.list <- function(x, namemap = NULL, ...) {
 #' @param ... Additional arguments, currently unused.
 #' @export
 toString.ergm_LayerLogic <- function(x, ...) {
-  if (length(x) == 2) x <- x[[2]]
-  if (is.character(x) && length(x) == 1L) x <- as.name(x) # Solitary layer name.
-  despace(deparse1(x))
+  if (hasAttr(x, "repr")) attr(x, "repr")
+  else {
+    if (length(x) == 2) x <- x[[2]]
+    if (is.character(x) && length(x) == 1L) x <- as.name(x) # Solitary layer name.
+    despace(deparse1(x))
+  }
 }
+
+#' @describeIn ergm_LayerLogic A generic for constructing a list of layer logics.
+#' @export
+ergm_LayerLogics <- function(x, ...) UseMethod("ergm_LayerLogics")
+
+#' @describeIn ergm_LayerLogic a method for [ergm_LayerLogic()] objects, simply insert it into a list.
+#' @export
+ergm_LayerLogics.ergm_LayerLogic <- function(x, ...) ergm_LayerLogics(list(x), ...)
+
+#' @describeIn ergm_LayerLogic a method to flatten the list.
+#' @importFrom rlang quo eval_tidy
+#' @method unlist ergm_LayerLogics
+#' @export
+unlist.ergm_LayerLogics <- function(x, recursive = TRUE, use.names = TRUE) {
+  if (recursive == FALSE) stop("Non-recursive unlist() is not implemented for this class.")
+  # This produces a flat list of layer logics.
+  rapply(x, quo, "ergm_LayerLogic") |> map(eval_tidy)
+}
+
+#' @describeIn ergm_LayerLogic construct from a list.
+#' @export
+ergm_LayerLogics.list <- function(x, namemap = NULL, ...) {
+  namemap <- .layer_namemap(namemap)
+
+  x <- x |>
+    rapply(ergm_LayerLogic, how = "replace", namemap = namemap) |>
+    unlist.ergm_LayerLogics()
+
+  if (is.null(namemap)) {
+    namemaps <- map(x, attr, "namemap") |> compact()
+    if (!all_identical(namemaps)) stop("Name maps are not all identical; this should never happen.")
+    namemap <- namemaps[[1L]]
+  }
+  x <- map(x, ergm_LayerLogic, namemap = namemap) |>
+    structure(class = "ergm_LayerLogics", namemap = namemap,
+              auxiliaries = .mk_.layer.net_auxform(x))
+
+  structure(x,
+            nlayers = length(list_rhs.formula(attr(x, "auxiliaries"))),
+            depends = map(x, attr, "depends") |> unlist() |> unique() |> sort())
+}
+
+#' @describeIn ergm_LayerLogic A method to generate coefficient names
+#'   associated with the Layer Logics.
+#'
+#' @export
+toString.ergm_LayerLogics <- function(x, ...) {
+  if (hasAttr(x, "repr")) attr(x, "repr")
+  else map_chr(x, toString) |>
+         imap_chr(function(f, nm) if (is.character(nm) && nm != "") paste0(nm, "=", f) else f) |>
+         paste(collapse = ",")
+}
+
 
 # Substitute numeric layer IDs for layer names and simplify some common trivial expressions (e.g., a | a => a).
 sub.ergm_LayerLogic <- function(x){
@@ -907,35 +976,27 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
   stack
 }
 
-.all_layers_terms <- function(n, LHS=NULL){
-  if(is.null(LHS))
-    lapply(seq_len(n), function(i) empty_env(as.formula(substitute(~x,list(x=as.name(i))))))
-  else
-    lapply(seq_len(n), function(i) empty_env(as.formula(substitute(lhs~x,list(lhs=LHS, x=as.name(i))))))
+.all_layers <- function(namemap, LHS = NULL) {
+  seq_along(namemap) |>
+    map(function(i) do.call(substitute,
+                            list(if (is.null(LHS)) ~x else lhs ~ x,
+                                 list(lhs = LHS, x = as.name(i))))) |>
+    map(ergm_LayerLogic, namemap = namemap) |>
+    ergm_LayerLogics(namemap = namemap) |>
+    structure(repr = ".")
 }
 
 .mk_.layer.net_auxform <- function(ll){
-  trmcalls <- .layers_expand_dot(ll) %>%
+  trmcalls <- enlist(ll) |>
     lapply(function(ltrm){
       if(length(ltrm)==3) ltrm[[2]] <- NULL
       ltrm
-    }) %>%
+    }) |>
     lapply(sub.ergm_LayerLogic)
-  # Get the formula as a list of term calls.o
+  # Get the formula as a list of term calls.
   trmcalls <- lapply(trmcalls, function(ltrm) call(".layer.net", ltrm))
   # TODO: Double-check that base_env here doesn't break anything.
   base_env(append_rhs.formula(~.,trmcalls)[-2])
-}
-
-.layers_expand_dot <- function(ll) {
-  ll <- enlist(ll)
-  nm <- attr(ll[[1]], "namemap")
-  nl <- length(nm)
-  # Replace . with all layers.
-  ergm_LayerLogic(do.call(c, lapply(ll, function(f) {
-    if (ult(f) == ".") .all_layers_terms(nl, LHS = if (length(f) == 3) f[[2]])
-    else list(as.formula(f))
-  })), nm)
 }
 
 #' @templateVar name L
@@ -966,25 +1027,21 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
 
   Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
-  Ls.dotexp <- .layers_expand_dot(Ls)
 
-  auxiliaries <- .mk_.layer.net_auxform(Ls)
-  nltrms <- length(list_rhs.formula(auxiliaries))
-
-  w <- rep(1,nltrms)
-  have.LHS <- sapply(Ls.dotexp, length)==3
-  w[have.LHS] <- as.numeric(sapply(lapply(Ls.dotexp[have.LHS], "[[", 2), eval,environment(Ls[[1]])))
+  w <- rep(1, attr(Ls, "nlayers"))
+  have.LHS <- lengths(Ls) == 3
+  w[have.LHS] <- as.numeric(sapply(lapply(Ls[have.LHS], "[[", 2), eval, environment(Ls[[1]])))
   
   nw1 <- nwl[[1]]
   m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
 
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
-  wm <- wrap.ergm_model(m, nw1, function(x) .lspec_coef.namewrap(Ls)(x))
+  wm <- wrap.ergm_model(m, nw1, ergm_mk_std_op_namewrap("L", toString(Ls)))
   gs <- wm$emptynwstats
-  wm$emptynwstats <- if(!is.null(gs)) gs*nltrms
+  wm$emptynwstats <- if(!is.null(gs)) gs*attr(Ls, "nlayers")
   wm$dependence <- wm$dependence || NA # If not determined by the model, set based on the layer logic.
 
-  c(list(name="OnLayer", iinputs=nltrms, inputs=w, submodel=m, auxiliaries = auxiliaries),
+  c(list(name="OnLayer", iinputs=attr(Ls, "nlayers"), inputs=w, submodel=m, auxiliaries = attr(Ls, "auxiliaries")),
     wm)
 }
 
@@ -1022,11 +1079,9 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 
   assert_LHS_Layer(nw)
 
-  Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
-  auxiliaries <- .mk_.layer.net_auxform(Ls)
-  nltrms <- length(list_rhs.formula(auxiliaries))
+  Ls <- ergm_LayerLogic(a$Ls, nw)
 
-  list(name="layerCMB", coef.names = paste0('CMBL(',despace(deparse1(Ls)),')'), iinputs=nltrms, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="layerCMB", coef.names = paste0('CMBL(', attr(Ls, "repr"), ')'), iinputs=attr(Ls, "nlayers"), dependence=TRUE, auxiliaries = attr(Ls, "auxiliaries"))
 }
 
 ################################################################################
@@ -1093,18 +1148,15 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   if (type == "any" && is.directed(nw)) ergm_Init_stop(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
   typeID <- match(type, TYPES) - 1L
 
-  Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
-  Ls <- rep(Ls, length.out=2)
-
-  auxiliaries <- .mk_.layer.net_auxform(Ls)
-  reprs <- .lspec_coef.namewrap(Ls, collapse=FALSE)
+  Ls <- ergm_LayerLogic(rep(enlist(a$Ls), length.out = 2), nw)
   coef.names <- paste0("twostarL(",
-                       paste0(reprs, collapse=TYPEREP[type]),
+                       map_chr(Ls, toString) |> paste0(collapse=TYPEREP[type]),
                        if(a$distinct) ",distinct",
                        ")")
 
   iinputs <- c(typeID, a$distinct)
-  list(name="twostarL", coef.names=coef.names, iinputs=iinputs, auxiliaries=auxiliaries, minval=0, dependence=TRUE)
+  list(name = "twostarL", coef.names = coef.names, iinputs = iinputs,
+       auxiliaries = attr(Ls, "auxiliaries"), minval = 0, dependence = TRUE)
 }
 
 ################################################################################
@@ -1207,11 +1259,9 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
   if(!is.null(L1) || !is.null(L2)){
     NVL(L1) <- L2
     NVL(L2) <- L1
-    auxiliaries <- .mk_.layer.net_auxform(L1)
-    aux2 <- .mk_.layer.net_auxform(L2)
-    auxiliaries[[2]] <- call("+", auxiliaries[[2]], aux2[[2]])
+    auxiliaries <- attr(Ls, "auxiliaries")
     name <- paste(name, "ML", sep="_")
-    coef.names <- .lspec_coef.namewrap(if(L1==L2) list(L1) else list(L1,L2))(coef.names)
+    coef.names <- ergm_mk_std_op_namewrap("L", if (L1 == L2) list(L1) else list(L1, L2))(coef.names)
     maxval <- maxval*2
   }else auxiliaries <- NULL
   
@@ -1257,18 +1307,16 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
   assert_LHS_Layer(nw)
 
   Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
-  Ls.dotexp <- .layers_expand_dot(Ls)
-  if (length(Ls.dotexp) < 2L) ergm_Init_stop("multiple layers are required")
-  lls <- lapply(Ls.dotexp, to_ergm_Cdouble)
-  deps <- lapply(lls, .depends_on_layers)
-  auxiliaries <- .mk_.layer.net_auxform(Ls)
+  if (length(Ls) < 2L) ergm_Init_stop("multiple layers are required")
+  deps <- lapply(Ls, attr, "depends")
 
   affects <- map(seq_len(network.layercount(nw)),
                  function(l) which(map_lgl(deps, function(d) l %in% d)))
 
   iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)
 
-  list(name="pairwisedistL", coef.names = paste0('hammingL(',despace(deparse1(Ls)),')'), iinputs = iinputs, dependence=TRUE, auxiliaries = auxiliaries)
+  list(name="pairwisedistL", coef.names = paste0('hammingL(', toString(Ls), ')'),
+       iinputs = iinputs, dependence=TRUE, auxiliaries = attr(Ls, "auxiliaries"))
 }
 
 

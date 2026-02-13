@@ -3,35 +3,53 @@
 \name{ergm_LayerLogic}
 \alias{ergm_LayerLogic}
 \alias{ergm_LayerLogic.default}
+\alias{ergm_LayerLogic.ergm_LayerLogic}
 \alias{ergm_LayerLogic.formula}
 \alias{ergm_LayerLogic.list}
 \alias{toString.ergm_LayerLogic}
+\alias{ergm_LayerLogics}
+\alias{ergm_LayerLogics.ergm_LayerLogic}
+\alias{unlist.ergm_LayerLogics}
+\alias{ergm_LayerLogics.list}
+\alias{toString.ergm_LayerLogics}
 \alias{to_ergm_Cdouble.ergm_LayerLogic}
 \title{Internal representation of Layer Logic}
 \usage{
-ergm_LayerLogic(x, namemap = NULL, ...)
+ergm_LayerLogic(x, ...)
 
-\method{ergm_LayerLogic}{default}(x, namemap = NULL, ...)
+\method{ergm_LayerLogic}{default}(x, ...)
 
-\method{ergm_LayerLogic}{formula}(x, namemap = NULL, ...)
+\method{ergm_LayerLogic}{ergm_LayerLogic}(x, namemap = attr(x, "namemap"), ...)
+
+\method{ergm_LayerLogic}{formula}(x, namemap, ...)
 
 \method{ergm_LayerLogic}{list}(x, namemap = NULL, ...)
 
 \method{toString}{ergm_LayerLogic}(x, ...)
+
+ergm_LayerLogics(x, ...)
+
+\method{ergm_LayerLogics}{ergm_LayerLogic}(x, ...)
+
+\method{unlist}{ergm_LayerLogics}(x, recursive = TRUE, use.names = TRUE)
+
+\method{ergm_LayerLogics}{list}(x, namemap = NULL, ...)
+
+\method{toString}{ergm_LayerLogics}(x, ...)
 
 \method{to_ergm_Cdouble}{ergm_LayerLogic}(x, ...)
 }
 \arguments{
 \item{x}{An \code{ergm_LayerLogic} object.}
 
+\item{...}{Additional arguments, currently unused.}
+
 \item{namemap}{A character vector giving the names of the layers
 referenced, a \code{\link[network:network]{network}} with layer metadata, or \code{NULL}.}
-
-\item{...}{Additional arguments, currently unused.}
 }
 \value{
 A structure with nonce class
-\code{c("ergm_LayerLogic",class(formula))}, comprising the input
+\code{c("ergm_LayerLogic", class(formula))}, comprising the input
 \code{formula} and an attribute \code{namemap} containing the \code{namemap}.
 }
 \description{
@@ -42,9 +60,11 @@ Internal representation of Layer Logic
 \item \code{ergm_LayerLogic(default)}: default method; tries to convert the
 specification to a formula.
 
+\item \code{ergm_LayerLogic(ergm_LayerLogic)}: optionally overwrite \code{namemap}.
+
 \item \code{ergm_LayerLogic(formula)}: a method for formulas.
 
-\item \code{ergm_LayerLogic(list)}: a method for lists: evaluate on each element.
+\item \code{ergm_LayerLogic(list)}: a method for lists: construct an \code{\link[=ergm_LayerLogics]{ergm_LayerLogics()}} object.
 
 }}
 \section{Methods (by generic)}{
@@ -52,8 +72,22 @@ specification to a formula.
 \item \code{toString(ergm_LayerLogic)}: A method to generate coefficient names
 associated with the Layer Logic.
 
+\item \code{ergm_LayerLogics(ergm_LayerLogic)}: a method for \code{\link[=ergm_LayerLogic]{ergm_LayerLogic()}} objects, simply insert it into a list.
+
 \item \code{to_ergm_Cdouble(ergm_LayerLogic)}: A method to encode and serialize the
 Layer Logic into a postfix program understood by the C code.
+
+}}
+\section{Functions}{
+\itemize{
+\item \code{ergm_LayerLogics()}: A generic for constructing a list of layer logics.
+
+\item \code{unlist(ergm_LayerLogics)}: a method to flatten the list.
+
+\item \code{ergm_LayerLogics(list)}: construct from a list.
+
+\item \code{toString(ergm_LayerLogics)}: A method to generate coefficient names
+associated with the Layer Logics.
 
 }}
 \keyword{internal}
