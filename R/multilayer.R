@@ -105,7 +105,7 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
 #' input network may be referenced as `.nw`. The expression's result
 #' is expected to be a vector of edge attribute values to be set on
 #' the edges in the order specified.}
-#' 
+#'
 #' \item{a character vector}{If of length one, the edge attribute with
 #' that name will simply be copied; if greater than one, the attribute
 #' values will be concatenated wtih the `.sep` argument as the
@@ -140,7 +140,7 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
 #' if(require(testthat, quietly=TRUE))
 #' testthat::expect_equivalent(as.matrix(flobusiness),as.matrix(flob))
 #' }
-#' 
+#'
 #' (flob <- network_view(flo, ~b&m))
 #' (flobusiness & flomarriage) # for comparison
 #' \dontshow{
@@ -161,13 +161,13 @@ assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
 #' if(require(testthat, quietly=TRUE))
 #' testthat::expect_equivalent(as.matrix(flobusiness)*(1+as.matrix(flomarriage)),as.matrix(flob, attrname="bm"))
 #' }
-#' 
-#' 
+#'
+#'
 #' @export
 network_view <- function(x, ..., .clear=FALSE, .sep="."){
   # Handle empty network
   if(network.edgecount(x,na.omit=FALSE)==0) return(x)
-  
+
   exprs <- list(...)
   fes <- exprs[NVL(names(exprs),rep("",length(exprs)))==""]
   oes <- exprs[NVL(names(exprs),rep("",length(exprs)))!=""]
@@ -200,14 +200,14 @@ network_view <- function(x, ..., .clear=FALSE, .sep="."){
 
   for(i in seq_along(oes)){
     el <- as_tibble(x, attrname=list.edge.attributes(x), na.rm=FALSE, store.eid=TRUE)
-    
+
     e <- oes[[i]]
     nm <- names(oes)[[i]]
-    
+
     newval <- evl(e, el, x)
     set.edge.attribute(x, nm, newval, el$.eid)
   }
-  
+
   if(.clear) for(a in setdiff(list.edge.attributes(x), c(nm,"na"))) delete.edge.attribute(x, a)
   x
 }
@@ -226,7 +226,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
                both = rbind(el, el[,2:1,drop=FALSE]),
                upper = cbind(pmin(el[,1],el[,2]),pmax(el[,1],el[,2])),
                lower = cbind(pmax(el[,1],el[,2]),pmin(el[,1],el[,2])))
-  
+
   o <- network.initialize(network.size(x), directed = TRUE,
                           bipartite = b1.size(x), loops = has.loops(x),
                           hyper = is.hyper(x), multiple = is.multiplex(x))
@@ -241,7 +241,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 #'
 #' @param ... layer specification, in one of three formats:
-#' 
+#'
 #'   1. An (optionally named) list of identically-dimensioned
 #'      networks.
 #'
@@ -358,7 +358,7 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #' @seealso [Help on model specification][ergmTerm] for specific terms.
 #'
 #' @references \insertAllCited{}
-#' 
+#'
 #' @examples
 #'
 #' data(florentine)
@@ -510,7 +510,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   }, nwl, blockout)
 
   # nwl may now be a list with networks of heterogeneous directedness.
-  
+
   dir <- sapply(nwl, is.directed)
   symm <- if(all_identical(dir)) rep(FALSE, length(nwl)) else !dir
 
@@ -547,7 +547,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
         base_env(~blockdiag(".LayerID", noncontig = "split"))
       else
         append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag", ".LayerID", noncontig = "split")), TRUE)
-  
+
   if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
   if(any(blockout!=0)||!is.null(.active)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
 
@@ -613,7 +613,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
   # Terms on this logical layer will induce dyadic independence if its
   # value depends on more than one other layer value.
   dependence <- length(.depends_on_layers(ll))>1
-  
+
   if (test_eval.LayerLogic(ll, FALSE))
     ergm_Init_stop("Layer specification ", sQuote(deparse1(a$L)),
                    " outputs edges when all input layers are empty.",
@@ -867,7 +867,7 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
     }
     coml[!is.na(coml)]
   }
-  
+
   com <- postfix(ult(formula))
   c(com, LL_STOP)
 }
@@ -961,7 +961,7 @@ test_eval.LayerLogic <- function(commands, lv, lvr = lv){
     }else if(com==-20){
       x0 <- stack[1]; stack <- stack[-1]
       stack <- c(sign(x0), stack)
-    }else if(com==-21){ 
+    }else if(com==-21){
       coms <- coms[-1]
       x0 <- coms[1]
       stack <- c(lvr[x0], stack)
@@ -1031,7 +1031,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   w <- rep(1, attr(Ls, "nlayers"))
   have.LHS <- lengths(Ls) == 3
   w[have.LHS] <- as.numeric(sapply(lapply(Ls[have.LHS], "[[", 2), eval, environment(Ls[[1]])))
-  
+
   nw1 <- nwl[[1]]
   m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
 
@@ -1208,7 +1208,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
   if (!is.null(a$same) || !is.null(a$by)) {
     if (!is.null(a$same)) {
      attrname <- a$same
-     if (!is.null(a$by)) 
+     if (!is.null(a$by))
        warning("Ignoring 'by' argument to mutual because 'same' exists", call.=FALSE)
     }else{
      attrname <- a$by
@@ -1235,7 +1235,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
      if (a$diff) {
       coef.names <- paste("mutual.same", attrname, u, sep=".")
       inputs <- c(ui, nodecov)
-     }else{ 
+     }else{
       coef.names <- paste("mutual", attrname, sep=".")
       inputs <- nodecov
      }
@@ -1264,13 +1264,13 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
     coef.names <- ergm_mk_std_op_namewrap("L", if (L1 == L2) list(L1) else list(L1, L2))(coef.names)
     maxval <- maxval*2
   }else auxiliaries <- NULL
-  
+
   list(name=name,                      #name: required
        coef.names = coef.names,        #coef.names: required
        inputs=inputs,
        auxiliaries = auxiliaries,
        minval = 0,
-       maxval = maxval) 
+       maxval = maxval)
 }
 
 
