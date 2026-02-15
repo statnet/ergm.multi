@@ -521,9 +521,13 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
       " Nesting of terms must match the nesting of constructors; this may change in the future.", immediate.=TRUE)
   }
 
-  uncombine_network(nw, split.vattr=split.vattr, names.vattr=names.vattr, use.subnet.cache=TRUE) %>% map(function(nw1){
-    for(name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
-    nw1})
+  nwl <- uncombine_network(nw, split.vattr = split.vattr, names.vattr = names.vattr, use.subnet.cache = TRUE)
+
+  if (length(copy.ergmlhs)) nwl <- map(nwl, function(nw1) {
+    for (name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
+    nw1
+  })
+  else nwl
 }
 
 #' Calculate a vector that maps the combined (block-diagonal) LHS network Vertex indices within-layer/within-network Vertex and a Vertex to layer/network lookup table.

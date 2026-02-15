@@ -17,10 +17,19 @@ Evaluates the terms in \code{formula} on an observed or
 logical layers specified in formula \code{Ls} and sums the results
 elementwise.
 }
+\note{
+For the purposes of the terms in the \code{formula}, nonstandard
+network and vertex attributes will be taken from the \emph{first}
+layer's network. The subsequent networks' attributes will be
+ignored by it. If \code{Ls} is specified as a \code{\link{function}}, this
+function will be able to access them, however.
+}
 \seealso{
 \code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "L", "subsection")}
+
+\code{\link[=Layer]{Layer()}}
 }
 \concept{layer-aware}
 \concept{operator}

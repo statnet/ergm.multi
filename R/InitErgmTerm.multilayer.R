@@ -21,25 +21,28 @@
 InitErgmTerm..layer.net <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("L"),
-                      vartypes = c("formula"),
+                      vartypes = c(ERGM_LAYER_SPEC),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
   assert_LHS_Layer(nw)
 
-  nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
+  nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
 
-  ll <- to_ergm_Cdouble(ergm_LayerLogic(a$L, nw))
+  L <- ergm_LayerLogic(a$L, nw)
   # Terms on this logical layer will induce dyadic independence if its
   # value depends on more than one other layer value.
-  dependence <- length(.depends_on_layers(ll))>1
+  dependence <- length(L%@%"depends") > 1
 
-  if (test_eval.LayerLogic(ll, FALSE))
+  if (test_eval.LayerLogic(L, FALSE))
     ergm_Init_stop("Layer specification ", sQuote(deparse1(a$L)),
                    " outputs edges when all input layers are empty.",
                    " This is not supported at this time.", call. = FALSE)
 
-  list(name="_layer_net", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)), if(is.directed(nw)) sapply(nwl, function(nw) (nw%v% ".undirected")[1]), ll), dependence=dependence)
+  list(name = "_layer_net", coef.names = c(), dependence = dependence,
+       iinputs = c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)),
+                   if (is.directed(nw)) sapply(nwl, function(nw) (nw%v%".undirected")[1]),
+                   L%@%"C"))
 }
 
 
@@ -55,24 +58,32 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
 #' @template ergmTerm-formula
 #' @templateVar Ls.interp , on which to evaluate `formula`
 #' @template ergmTerm-Ls-1
+#'
+#' @note For the purposes of the terms in the `formula`, nonstandard
+#'   network and vertex attributes will be taken from the *first*
+#'   layer's network. The subsequent networks' attributes will be
+#'   ignored by it. If `Ls` is specified as a [`function`], this
+#'   function will be able to access them, however.
+#'
 #' @template ergmTerm-general
 #'
+#' @seealso [Layer()]
 #' @concept operator
 #' @concept layer-aware
 InitErgmTerm.L <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "Ls"),
-                      vartypes = c("formula", "formula,list"),
+                      vartypes = c("formula", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, empty_env(~.)),
                       required = c(TRUE, FALSE))
 
   assert_LHS_Layer(nw)
 
-  nwl <- subnetwork_templates(nw,".LayerID",".LayerName")
+  nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
 
-  Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
+  Ls <- ergm_LayerLogics(a$Ls, nw)
 
-  w <- rep(1, attr(Ls, "nlayers"))
+  w <- rep(1, length(Ls))
   have.LHS <- lengths(Ls) == 3
   w[have.LHS] <- as.numeric(sapply(lapply(Ls[have.LHS], "[[", 2), eval, environment(Ls[[1]])))
 
@@ -82,10 +93,11 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
   wm <- wrap.ergm_model(m, nw1, ergm_mk_std_op_namewrap("L", toString(Ls)))
   gs <- wm$emptynwstats
-  wm$emptynwstats <- if(!is.null(gs)) gs*attr(Ls, "nlayers")
+  wm$emptynwstats <- if(!is.null(gs)) gs * sum(w)
   wm$dependence <- wm$dependence || NA # If not determined by the model, set based on the layer logic.
 
-  c(list(name="OnLayer", iinputs=attr(Ls, "nlayers"), inputs=w, submodel=m, auxiliaries = attr(Ls, "auxiliaries")),
+  c(list(name = "OnLayer", iinputs = length(Ls), inputs = w,
+         submodel = m, auxiliaries = Ls%@%"auxiliaries"),
     wm)
 }
 
@@ -117,15 +129,16 @@ InitErgmTerm.L <- function(nw, arglist, ...){
 InitErgmTerm.CMBL <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
-                      vartypes = c("formula,list"),
+                      vartypes = c(ERGM_LAYERS_SPEC),
                       defaultvalues = list(empty_env(~.)),
                       required = c(FALSE))
 
   assert_LHS_Layer(nw)
 
-  Ls <- ergm_LayerLogic(a$Ls, nw)
+  Ls <- ergm_LayerLogics(a$Ls, nw)
 
-  list(name="layerCMB", coef.names = paste0('CMBL(', attr(Ls, "repr"), ')'), iinputs=attr(Ls, "nlayers"), dependence=TRUE, auxiliaries = attr(Ls, "auxiliaries"))
+  list(name = "layerCMB", coef.names = paste0("CMBL(", Ls%@%"repr", ")"),
+       iinputs = length(Ls), dependence = TRUE, auxiliaries = Ls%@%"auxiliaries")
 }
 
 ################################################################################
@@ -175,7 +188,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
 InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls", "type", "distinct"),
-                      vartypes = c("formula,list", "character", "logical"),
+                      vartypes = c(ERGM_LAYERS_SPEC, "character", "logical"),
                       defaultvalues = list(NULL, NULL, TRUE),
                       required = c(TRUE, FALSE, FALSE))
 
@@ -192,7 +205,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
   if (type == "any" && is.directed(nw)) ergm_Init_stop(paste0("at this time, ", sQuote('type="any"'), " is only supported for undirected networks"))
   typeID <- match(type, TYPES) - 1L
 
-  Ls <- ergm_LayerLogic(rep_len(enlist(a$Ls), 2), nw)
+  Ls <- ergm_LayerLogics(a$Ls, nw) |> rep_len(2) |> ergm_LayerLogics(nw)
   coef.names <- paste0("twostarL(",
                        map_chr(Ls, toString) |> paste0(collapse=TYPEREP[type]),
                        if(a$distinct) ",distinct",
@@ -200,7 +213,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
 
   iinputs <- c(typeID, a$distinct)
   list(name = "twostarL", coef.names = coef.names, iinputs = iinputs,
-       auxiliaries = attr(Ls, "auxiliaries"), minval = 0, dependence = TRUE)
+       auxiliaries = Ls%@%"auxiliaries", minval = 0, dependence = TRUE)
 }
 
 ################################################################################
@@ -242,7 +255,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
   ## Check the network and arguments to make sure they are appropriate.
   a <- check.ErgmTerm(nw, arglist, directed=TRUE, bipartite=NULL,
                       varnames = c("same", "by", "diff", "keep", "Ls"),
-                      vartypes = c("character", "character", "logical", "numeric", "formula,list"),
+                      vartypes = c("character", "character", "logical", "numeric", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, NULL, FALSE, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 
@@ -297,13 +310,13 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 
   maxval <- network.dyadcount(nw,FALSE)/2
 
-  Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
+  Ls <- ergm_LayerLogics(a$Ls, nw)
   L1 <- Ls[[1]]
   L2 <- Ls[[2]]
   if(!is.null(L1) || !is.null(L2)){
     NVL(L1) <- L2
     NVL(L2) <- L1
-    auxiliaries <- attr(Ls, "auxiliaries")
+    auxiliaries <- Ls%@%"auxiliaries"
     name <- paste(name, "ML", sep="_")
     coef.names <- ergm_mk_std_op_namewrap("L", if (L1 == L2) list(L1) else list(L1, L2))(coef.names)
     maxval <- maxval*2
@@ -344,13 +357,13 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 InitErgmTerm.hammingL <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("Ls"),
-                      vartypes = c("formula,list"),
+                      vartypes = c(ERGM_LAYERS_SPEC),
                       defaultvalues = list(empty_env(~.)),
                       required = c(FALSE))
 
   assert_LHS_Layer(nw)
 
-  Ls <- ergm_LayerLogic(enlist(a$Ls), nw)
+  Ls <- ergm_LayerLogics(a$Ls, nw)
   if (length(Ls) < 2L) ergm_Init_stop("multiple layers are required")
   deps <- lapply(Ls, attr, "depends")
 
@@ -360,7 +373,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
   iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)
 
   list(name="pairwisedistL", coef.names = paste0('hammingL(', toString(Ls), ')'),
-       iinputs = iinputs, dependence=TRUE, auxiliaries = attr(Ls, "auxiliaries"))
+       iinputs = iinputs, dependence = TRUE, auxiliaries = Ls%@%"auxiliaries")
 }
 
 

@@ -18,17 +18,14 @@
 
   out <- list()
 
-  namemap <- .layer_namemap(nw)
-
-  if(is(a$Ls.path,"formula")) a$Ls.path <- list(a$Ls.path)
-  if(length(a$Ls.path) == 1) a$Ls.path <- rep(a$Ls.path, 2)
-  L.path1 <- NVL3(a$Ls.path[[1]], ergm_LayerLogic(., namemap))
-  L.path2 <- NVL3(a$Ls.path[[2]], ergm_LayerLogic(., namemap))
-  L.base <- NVL3(a$L.base, ergm_LayerLogic(., namemap))
+  Ls.path <- ergm_LayerLogics(a$Ls.path, nw) |> rep_len(2)
+  L.path1 <- NVL3(Ls.path[[1]], ergm_LayerLogic(., nw))
+  L.path2 <- NVL3(Ls.path[[2]], ergm_LayerLogic(., nw))
+  L.base <- NVL3(a$L.base, ergm_LayerLogic(., nw))
 
   if(is.null(L.path1) && is.null(L.path2) && is.null(L.base)) return(out)
 
-  if(type=="RTP") stop("Layer-aware shared partner terms do not support reciprocated two-paths at this time.",call.=FALSE)
+  if(type=="RTP") ergm_Init_stop("Layer-aware shared partner terms do not support reciprocated two-paths at this time.",call.=FALSE)
 
   NVL(L.path1) <- NVL(L.path2, L.base)
   NVL(L.path2) <- NVL(L.path1, L.base)
@@ -39,15 +36,15 @@
       as.formula(call("~",call("|",call("|", L.path1[[2]], L.path2[[2]]),L.base[[2]])))
     else
       as.formula(call("~",call("|", L.path1[[2]], L.path2[[2]]))),
-    namemap)
+    nw)
 
-  out$auxiliaries <- .mk_.layer.net_auxform(layer0)
-  aux1 <- .mk_.layer.net_auxform(L.path1)
+  out$auxiliaries <- layer0%@%"auxiliaries"
+  aux1 <- L.path1%@%"auxiliaries"
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux1[[2]])
-  aux2 <- .mk_.layer.net_auxform(L.path2)
+  aux2 <- L.path2%@%"auxiliaries"
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux2[[2]])
   if(has_base){
-    aux3 <- .mk_.layer.net_auxform(L.base)
+    aux3 <- L.base%@%"auxiliaries"
     out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux3[[2]])
   }
   if(cache.sp){
@@ -139,7 +136,7 @@ wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp =
 InitErgmTerm.despL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
-                      vartypes = c("numeric","character","formula","formula,list","logical"),
+                      vartypes = c("numeric","character",ERGM_LAYER_SPEC,ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL,"OTP",NULL,NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE,FALSE))
 
@@ -198,7 +195,7 @@ InitErgmTerm.espL <- InitErgmTerm.despL
 InitErgmTerm.dgwespL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
-                      vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
+                      vartypes = c("numeric","logical","numeric","character", "numeric",ERGM_LAYER_SPEC,ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE,FALSE))
 
@@ -251,7 +248,7 @@ InitErgmTerm.gwespL <- InitErgmTerm.dgwespL
 InitErgmTerm.ddspL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","Ls.path","L.in_order"),
-                      vartypes = c("numeric","character","formula,list","logical"),
+                      vartypes = c("numeric","character",ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL,"OTP",NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE))
 
@@ -292,7 +289,7 @@ InitErgmTerm.dspL <- InitErgmTerm.ddspL
 InitErgmTerm.dgwdspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","Ls.path","L.in_order"),
-                      vartypes = c("numeric","logical","numeric","character", "numeric","formula,list","logical"),
+                      vartypes = c("numeric","logical","numeric","character", "numeric",ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE))
 
@@ -347,7 +344,7 @@ InitErgmTerm.gwdspL <- InitErgmTerm.dgwdspL
 InitErgmTerm.dnspL<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("d","type","L.base","Ls.path","L.in_order"),
-                      vartypes = c("numeric","character","formula","formula,list","logical"),
+                      vartypes = c("numeric","character",ERGM_LAYER_SPEC,ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL,"OTP",NULL,NULL,FALSE),
                       required = c(TRUE, FALSE,FALSE,FALSE,FALSE))
 
@@ -389,7 +386,7 @@ InitErgmTerm.nspL <- InitErgmTerm.dnspL
 InitErgmTerm.dgwnspL<-function(nw, arglist, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("decay","fixed","cutoff","type", "alpha","L.base","Ls.path","L.in_order"),
-                      vartypes = c("numeric","logical","numeric","character", "numeric","formula","formula,list","logical"),
+                      vartypes = c("numeric","logical","numeric","character", "numeric",ERGM_LAYER_SPEC,ERGM_LAYERS_SPEC,"logical"),
                       defaultvalues = list(NULL, FALSE, gw.cutoff,"OTP", NULL,NULL,NULL,FALSE),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE,FALSE,FALSE,FALSE))
 
@@ -433,7 +430,7 @@ InitErgmTerm.gwnspL <- InitErgmTerm.dgwnspL
 InitErgmTerm.b1dspL <- function(nw, arglist, cache.sp=TRUE, ...){
   a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
                       varnames = c("d", "Ls.path"),
-                      vartypes = c("numeric", "formula,list"),
+                      vartypes = c("numeric", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, NULL),
                       required = c(TRUE, FALSE))
 
@@ -469,7 +466,7 @@ InitErgmTerm.b1dspL <- function(nw, arglist, cache.sp=TRUE, ...){
 InitErgmTerm.gwb1dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
                       varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
-                      vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
+                      vartypes = c("numeric", "logical", "numeric", "numeric", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 
@@ -502,7 +499,7 @@ InitErgmTerm.gwb1dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
 InitErgmTerm.b2dspL <- function(nw, arglist, cache.sp=TRUE, ...){
   a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
                       varnames = c("d", "Ls.path"),
-                      vartypes = c("numeric", "formula,list"),
+                      vartypes = c("numeric", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, NULL),
                       required = c(TRUE, FALSE))
 
@@ -538,7 +535,7 @@ InitErgmTerm.b2dspL <- function(nw, arglist, cache.sp=TRUE, ...){
 InitErgmTerm.gwb2dspL<-function(nw, arglist, cache.sp=TRUE, gw.cutoff=30, ...) {
   a <- check.ErgmTerm(nw, arglist, bipartite = TRUE,
                       varnames = c("decay", "fixed", "cutoff", "alpha", "Ls.path"),
-                      vartypes = c("numeric", "logical", "numeric", "numeric", "formula,list"),
+                      vartypes = c("numeric", "logical", "numeric", "numeric", ERGM_LAYERS_SPEC),
                       defaultvalues = list(NULL, FALSE, gw.cutoff, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 

@@ -12,7 +12,7 @@
 #' @import statnet.common
 #' @import stats
 #' @importFrom Rdpack reprompt
-## #' @import rlang
+#' @importFrom rlang "%@%" "%@%<-"
 
 .onAttach <- function(libname, pkgname){
   #' @importFrom statnet.common statnetStartupMessage

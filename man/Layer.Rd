@@ -57,11 +57,6 @@ will appear as unipartite to the statistics, and if any are
 directed, all will be. However, \link[ergm:ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
 used to construct a bipartite subgraph of a unipartite graph or
 change directedness.
-
-Its nonstandard network and vertex attributes will be taken from
-the \emph{first} network in the list. The subsequent networks'
-attributes will be overwritten with a warning if they differ from
-those in the first network.
 }
 \section{Specifying models for multilayer networks}{
 
@@ -83,7 +78,11 @@ or \code{\link[=c]{c()}}) is named \code{Ls=}; and a specification of the form \
 placeholder for all observed layers.
 
 Operator \code{\link[=L-ergmTerm]{L(formula, Ls=...)}} can be used to evaluate
-arbitrary terms in the \code{formula} on specified layers.
+arbitrary terms in the \code{formula} on specified layers. Note that for
+the purposes of the terms in the \code{formula}, nonstandard network and
+vertex attributes will be taken from the \emph{first} network in the
+list. The subsequent networks' attributes will be ignored by it
+(but not by \code{Ls}: see Alternative ways to specify layers below).
 
 Layer specification documentation follows.
 \subsection{Layer Logic}{
@@ -121,6 +120,26 @@ the direction of all relations (transposing the sociomatrix).
 
 At this time, logical expressions that produce complete graphs from empty
 graph inputs (e.g., \code{A==B} or \code{!A}) are not supported.
+}
+
+\subsection{Alternative ways to specify layers}{
+
+The following are provided for convenience:
+
+\describe{
+
+\item{\code{\link{numeric}} or \code{\link{logical}} vector}{Select from among the observed layers of the network; negative indices are supported.}
+
+\item{\code{\link{character}} vector}{Converted one or more formulas, prepending \code{"~"} if absent.}
+
+\item{\code{\link{function}} (or a list of them)}{Call the function(s) (with
+arguments \code{lattr} containing a data frame of layer attributes,
+\code{lnw} containing the combined network, and \code{namemap} containing
+the mapping from layer names to layer indices), then interpret
+their outputs as above. It is strongly recommended that this
+function take the \code{...} arguments for future compatibility.}
+
+}
 }
 
 \subsection{Summing layers}{
