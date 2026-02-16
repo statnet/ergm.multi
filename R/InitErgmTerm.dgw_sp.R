@@ -38,13 +38,13 @@
       as.formula(call("~",call("|", L.path1[[2]], L.path2[[2]]))),
     nw)
 
-  out$auxiliaries <- layer0%@%"auxiliaries"
-  aux1 <- L.path1%@%"auxiliaries"
+  out$auxiliaries <- layer0%@%"aux"
+  aux1 <- L.path1%@%"aux"
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux1[[2]])
-  aux2 <- L.path2%@%"auxiliaries"
+  aux2 <- L.path2%@%"aux"
   out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux2[[2]])
   if(has_base){
-    aux3 <- L.base%@%"auxiliaries"
+    aux3 <- L.base%@%"aux"
     out$auxiliaries[[2]] <- call("+", out$auxiliaries[[2]], aux3[[2]])
   }
   if(cache.sp){

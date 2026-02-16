@@ -688,9 +688,9 @@ LL_TOGGLE <- c("t")
 #'
 #' \item{`repr`}{a string for pretty-printing the expression}
 #'
-#' \item{`auxiliaries`}{a formula with auxiliary specifications involved}
+#' \item{`aux`}{a formula with auxiliary specifications involved}
 #'
-#' \item{`depends`}{indices of observed layers on which the specified layer logic depends}
+#' \item{`dep`}{indices of observed layers on which the specified layer logic depends}
 #'
 #' \item{`C`}{an integer vector encoding the layer logic for C}
 #'
@@ -754,9 +754,9 @@ ergm_LayerLogics.formula <- function(x, lnw, ...) {
                  repr = toString.ergm_LayerLogic(x),
                  C = to_ergm_Cdouble(o))
 
-  o <- structure(o, depends =  .depends_on_layers(o%@%"C"))
+  o <- structure(o, dep =  .depends_on_layers(o%@%"C"))
 
-  o <- structure(o, auxiliaries = .mk_.layer.net_auxform(o))
+  o <- structure(o, aux = .mk_.layer.net_auxform(o))
 
   ergm_LayerLogics(o, lnw, ...)
 }
@@ -807,15 +807,15 @@ ergm_LayerLogics.list <- function(x, lnw, ...) {
            how = "replace", lnw = lnw, ...) |>
     unlist.ergm_LayerLogics()
 
-  if (length(x) == 0) return(structure(list(), class = "ergm_LayerLogics", lnw = lnw, namemap = .layer_namemap(lnw), auxiliaries = NULL, depends = integer(0)))
+  if (length(x) == 0) return(structure(list(), class = "ergm_LayerLogics", lnw = lnw, namemap = .layer_namemap(lnw), aux = NULL, dep = integer(0)))
 
   namemaps <- map(x, attr, "namemap") |> compact()
   if (!all_identical(namemaps)) stop("Name maps are not all identical; this should never happen.")
   namemap <- namemaps[[1L]]
 
   structure(x, class = "ergm_LayerLogics", lnw = lnw, namemap = namemap,
-            auxiliaries = .mk_.layer.net_auxform(x),
-            depends = map(x, attr, "depends") |> unlist() |> unique() |> sort())
+            aux = .mk_.layer.net_auxform(x),
+            dep = map(x, attr, "dep") |> unlist() |> unique() |> sort())
 }
 
 
@@ -951,12 +951,9 @@ to_ergm_Cdouble.ergm_LayerLogic <- function(x, ...){
 
 
 test_eval.LayerLogic <- function(x, lv, lvr = lv){
-  commands <- x%@%"C"
-
-  coms <- as.integer(commands)
-  ndeps <- EVL3(.depends_on_layers(commands), max(.), 0)
-  lv <- rep_len(lv, max(ndeps))
-  lvr <- rep_len(lvr, max(ndeps))
+  coms <- as.integer(x%@%"C")
+  lv <- rep_len(lv, length(x%@%"namemap"))
+  lvr <- rep_len(lvr, length(x%@%"namemap"))
   stack <- integer(0)
 
   repeat{

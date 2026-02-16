@@ -32,7 +32,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
   L <- ergm_LayerLogic(a$L, nw)
   # Terms on this logical layer will induce dyadic independence if its
   # value depends on more than one other layer value.
-  dependence <- length(L%@%"depends") > 1
+  dependence <- length(L%@%"dep") > 1
 
   if (test_eval.LayerLogic(L, FALSE))
     ergm_Init_stop("Layer specification ", sQuote(deparse1(a$L)),
@@ -97,7 +97,7 @@ InitErgmTerm.L <- function(nw, arglist, ...){
   wm$dependence <- wm$dependence || NA # If not determined by the model, set based on the layer logic.
 
   c(list(name = "OnLayer", iinputs = length(Ls), inputs = w,
-         submodel = m, auxiliaries = Ls%@%"auxiliaries"),
+         submodel = m, auxiliaries = Ls%@%"aux"),
     wm)
 }
 
@@ -138,7 +138,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
   Ls <- ergm_LayerLogics(a$Ls, nw)
 
   list(name = "layerCMB", coef.names = paste0("CMBL(", Ls%@%"repr", ")"),
-       iinputs = length(Ls), dependence = TRUE, auxiliaries = Ls%@%"auxiliaries")
+       iinputs = length(Ls), dependence = TRUE, auxiliaries = Ls%@%"aux")
 }
 
 ################################################################################
@@ -213,7 +213,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
 
   iinputs <- c(typeID, a$distinct)
   list(name = "twostarL", coef.names = coef.names, iinputs = iinputs,
-       auxiliaries = Ls%@%"auxiliaries", minval = 0, dependence = TRUE)
+       auxiliaries = Ls%@%"aux", minval = 0, dependence = TRUE)
 }
 
 ################################################################################
@@ -316,7 +316,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
   if(!is.null(L1) || !is.null(L2)){
     NVL(L1) <- L2
     NVL(L2) <- L1
-    auxiliaries <- Ls%@%"auxiliaries"
+    auxiliaries <- Ls%@%"aux"
     name <- paste(name, "ML", sep="_")
     coef.names <- ergm_mk_std_op_namewrap("L", if (L1 == L2) list(L1) else list(L1, L2))(coef.names)
     maxval <- maxval*2
@@ -365,7 +365,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
 
   Ls <- ergm_LayerLogics(a$Ls, nw)
   if (length(Ls) < 2L) ergm_Init_stop("multiple layers are required")
-  deps <- lapply(Ls, attr, "depends")
+  deps <- lapply(Ls, attr, "dep")
 
   affects <- map(seq_len(network.layercount(nw)),
                  function(l) which(map_lgl(deps, function(d) l %in% d)))
@@ -373,7 +373,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
   iinputs <- c(0L, cumsum(c(0L, lengths(affects))) + length(affects) + 1L, unlist(affects) - 1L)
 
   list(name="pairwisedistL", coef.names = paste0('hammingL(', toString(Ls), ')'),
-       iinputs = iinputs, dependence = TRUE, auxiliaries = Ls%@%"auxiliaries")
+       iinputs = iinputs, dependence = TRUE, auxiliaries = Ls%@%"aux")
 }
 
 

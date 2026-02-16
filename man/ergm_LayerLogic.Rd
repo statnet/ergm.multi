@@ -83,9 +83,9 @@ A structure with class
 
 \item{\code{repr}}{a string for pretty-printing the expression}
 
-\item{\code{auxiliaries}}{a formula with auxiliary specifications involved}
+\item{\code{aux}}{a formula with auxiliary specifications involved}
 
-\item{\code{depends}}{indices of observed layers on which the specified layer logic depends}
+\item{\code{dep}}{indices of observed layers on which the specified layer logic depends}
 
 \item{\code{C}}{an integer vector encoding the layer logic for C}
 
