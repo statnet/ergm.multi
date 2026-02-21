@@ -12,6 +12,10 @@
 
 #define L2RTPERR error("RTP type is not supported by layered triadic terms at this time.")
 
+static inline double gwmul(double coef, int count) {
+  return(count ? coef * count : 0);
+}
+
 #define all_calcs(term)                         \
   dvec_calc(term ## _ML)                               \
        dist_calc(term ## _ML)                          \
@@ -91,9 +95,9 @@
     double cumchange = 0;                                               \
     term ## _change({                                                   \
         int nL2 = L2 + c2path;                                          \
-        cumchange += exp(log1mexp(-loneexpa * nL2)) - exp(log1mexp(-loneexpa * L2)); \
+        cumchange += exp(log1mexp(-gwmul(loneexpa, nL2))) - exp(log1mexp(-gwmul(loneexpa, L2))); \
       },{                                                               \
-        cumchange += l3c * exp(log1mexp(-loneexpa * L2));               \
+        cumchange += l3c * exp(log1mexp(-gwmul(loneexpa, L2)));         \
       });                                                               \
     return cumchange;                                                   \
   }
@@ -104,9 +108,9 @@
     double cumchange = 0;                                               \
     term ## _change({                                                   \
         int nL2 = L2 + c2path;                                          \
-        cumchange += (exp(log1mexp(-loneexpa * nL2)) - exp(log1mexp(-loneexpa * L2))) * 2; \
+        cumchange += (exp(log1mexp(-gwmul(loneexpa, nL2))) - exp(log1mexp(-gwmul(loneexpa, L2)))) * 2; \
       },{                                                               \
-        cumchange += l3c * exp(log1mexp(-loneexpa * L2));               \
+        cumchange += l3c * exp(log1mexp(-gwmul(loneexpa, L2)));         \
       });                                                               \
     return cumchange;                                                   \
   }

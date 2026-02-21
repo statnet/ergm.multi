@@ -86,9 +86,11 @@ dnspL <- function(x, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
   tabulate(match(nspL, x),length(x))
 }
 
+log1mexp <- statnet.common::log1mexp
+
 GW <- function(decay, n){
   i <- 1:n
-  exp(decay)*(1-(1-exp(-decay))^i)
+  exp(decay + log1mexp(-log1mexp(decay) * i))
 }
 
 dgwespL <- function(decay, n, type, L.base, Ls.path1, Ls.path2=Ls.path1, ...){
@@ -184,9 +186,12 @@ n <- 5
 ##                changes = testseq2,stats.start=TRUE)
 
 ctrl <- control.simulate.formula(MCMC.burnin=1, MCMC.interval=1)
-decay <- runif(1,0,1)
+decays <- c(0, 0.5, 20, 100)
+mkdesc <- function(type, decay, sptxt) sprintf("Multilayer dgw*sp statistics for %s networks with decay=%f %s", type, decay, sptxt)
 
-for(cache.sp in c(FALSE,TRUE)){
+
+for (cache.sp in c(FALSE, TRUE)) {
+  for (decay in decays) {
   options(ergm.term=list(cache.sp=cache.sp))
   sptxt <- if(cache.sp) "with shared partner caching" else "without shared partner caching"
 
@@ -195,7 +200,7 @@ for(cache.sp in c(FALSE,TRUE)){
   nw1 <- nw2 <- nw3 <- network.initialize(n,dir=TRUE)
   lnw <- Layer(nw1,nw2,nw3)
 
-test_that(paste("Multilayer dgw*sp statistics for homogeneously directed networks",sptxt), {
+test_that(mkdesc("homogeneously directed", decay, sptxt), {
   sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -547,6 +552,8 @@ test_that(paste("Multilayer dgw*sp statistics for homogeneously directed network
                     )
                   }) %>% t()
 
+  expect_false(anyNA(attr(sim, "stats")))
+  expect_false(anyNA(stats))
   expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
@@ -555,7 +562,8 @@ nw1 <- nw3 <- network.initialize(n,dir=TRUE)
 nw2 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
-test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed networks 1",sptxt), {
+
+test_that(mkdesc("heterogeneously directed", decay, sptxt), {
   sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,type="OTP",L.base=~`1`,Ls.path=c(~`2`,~`3`),L.in_order=TRUE)+
@@ -907,6 +915,8 @@ test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed netwo
                     )
                   }) %>% t()
 
+  expect_false(anyNA(attr(sim, "stats")))
+  expect_false(anyNA(stats))
   expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
@@ -915,7 +925,7 @@ test_that(paste("Multilayer dgw*sp statistics for heterogeneously directed netwo
 nw1 <- nw2 <- nw3 <- network.initialize(n,dir=FALSE)
 lnw <- Layer(nw1,nw2,nw3)
 
-test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
+test_that(mkdesc("undirected", decay, sptxt), {
   sim <- simulate(lnw~
                     # despL distinct layers
                     despL(0:n,L.base=~`1`,Ls.path=c(~`2`,~`3`))+
@@ -1027,6 +1037,8 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
                     )
                   }) %>% t()
 
+  expect_false(anyNA(attr(sim, "stats")))
+  expect_false(anyNA(stats))
   expect_equal(attr(sim,"stats"), stats, ignore_attr=TRUE)
 })
 
@@ -1037,7 +1049,7 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
   nw1 <- nw2 <- nw3 <- network.initialize(n, dir = FALSE, bipartite = b1)
   lnw <- Layer(nw1,nw2,nw3)
 
-  test_that(paste("Multilayer dgw*sp statistics for bipartite networks",sptxt), {
+  test_that(mkdesc("bipartite", decay, sptxt), {
     sim <- simulate(lnw~
                       ## b1
                       b1dspL(0:n,Ls.path=c(~`2`,~`3`))+
@@ -1097,6 +1109,9 @@ test_that(paste("Multilayer dgw*sp statistics for undirected networks",sptxt), {
                     )
                   }) %>% t()
 
+    expect_false(anyNA(attr(sim, "stats")))
+    expect_false(anyNA(stats))
     expect_equal(attr(sim, "stats"), stats, ignore_attr=TRUE)
   })
+}
 }
