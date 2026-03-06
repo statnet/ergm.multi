@@ -21,12 +21,28 @@
 #
 ##########################################################################################
 
+# Extracted, since it's useful elsewhere; which is a logical vector
+# indicating which nodes should enforce the constraint. This
+# constraint
+upper_tri_rlebdm <- function(n, which = rep.int(TRUE, n)) {
+  # The pattern is TRUE,...,TRUE,FALSE,...,FALSE for those
+  # columns i where restrict[i]==TRUE, and it's just
+  # TRUE,...,TRUE,TRUE,...,TRUE where restrict[i]==FALSE.
+  do.call(c, map(seq_len(n), function(i) {
+    rep(c(rle(TRUE), rle(!which[i])),
+        c(i, n - i), scale = "run")
+  })) |>
+    compress() |>
+    rlebdm(n)
+}
+
 #' @templateVar name upper_tri
 #' @title Only dyads in the upper-triangle of the sociomatrix may be
 #'   toggled
 #' @description For a directed network, only dyads \eqn{(i,j)} for
-#'   which \eqn{i < j} may be toggled. Optional argument `attr`
-#'   controls which subgraphs are thus restricted.
+#'   which \eqn{i \le j} may be toggled (though \eqn{i = j} is usually
+#'   excluded by other constraints). Optional argument `attr` controls
+#'   which subgraphs are thus restricted.
 #'
 #' @usage
 #' # upper_tri(attr = NULL)
@@ -48,11 +64,7 @@ InitErgmConstraint.upper_tri<-function(nw, arglist, ...){
   list(attr=a$attr,
        free_dyads = {
          restrict <- if(is.null(a$attr)) rep(TRUE, n) else ergm_get_vattr(a$attr, nw, accept = "logical")
-         # The pattern is TRUE,...,TRUE,FALSE,...,FALSE for those
-         # columns i where restrict[i]==TRUE, and it's just
-         # TRUE,...,TRUE,TRUE,...,TRUE where restrict[i]==FALSE.
-         d <- do.call(c, lapply(seq_len(n), function(i) rep(c(rle(TRUE),rle(!restrict[i])), c(i-1, n-i+1),scale="run")))
-         rlebdm(compress(d), n)
+         upper_tri_rlebdm(n, restrict)
        },
        dependence = FALSE
        )

@@ -13,8 +13,9 @@ toggled}
 }
 \description{
 For a directed network, only dyads \eqn{(i,j)} for
-which \eqn{i < j} may be toggled. Optional argument \code{attr}
-controls which subgraphs are thus restricted.
+which \eqn{i \le j} may be toggled (though \eqn{i = j} is usually
+excluded by other constraints). Optional argument \code{attr} controls
+which subgraphs are thus restricted.
 }
 \seealso{
 \code{\link[ergm:ergmConstraint]{ergmConstraint}} for index of constraints and hints currently visible to the package.
