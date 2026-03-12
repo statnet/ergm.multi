@@ -69,7 +69,7 @@ of their imputations under the model.}
 
 \item{stats,stats.obs}{If \code{save_stats} control parameter is \code{TRUE}, the simulated statistics.}
 
-In addition, the following \code{\link[statnet.common:attr]{attr}}-style attributes are included:
+In addition, the following \code{\link[base:attr]{attr}}-style attributes are included:
 
 \item{nw}{The observed multinetwork object.}
 

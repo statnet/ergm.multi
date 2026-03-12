@@ -97,6 +97,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Pavel N. Krivitsky \email{pavel@statnet.org} (\href{https://orcid.org/0000-0002-9101-3362}{ORCID})
 
+Authors:
+\itemize{
+  \item Pavel N. Krivitsky \email{pavel@statnet.org} (\href{https://orcid.org/0000-0002-9101-3362}{ORCID})
+}
+
 Other contributors:
 \itemize{
   \item Mark S. Handcock \email{handcock@stat.ucla.edu} [contributor]

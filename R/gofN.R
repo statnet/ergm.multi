@@ -58,7 +58,7 @@
 #'
 #' \item{stats,stats.obs}{If `save_stats` control parameter is `TRUE`, the simulated statistics.}
 #' 
-#' In addition, the following [`attr`]-style attributes are included:
+#' In addition, the following [`attr`][base::attr]-style attributes are included:
 #'
 #' \item{nw}{The observed multinetwork object.}
 #' 
