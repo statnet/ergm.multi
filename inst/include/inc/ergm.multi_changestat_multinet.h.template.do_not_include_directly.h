@@ -7,7 +7,7 @@
  *
  *  Copyright 2003-2025 Statnet Commons
  */
-#include "ergm.multi_changestat_multinet_common.do_not_include_directly.h"
+#include "inc/ergm.multi_changestat_multinet_common.do_not_include_directly.h"
 
 /* network-aware macros eponymous to ergm_changestat.h */
 /* These routines need a way to specify which of the subnetworks is

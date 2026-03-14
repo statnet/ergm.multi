@@ -13,7 +13,7 @@
 #include "ergm_edgetree.h"
 
 #include "ergm_edgetype_set_binary.h"
-#include "ergm.multi_changestat_multinet.h.template.do_not_include_directly.h"
+#include "inc/ergm.multi_changestat_multinet.h.template.do_not_include_directly.h"
 
 #define MN_IO_TAIL(sn, t) ((Vertex) ((sn)->smap[t]))
 #define MN_IO_HEAD(sn, h) ((Vertex) ((sn)->smap[h]))

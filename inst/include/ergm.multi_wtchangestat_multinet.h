@@ -13,7 +13,7 @@
 #include "ergm_wtedgetree.h"
 
 #include "ergm_edgetype_set_double.h"
-#include "ergm.multi_changestat_multinet.h.template.do_not_include_directly.h"
+#include "inc/ergm.multi_changestat_multinet.h.template.do_not_include_directly.h"
 
 #define WtMN_IO_TAIL(sn, t) ((Vertex) ((sn)->smap[t]))
 #define WtMN_IO_HEAD(sn, h) ((Vertex) ((sn)->smap[h]))

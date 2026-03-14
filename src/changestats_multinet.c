@@ -13,4 +13,4 @@
 #include "ergm_model.h"
 
 #include "ergm_edgetype_set_binary.h"
-#include "ergm.multi_changestat_multinet.c.template.do_not_include_directly.h"
+#include "changestats_multinet.c.template.do_not_include_directly.h"
