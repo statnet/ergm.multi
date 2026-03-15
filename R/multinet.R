@@ -96,13 +96,15 @@ unNetworks <- function(object) {
 #' @export
 as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName", store.nid=FALSE){
   unit <- match.arg(unit)
-  if(unit!="networks") return(NextMethod())
+  if(unit!="networks"){
+    # For edges/vertices, convert to networkLite first and delegate.
+    return(NextMethod(as.networkLite(x), attrnames=attrnames, ..., unit=unit))
+  }
 
   al <-
-    if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[.NetworkID]]
+    if(!is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[.NetworkID]]
     else{
-      # FIXME: Probably more efficient to use attrnames earlier, in order to save calls to get.network.attribute().
-      xl <- if(is.network(x)) subnetwork_templates(x, .NetworkID, .NetworkName) else x
+      xl <- if(!is.null(x$nw)) x$nw else subnetwork_templates(x, .NetworkID, .NetworkName)
       nattrs <- Reduce(union, lapply(xl, list.network.attributes))
       lapply(nattrs, function(nattr) lapply(xl, get.network.attribute, nattr)) %>% set_names(nattrs)
     }
@@ -113,8 +115,9 @@ as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertice
   out <- al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
 
   if(store.nid){
-    out[[.NetworkID]] <- unique(x %v% .NetworkID)
-    out[[.NetworkName]] <- unique(x %v% .NetworkName)
+    out[[.NetworkID]] <- unique(get.vertex.attribute(x, .NetworkID))
+    if(!is.null(.NetworkName) && .NetworkName %in% list.vertex.attributes(x))
+      out[[.NetworkName]] <- unique(get.vertex.attribute(x, .NetworkName))
   }
 
   out

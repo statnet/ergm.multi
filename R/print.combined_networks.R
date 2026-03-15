@@ -9,9 +9,11 @@
 ################################################################################
 
 .print_combined_networks_info <- function(x, ...){
-  cat(" Combined ", length((x%n%".subnetattr")[[1]]$n), " networks on ", sQuote(x%n%".blockID.vattr"),
-      NVL3(x%n%".blockName.vattr",  paste0("/",sQuote(.)), ""), ":\n", sep="")
-  nattrs <- (x%n%".subnetattr")[[1]]
+  blockID.vattr <- x %n% ".blockID.vattr"
+  blockName.vattr <- x %n% ".blockName.vattr"
+  nattrs <- (x %n% ".subnetattr")[[blockID.vattr]]
+  cat(" Combined ", length(nattrs$n), " networks on ", sQuote(blockID.vattr),
+      NVL3(blockName.vattr,  paste0("/",sQuote(.)), ""), ":\n", sep="")
   nids <- format(seq_along(nattrs$n))
   for(i in seq_along(nattrs$n)){
     cat("  ", nids[[i]],": n = ", nattrs$n[[i]], ", directed = ", nattrs$directed[[i]], ", bipartite = ", nattrs$bipartite[[i]], ", loops = ", nattrs$loops[[i]], "\n", sep="")
@@ -29,8 +31,7 @@
 #' @export
 print.combined_networks<-function(x, ...) {
   .print_combined_networks_info(x)
-  delete.network.attribute(x, c(".subnetcache", ".subnetattr", ".blockID.vattr", ".blockName.vattr"))
-  NextMethod()
+  invisible(x)
 }
 
 #' @describeIn combine_networks A wrapper around
@@ -38,8 +39,8 @@ print.combined_networks<-function(x, ...) {
 #'   information and omit some internal variables.
 #' @export
 summary.combined_networks<-function (object, ...) {
-  object <- NextMethod(object)
-  structure(object, class = c("summary.combined_networks", class(object)))
+  .print_combined_networks_info(object)
+  invisible(object)
 }
 
 #' @describeIn combine_networks A wrapper around
@@ -48,7 +49,6 @@ summary.combined_networks<-function (object, ...) {
 #' @export
 print.summary.combined_networks<-function(x, ...) {
   .print_combined_networks_info(x)
-  delete.network.attribute(x, c(".subnetcache", ".subnetattr", ".blockID.vattr", ".blockName.vattr"))
   NextMethod()
 }
 
