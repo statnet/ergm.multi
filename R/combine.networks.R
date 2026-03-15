@@ -123,10 +123,6 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   # Build .subnetattr metadata
   sna <- list()
   sna[[blockID.vattr]] <- list()
-  sna[[blockID.vattr]]$n <- ns
-  sna[[blockID.vattr]]$directed <- sapply(nwl, is.directed)
-  sna[[blockID.vattr]]$bipartite <- sapply(nwl, function(nw) NVL(b1.size(nw), FALSE))
-  sna[[blockID.vattr]]$loops <- sapply(nwl, has.loops)
 
   # gal starts with required network properties
   gal <- list(
@@ -207,10 +203,6 @@ combine_networks <- function(nwl, ignore.nattr=c("mnext"), ignore.vattr=c(), ign
   # Build .subnetattr metadata
   sna <- list()
   sna[[blockID.vattr]] <- list()
-  sna[[blockID.vattr]]$n <- ns
-  sna[[blockID.vattr]]$directed <- sapply(nwl, is.directed)
-  sna[[blockID.vattr]]$bipartite <- es
-  sna[[blockID.vattr]]$loops <- sapply(nwl, has.loops)
 
   # gal starts with required network properties
   gal <- list(
@@ -491,7 +483,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
     class(nwi) <- sna$..class[[i]]
     for(nattr in c(".subnetattr", ".blockID.vattr", ".blockName.vattr", ".blocknames"))
       if(nattr %in% list.network.attributes(nwi))
-        delete.network.attribute(nwi, nattr)
+        nwi <- delete.network.attribute(nwi, nattr)
     for(nattr in setdiff(names(sna), c("..class", "n", "directed", "bipartite", "loops")))
       nwi %n% nattr <- sna[[nattr]][[i]]
 
@@ -499,6 +491,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
   }
   nwl
 }
+#' Dynamic registry of functions that combine networks.
 #'
 #' This is used primarily by developers to provide informative error
 #' messages.
@@ -549,13 +542,12 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
 
   if(!is.null(nw$nw)){
     # New list-based: return constituent networks with edges cleared.
-    nwl <- lapply(nw$nw, `[<-.network`, value = 0)
+    nwl <- lapply(nw$nw, .clear_edges)
+    if(!is.null(names.vattr)) names(nwl) <- nw$gal[[".blocknames"]]
   } else {
     # Legacy / networkLite-based: use subnet cache if available.
     nwl <- uncombine_network(nw, split.vattr = split.vattr, names.vattr = names.vattr, use.subnet.cache = TRUE)
   }
-
-  if(!is.null(names.vattr)) names(nwl) <- nw$gal[[".blocknames"]]
 
   if (length(copy.ergmlhs)) nwl <- map(nwl, function(nw1) {
     for (name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
@@ -705,8 +697,10 @@ as.networkLite.combined_networks <- function(x, ...){
     out <- set.network.attribute(out, ".subnetattr",      x$gal[[".subnetattr"]])
 
     # Store empty-network subnet cache for efficient post-simulation uncombine.
+    # Convert templates to networkLite to ensure they have proper vertex
+    # attributes (including nested block IDs) for multi-level uncombining.
     snc <- list()
-    snc[[blockID.vattr]] <- lapply(nwl, `[<-.network`, value = 0)
+    snc[[blockID.vattr]] <- lapply(nwl, function(nw1) as.networkLite(.clear_edges(nw1)))
     out <- set.network.attribute(out, ".subnetcache", snc)
 
     extra_classes <- class(x)[seq_len(which(class(x) == "combined_networks")[1])]

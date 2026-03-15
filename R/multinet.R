@@ -97,8 +97,8 @@ unNetworks <- function(object) {
 as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName", store.nid=FALSE){
   unit <- match.arg(unit)
   if(unit!="networks"){
-    # For edges/vertices, convert to networkLite first and delegate.
-    return(NextMethod(as.networkLite(x), attrnames=attrnames, ..., unit=unit))
+    # For edges/vertices, convert to networkLite first and use its as_tibble.
+    return(as_tibble(as.networkLite(x), attrnames=attrnames, ..., unit=unit))
   }
 
   al <-

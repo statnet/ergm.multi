@@ -284,6 +284,20 @@ delete.vertex.attribute.combined_networks <- function(x, attrname, ...) {
 # Edge methods
 # ---------------------------------------------------------------------------
 
+# Helper: clear all edges from a network (works for both network and
+# combined_networks objects).
+.clear_edges <- function(x) {
+  if(!is.null(x$nw)){
+    # combined_networks: clear edges from all constituent networks.
+    x$nw <- lapply(x$nw, .clear_edges)
+    x
+  } else {
+    # Leaf network (network or networkLite): use [<-.network.
+    x[,] <- 0
+    x
+  }
+}
+
 #' @export
 network.edgecount.combined_networks <- function(x, na.omit = TRUE, ...) {
   sum(sapply(x$nw, network.edgecount, na.omit = na.omit))
