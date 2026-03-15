@@ -745,8 +745,9 @@ as.networkLite.combined_networks <- function(x, ...){
       get.vertex.attribute(nw1, blockID.vattr, unlist = FALSE)))
   }
 
-  mapply(function(outer, inner) c(outer, inner), top_bid, inner_flat,
-         SIMPLIFY = FALSE)
+  mapply(function(outer, inner)
+    if(length(inner) == 0L || is.na(inner[[1]])) c(outer) else c(outer, inner),
+    top_bid, inner_flat, SIMPLIFY = FALSE)
 }
 
 .as_nested_bname <- function(x, top_bname){
@@ -768,6 +769,7 @@ as.networkLite.combined_networks <- function(x, ...){
     inner_flat <- do.call(c, lapply(x$nw, function(nw1)
       get.vertex.attribute(nw1, blockName.vattr, unlist = FALSE)))
   }
-  mapply(function(outer, inner) c(outer, inner), top_bname, inner_flat,
-         SIMPLIFY = FALSE)
+  mapply(function(outer, inner)
+    if(length(inner) == 0L || is.na(inner[[1]])) c(outer) else c(outer, inner),
+    top_bname, inner_flat, SIMPLIFY = FALSE)
 }

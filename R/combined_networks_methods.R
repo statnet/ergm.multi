@@ -170,7 +170,7 @@ get.vertex.attribute.combined_networks <- function(x, attrname,
   }
 
   result <- mapply(function(outer, inner)
-    if(is.na(inner[[1]])) list(outer) else c(list(outer), inner),
+    if(length(inner) == 0L || is.na(inner[[1]])) list(outer) else c(list(outer), inner),
     top_bid, inner_flat, SIMPLIFY = FALSE)
 
   if(unlist) sapply(result, `[`, 1) else result
@@ -225,7 +225,7 @@ get.vertex.attribute.combined_networks <- function(x, attrname,
   }
 
   result <- mapply(function(outer, inner)
-    if(is.na(inner[[1]])) list(outer) else c(list(outer), inner),
+    if(length(inner) == 0L || is.na(inner[[1]])) list(outer) else c(list(outer), inner),
     top_bname, inner_flat, SIMPLIFY = FALSE)
 
   if(unlist) sapply(result, `[`, 1) else result
@@ -287,7 +287,7 @@ delete.vertex.attribute.combined_networks <- function(x, attrname, ...) {
 # Helper: clear all edges from a network (works for both network and
 # combined_networks objects).
 .clear_edges <- function(x) {
-  if(!is.null(x$nw)){
+  if(is(x, "combined_networks") && !is.null(x$nw)){
     # combined_networks: clear edges from all constituent networks.
     x$nw <- lapply(x$nw, .clear_edges)
     x
