@@ -49,6 +49,6 @@ summary.combined_networks<-function (object, ...) {
 #' @export
 print.summary.combined_networks<-function(x, ...) {
   .print_combined_networks_info(x)
-  NextMethod()
+  invisible(x)
 }
 

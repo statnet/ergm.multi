@@ -292,8 +292,9 @@ delete.vertex.attribute.combined_networks <- function(x, attrname, ...) {
     x$nw <- lapply(x$nw, .clear_edges)
     x
   } else {
-    # Leaf network (network or networkLite): use [<-.network.
-    x[,] <- 0
+    # Leaf network (network or networkLite): delete all edges.
+    ec <- network.edgecount(x)
+    if(ec > 0L) x <- delete.edges(x, seq_len(ec))
     x
   }
 }
@@ -336,19 +337,4 @@ as.matrix.combined_networks <- function(x, matrix.type = "adjacency", ...) {
 # Printing / summary
 # ---------------------------------------------------------------------------
 
-#' @describeIn combine_networks A wrapper to print constituent network
-#'   information.
-#' @param x,object a combined network.
-#' @param ... additional arguments to methods.
-#' @export
-print.combined_networks <- function(x, ...) {
-  .print_combined_networks_info(x)
-  invisible(x)
-}
-
-#' @describeIn combine_networks A summary method for combined networks.
-#' @export
-summary.combined_networks <- function(object, ...) {
-  .print_combined_networks_info(object)
-  invisible(object)
-}
+# Print and summary methods are defined in R/print.combined_networks.R

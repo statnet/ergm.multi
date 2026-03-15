@@ -412,9 +412,9 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
   nb <- length(levels)
 
   # Determine per-block vertex ranges in the combined ordering.
-  ns <- sna$n
+  ns <- unlist(sna$n)
   if(NVL(bip, 0)){
-    es <- sna$bipartite
+    es <- unlist(sna$bipartite)
     eblks <- c(0, cumsum(es))
     ablks <- cumsum(c(bip, ns - es))
     # For bipartite, vertices for block i are at:
@@ -453,8 +453,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
       }
       # Copy vertex attributes
       for(va in setdiff(list.vertex.attributes(nw),
-                        c(list.network.attributes(nw), ".NetworkID", ".NetworkName",
-                          ".LayerID", ".LayerName"))){
+                        c(".NetworkID", ".NetworkName", ".LayerID", ".LayerName"))){
         vals <- get.vertex.attribute(nw, va, unlist = FALSE)
         if(!is.null(vals)) nwi <- set.vertex.attribute(nwi, va, vals[r])
       }
@@ -481,7 +480,7 @@ uncombine_network <- function(nw, split.vattr=nw %n% ".blockID.vattr", names.vat
 
     # Restore network attributes from .subnetattr.
     class(nwi) <- sna$..class[[i]]
-    for(nattr in c(".subnetattr", ".blockID.vattr", ".blockName.vattr", ".blocknames"))
+    for(nattr in c(".subnetattr", ".subnetcache", ".blockID.vattr", ".blockName.vattr", ".blocknames"))
       if(nattr %in% list.network.attributes(nwi))
         nwi <- delete.network.attribute(nwi, nattr)
     for(nattr in setdiff(names(sna), c("..class", "n", "directed", "bipartite", "loops")))
@@ -642,7 +641,7 @@ as.networkLite.combined_networks <- function(x, ...){
 
       # Edge list with remapped indices.
       el <- map(seq_along(nwl), function(b) {
-        df <- as_tibble(nwl[[b]], attrname = TRUE, unit = "edge", na.rm = FALSE)
+        df <- as_tibble(nwl[[b]], attrnames = TRUE, unit = "edge", na.rm = FALSE)
         remap <- function(i) i + ifelse(i <= es[b], eblks[b], -es[b] + ablks[b])
         nms  <- rep(list(as.list(names(df)[-(1:2)])), nrow(df))
         vals <- transpose(df[, -(1:2)])
@@ -670,15 +669,19 @@ as.networkLite.combined_networks <- function(x, ...){
 
       # Edge list with remapped indices.
       el <- map(seq_along(nwl), function(b) {
-        df <- as_tibble(nwl[[b]], attrname = TRUE, unit = "edge", na.rm = FALSE)
+        df <- as_tibble(nwl[[b]], attrnames = TRUE, unit = "edge", na.rm = FALSE)
         nms  <- rep(list(as.list(names(df)[-(1:2)])), nrow(df))
         vals <- transpose(df[, -(1:2)])
         list(tails = df[[1]] + blks[b], heads = df[[2]] + blks[b], names = nms, vals = vals)
       }) %>% transpose()
     }
 
-    out <- add.edges(out, unlist(el$tails), unlist(el$heads),
-                     names.eval = do.call(c, el$names), vals.eval = do.call(c, el$vals))
+    all_tails <- unlist(el$tails)
+    all_heads <- unlist(el$heads)
+    if(length(all_tails) > 0){
+      out <- add.edges(out, all_tails, all_heads,
+                       names.eval = do.call(c, el$names), vals.eval = do.call(c, el$vals))
+    }
 
     # Add block-ID and (optionally) block-name vertex attributes.
     out <- set.vertex.attribute(out, blockID.vattr, .as_nested_bid(x, bid))
