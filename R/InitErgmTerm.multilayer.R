@@ -332,7 +332,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
 
 
 #' @templateVar name hammingL
-#' @title Hamming distance between pairs of lairs
+#' @title Hamming distance between pairs of layers
 #' @description Models marginal dependence of layers within each dyad
 #'   by counting their hamming distances.
 #'

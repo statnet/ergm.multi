@@ -3,7 +3,7 @@
 \name{hammingL-ergmTerm}
 \alias{hammingL-ergmTerm}
 \alias{InitErgmTerm.hammingL}
-\title{Hamming distance between pairs of lairs}
+\title{Hamming distance between pairs of layers}
 \usage{
 # binary: hammingL(Ls=~.)
 }
