@@ -401,5 +401,5 @@ test_that("Statistics simulation for heterogeneously bipartite networks", {
 
 test_that("L() stops if given a non-multilayer object with a sensible error message.",{
   expect_error(ergm_model(nw1 ~ L(~edges)),
-               "In term 'L' in package 'ergm\\.multi': The LHS of the model is not a multilayer 'Layer\\(\\)' construct\\.")
+               "In term 'L' in package 'ergm\\.multi': .* not a multi-layer .* by 'Layer\\(\\)'.*")
 })

@@ -9,9 +9,11 @@
 ################################################################################
 
 .print_combined_networks_info <- function(x, ...){
-  cat(" Combined ", length((x%n%".subnetattr")[[1]]$n), " networks on ", sQuote(x%n%".blockID.vattr"),
-      NVL3(x%n%".blockName.vattr",  paste0("/",sQuote(.)), ""), ":\n", sep="")
-  nattrs <- (x%n%".subnetattr")[[1]]
+  cat(" Combined ", length(x%n%".snl"), " networks by ",
+      sQuote(NVL3(x%n%".combiner",
+                  ergm.multi_combiner(.[1])$constructor,
+                  "combine_networks()")), ":\n", sep = "")
+  nattrs <- x%n%".snattr"
   nids <- format(seq_along(nattrs$n))
   for(i in seq_along(nattrs$n)){
     cat("  ", nids[[i]],": n = ", nattrs$n[[i]], ", directed = ", nattrs$directed[[i]], ", bipartite = ", nattrs$bipartite[[i]], ", loops = ", nattrs$loops[[i]], "\n", sep="")
@@ -29,7 +31,7 @@
 #' @export
 print.combined_networks<-function(x, ...) {
   .print_combined_networks_info(x)
-  delete.network.attribute(x, c(".subnetcache", ".subnetattr", ".blockID.vattr", ".blockName.vattr"))
+  delete.network.attribute(x, c(".snl", ".snattr", ".combiner", ".bm"))
   NextMethod()
 }
 
@@ -48,7 +50,7 @@ summary.combined_networks<-function (object, ...) {
 #' @export
 print.summary.combined_networks<-function(x, ...) {
   .print_combined_networks_info(x)
-  delete.network.attribute(x, c(".subnetcache", ".subnetattr", ".blockID.vattr", ".blockName.vattr"))
+  delete.network.attribute(x, c(".snl", ".snattr", ".combiner", ".bm"))
   NextMethod()
 }
 

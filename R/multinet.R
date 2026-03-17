@@ -50,10 +50,11 @@ Networks <- function(...){
   if(!.same_constraints(nwl, "constraints")) stop("Networks have differing constraint structures. This is not supported at this time.")
   if(!.same_constraints(nwl, "obs.constraints")) stop("Networks have differing observation processes. This is not supported at this time.")
   
-  nw <- combine_networks(nwl, blockID.vattr=".NetworkID", blockName.vattr=".NetworkName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+  nw <- combine_networks(nwl, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "ergm"))
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)
-  nw <- add_con(nw, blockdiag_term_list(".NetworkID"), nwl[[1]])
+  nw <- add_con(nw, blockdiag_tl, nwl[[1]])
+  nw %n% ".combiner" <- "Networks"
 
   nw
 }
@@ -65,10 +66,8 @@ Networks <- function(...){
 #'
 #' @export
 unNetworks <- function(object) {
-  if (object %n% ".blockID.vattr" != ".NetworkID")
-    stop("The specified network is not a sample of disjoint networks at the top level.")
-
-  uncombine_network(object) |> map(ergmlhs_remove_blockdiag, ".NetworkID")
+  assert_combined_network(object, "Networks", FALSE)
+  uncombine_network(object, populate = TRUE)
 }
 
 
@@ -82,42 +81,24 @@ unNetworks <- function(object) {
 #' @param x  a [`combined_networks`] (inheriting from [`network::network`]).
 #' @param attrnames a list (or a selection index) for attributes to obtain; for combined networks, defaults to all.
 #' @param unit whether to obtain edge, vertex, or network attributes.
-#' @template ergmTerm-NetworkIDName
-#' @param store.nid whether to include columns with network ID and network name; the columns will be named with the arguments passed to `.NetworkID` and `.NetworkName`.
 #' @param ... additional arguments, currently passed to unlist()].
 #'
 #' @seealso [network::as_tibble.network()]
 #' @export
-as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks"), .NetworkID=".NetworkID", .NetworkName=".NetworkName", store.nid=FALSE){
+as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertices","networks")), ..., unit=c("edges", "vertices", "networks")){
   unit <- match.arg(unit)
   if(unit!="networks") return(NextMethod())
 
-  al <-
-    if(is(x, "combined_networks") && !is.null(x %n% ".subnetattr")) (x %n% ".subnetattr")[[.NetworkID]]
-    else{
-      # FIXME: Probably more efficient to use attrnames earlier, in order to save calls to get.network.attribute().
-      xl <- if(is.network(x)) subnetwork_templates(x, .NetworkID, .NetworkName) else x
-      nattrs <- Reduce(union, lapply(xl, list.network.attributes))
-      lapply(nattrs, function(nattr) lapply(xl, get.network.attribute, nattr)) %>% set_names(nattrs)
-    }
+  al <- x %n% ".snattr"
 
   if(is.logical(attrnames) || is.numeric(attrnames)) attrnames <- na.omit(names(al)[attrnames])
   else intersect(attrnames, names(al))
 
   out <- al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
 
-  if(store.nid){
-    out[[.NetworkID]] <- unique(x %v% .NetworkID)
-    out[[.NetworkName]] <- unique(x %v% .NetworkName)
-  }
+  combiner <- x%n%".combiner"
+  if (!is.null(i <- ergm.multi_combiner(combiner)[["id"]])) out[[i]] <- seq_len(nrow(out))
+  if (!is.null(i <- ergm.multi_combiner(combiner)[["name"]])) out[[i]] <- names(x%n%".snl")
 
   out
-}
-
-assert_LHS_Networks <- function(nw, nid, term_trace = TRUE, call = if(term_trace) NULL else rlang::caller_env()){
-  if(anyNA(get_combining_attr(nw, nid))){
-    msg <- paste0("The LHS of the model is not a multi-network ", sQuote("Networks()"), " construct.")
-    if(term_trace) ergm_Init_abort(msg, call=call)
-    else abort(msg, call=call)
-  }
 }

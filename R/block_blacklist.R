@@ -116,7 +116,7 @@ flatten_guid_pairs <- function(guidll){
 
 get_all_bl_subnetattr <- function(l){
   lapply(l, function(subl)
-    c(subl$.block_blacklist, lapply(subl$.subnetattr, get_all_bl_subnetattr), recursive=FALSE)
+    c(subl$.block_blacklist, lapply(subl$.snattr, get_all_bl_subnetattr), recursive=FALSE)
     ) %>% flatten_guid_pairs
 }
 
@@ -124,6 +124,6 @@ get_all_bl_subnetattr <- function(l){
 #' networks, which may be combined networks.
 #' @noRd
 get_all_bl <- function(nw, blacklist_nattr=".block_blacklist"){
-  c(nw%n%blacklist_nattr, get_all_bl_subnetattr(nw%n%".subnetattr")) %>% unique
+  c(nw%n%blacklist_nattr, get_all_bl_subnetattr(list(nw%n%".snattr"))) %>% unique
 }
 

@@ -14,7 +14,7 @@
 }
 
 .sp.handle_layers <- function(nw, a, type, has_base, cache.sp=FALSE){
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   out <- list()
 
@@ -67,7 +67,7 @@ no_layer_err <- function(instead){
 
 wrap_ergm_sp_call <- function(ergm_name, nw, a, has_base, d0 = FALSE, cache.sp = TRUE, ...) {
   # A "representative" layer network.
-  nw1 <- subnetwork_templates(nw, ".LayerID", ".LayerName")[[1]]
+  nw1 <- subnetwork_templates(nw)[[1]]
 
   # Construct and call the ergm term with only the arguments it
   # supports.

@@ -41,31 +41,7 @@ combine_ergmlhs <- function(nwl, ignore.settings=c()){
   l
 }
 
-#' Remove a [`blockdiag`][blockdiag-ergmConstraint] constraint for a
-#' specific vertex attribute from an [`%ergmlhs%`] formula if it's
-#' absent in the network.
-#'
-#' @param nw a [`network`]
-#' @param vattr a vertex attribute name
-#'
-#' @return a [`network`] with an updated `%ergmlhs% "constraints"`.
-#' @keywords internal
-#' @export
-ergmlhs_remove_blockdiag <- function(nw, vattr) {
-  if (! vattr %in% list.vertex.attributes(nw)) {
-    todel <- blockdiag_term_list(vattr)
-
-    con <- ergm_flatten_conterm_list(nw %ergmlhs% "constraints")
-    nw %ergmlhs% "constraints" <- con[map(seq_along(con), \(i) con[i]) |>
-                                      map_lgl(identical, todel) |>
-                                      (`!`)()]
-  }
-  nw
-}
-
-blockdiag_term_list <- function(vattr) {
-  term_list(call("blockdiag", vattr, noncontig = "split"), env = baseenv())
-}
+blockdiag_tl <- term_list(call("blockdiag", ".snid", noncontig = "split"), env = baseenv())
 
 add_con <- function(x, y, from = x) {
   con <- ergm_flatten_conterm_list(from %ergmlhs% "constraints") %||%

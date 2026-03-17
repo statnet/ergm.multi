@@ -58,8 +58,8 @@ eval(UPDATE_MY_SCTRL_EXPR)
 }
 
 .RegisterCombiners <- function() {
-  ergm.multi_combiner(".LayerID", c("Layer()", "layers"))
-  ergm.multi_combiner(".NetworkID", c("Networks()", "networks"))
+  ergm.multi_combiner("Layer", c(constructor = "Layer()", construct = "multi-layer network", element = "layer", id = ".LayerID", name = ".LayerName"))
+  ergm.multi_combiner("Networks", c(constructor = "Networks()", element = "network", id = ".NetworkID", name = ".NetworkName"))
 }
 
 #' @useDynLib ergm.multi

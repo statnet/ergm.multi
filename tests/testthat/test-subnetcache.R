@@ -9,10 +9,15 @@
 ################################################################################
 data(samplk)
 
-test_that("subnet cache is only used if called through subnetwork_templates()", {
-  samplks <- combine_networks(list(samplk1, samplk2, samplk3), subnet.cache=TRUE)
+test_that("combine_networks roundtrip", {
+  samplkl <- list(samplk1, samplk2, samplk3)
+  samplks <- combine_networks(samplkl)
+  samplkl2 <- uncombine_network(samplks, populate = TRUE)
+  samplkl0 <- uncombine_network(samplks, populate = FALSE)
 
-  expect_equal(s <- unname(summary(samplks~edges)), sum(sapply(list(samplk1, samplk2, samplk3), network.edgecount)))
-  expect_equal(sum(summary(uncombine_network(samplks)~edges)), s)
+  expect_equal(lapply(samplkl2, as.edgelist, attrname = "score", output = "tibble"),
+               lapply(samplkl, as.edgelist, attrname = "score", output = "tibble"))
+
+  expect_equal(sum(sapply(samplkl0, network.edgecount)), 0)
   expect_equal(sum(sapply(subnetwork_templates(samplks), network.edgecount)), 0)
 })

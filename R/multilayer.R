@@ -18,8 +18,8 @@
 #' @export
 #' @keywords internal
 network.layercount <- function(x, ...) {
-  assert_LHS_Layer(x)
-  max(get_combining_attr(x, ".LayerID"))
+  assert_combined_network(x, "Layer", FALSE)
+  length(x %n% ".snl")
 }
 
 
@@ -73,8 +73,8 @@ network.layercount <- function(x, ...) {
 
 
 .layer_namemap <- function(nw) {
-  if (is(nw, "network")) {
-    nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
+  if (is(nw, "combined_networks")) {
+    nwl <- subnetwork_templates(nw, copy.ergmlhs = c())
     setNames(seq_along(nwl), names(nwl))
   } else nw
 }
@@ -92,19 +92,6 @@ network.layercount <- function(x, ...) {
     imap_chr(function(l, i) {
     if (is.character(i) && i != "") paste0(i, "=", fmt(l)) else fmt(l)
   })
-}
-
-
-#' Confirm that this is a multilayer network.
-#'
-#' @param nw a [`network`]
-#' @param errfn function to call with the error message
-#'
-#' @return `TRUE` if a valid multilayer network, results of calling `errfn` otherwise.
-#' @export
-assert_LHS_Layer <- function(nw, errfn = ergm_Init_stop){
-  if(anyNA(get_combining_attr(nw, ".LayerID"))) errfn("The LHS of the model is not a multilayer ", sQuote("Layer()"), " construct.")
-  else TRUE
 }
 
 
@@ -579,11 +566,12 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
   if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
 
-  nw <- combine_networks(nwl, blockID.vattr=".LayerID", blockName.vattr=".LayerName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+  nw <- combine_networks(nwl, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "ergm"))
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)
 
-  nw <- add_con(nw, blockdiag_term_list(".LayerID"), nwl[[1]])
+  nw <- add_con(nw, blockdiag_tl, nwl[[1]])
+  nw %n% ".combiner" <- "Layer"
 
   if(any(symm)) nw <- add_con(nw, term_list(call("upper_tri", ".undirected"), env = baseenv()))
   if(any(blockout!=0)||!is.null(.active)) nw <- add_con(nw, term_list(call("blacklist_block"), env = baseenv()))
@@ -599,11 +587,9 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 #'
 #' @export
 unLayer <- function(object) {
-  if (object %n% ".blockID.vattr" != ".LayerID")
-    stop("The specified network is not a multilayer network at the top level.")
+  assert_combined_network(object, "Layer", FALSE)
 
   uncombine_network(object) |>
-    map(ergmlhs_remove_blockdiag, ".LayerID") |>
     map_if(function(nw) all(replace(nw %v% ".undirected", is.na, FALSE)),
            function(nw) ergm_symmetrize(nw, rule = "upper")) |>
     map(delete.vertex.attribute, ".undirected") |>
@@ -830,7 +816,7 @@ ergm_LayerLogics.list <- function(x, lnw, ...) {
 #' @export
 ergm_LayerLogics.function <- function(x, lnw, ...) {
   namemap <- .layer_namemap(lnw)
-  lattr <- as_tibble(lnw, unit = "networks", .NetworkID = ".LayerID", .NetworkName = ".LayerName", store.nid = TRUE)
+  lattr <- as_tibble(lnw, unit = "networks")
   o <- x(lattr = lattr, lnw = lnw, namemap = namemap, ...)
 
   if (is.list(o)) o <- map(o, ergm_LayerLogics, lnw = lnw, ...)

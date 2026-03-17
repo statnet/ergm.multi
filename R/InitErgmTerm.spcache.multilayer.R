@@ -15,7 +15,7 @@ InitErgmTerm..spcache.netL<-function(nw, arglist, ...){
                       defaultvalues = list(NULL,NULL,NULL),
                       required = c(TRUE, TRUE, TRUE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   type <- match.arg(tolower(a$type), c("otp","osp","isp","utp")) # ITP not included, because it's just OTP with direction reversed.
 

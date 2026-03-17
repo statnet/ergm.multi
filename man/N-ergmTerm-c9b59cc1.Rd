@@ -8,15 +8,15 @@
 \title{Evaluation on multiple networks}
 \usage{
 # binary: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL,
-#           .NetworkID=".NetworkID", .NetworkName=".NetworkName")
+#           .combiner = "Networks")
 
 # valued: N(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL,
-#           .NetworkID=".NetworkID", .NetworkName=".NetworkName")
+#           .combiner = "Networks")
 }
 \arguments{
-\item{.NetworkID, .NetworkName}{Optional strings indicating the
-vertex attributes used to distinguish and name the networks;
-intended to be used by term developers.}
+\item{.combiner}{A character vector specifying which combiner, such
+as \code{\link{Layer}} or \code{\link{Networks}} is expected to have created the LHS
+network.}
 
 \item{formula}{a one-sided \code{\link[ergm:ergm]{ergm()}}-style formula with the terms to be evaluated}
 
@@ -48,9 +48,10 @@ networks have missing values, the term will stop with an
 error. This can be avoided by pre-filtering with \code{subset}, which
 controls which networks are affected by the term.
 
-The formula may also reference \code{.NetworkID} and \code{.NetworkName}. In
-particular, \code{~0+factor(.NetworkID)} will evaluate \code{formula} on each
-network individually.
+The formula may also reference \code{.NetworkID} and \code{.NetworkName} (or
+the corresponding IDs set by \code{.combiner}). In particular,
+\code{~0+factor(.NetworkID)} will evaluate \code{formula} on each network
+individually.
 }
 \note{
 Care should be taken to avoid multicollinearity when using

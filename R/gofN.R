@@ -116,8 +116,8 @@ gofN <- function(object, GOF=NULL, subset=TRUE, control=control.gofN.ergm(), sav
   max_elts <- if(save_stats) Inf else control$array.max*1024^2/8 # A numeric is 8 bytes per element.
 
   nw <- object$network
-  assert_LHS_Networks(nw, ".NetworkID", term_trace=FALSE)
-  nnets <- length(unique(get_combining_attr(nw, ".NetworkID")))
+  assert_combined_network(nw, "Networks", FALSE)
+  nnets <- length(nw%n%".snl")
 
   if(is.numeric(subset)) subset <- unwhich(subset, nnets)
   subset <- rep_len(subset, nnets)

@@ -4,14 +4,19 @@
 \alias{ergm.multi_combiner}
 \title{Dynamic registry of functions that combine networks.}
 \usage{
-ergm.multi_combiner(blockID, combiner = NULL)
+ergm.multi_combiner(combiner, description = NULL)
 }
 \arguments{
-\item{blockID}{the vertex attribute used as the ID of the block.}
+\item{combiner}{the combiner name (typically \code{nw \%n\% ".combiner"})}
 
-\item{combiner}{a character vector of length 1 or 2, giving the
-top-level (i.e. user-visible) function that combines on it and
-optionally what is being combined.}
+\item{description}{a named character vector or list with elements
+\code{constructor}, \code{element}, \code{elements}, \code{construct}, \code{id}, and
+\code{name}, containing, respectively, the top-level
+(i.e. user-visible) function that combines on it, what is being
+combined (singular and plural), and what columns, if any, should
+be used to identify its index and name in the attributes
+table. \code{elements} and \code{construct} will be extrapolated from the
+others if not given.}
 }
 \description{
 This is used primarily by developers to provide informative error

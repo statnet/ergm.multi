@@ -3,6 +3,7 @@
 \name{combine_networks}
 \alias{combine_networks}
 \alias{combined_networks}
+\alias{uncombine_network}
 \alias{print.combined_networks}
 \alias{summary.combined_networks}
 \alias{print.summary.combined_networks}
@@ -13,12 +14,10 @@ combine_networks(
   ignore.nattr = c("mnext"),
   ignore.vattr = c(),
   ignore.eattr = c(),
-  blockID.vattr = ".NetworkID",
-  blockName.vattr = NULL,
-  detect.edgecov = FALSE,
-  keep.unshared.attr = FALSE,
-  subnet.cache = FALSE
+  keep.unshared.attr = FALSE
 )
+
+uncombine_network(nw, populate = TRUE)
 
 \method{print}{combined_networks}(x, ...)
 
@@ -35,28 +34,16 @@ group) can vary.}
 \item{ignore.nattr, ignore.vattr, ignore.eattr}{network, vertex, and
 edge attributes not to be processed as described below.}
 
-\item{blockID.vattr}{name of the vertex attribute into which to store
-the index of the network to which that vertex originally belonged.}
-
-\item{blockName.vattr}{if not \code{NULL}, the name of the vertex
-attribute into which to store the name of the network to which
-that vertex originally belonged.}
-
-\item{detect.edgecov}{if \code{TRUE}, combine network attributes that
-look like dyadic covariate (\code{\link[ergm:edgecov-ergmTerm-1fb5ef19]{ergm::edgecov}}) matrices into a
-block-diagonal matrix.}
-
 \item{keep.unshared.attr}{whether to keep those network, vertex,
 and edge attributes not shared by all networks in the list; if
 \code{TRUE}, positions corresponding to networks lacking the
 attribute are replaced with \code{NA}, \code{NULL}, or some other
 placeholder; incompatible with \code{detect.edgecov==TRUE}.}
 
-\item{subnet.cache}{whether to save the input network list as an
-attribute of the combined network, so that if the network is
-resplit using on the same attribute (e.g. using
-\code{\link[=uncombine_network]{uncombine_network()}}), an expensive call to \code{\link[=split.network]{split.network()}}
-can be avoided, at the cost of storage.}
+\item{nw}{a \code{\link[network:network]{network::network}} created by \code{\link[=combine_networks]{combine_networks()}}.}
+
+\item{populate}{logical; whether to map the edges from the combined
+network to the subnetworks, or whether to return them empty.}
 
 \item{x, object}{a combined network.}
 
@@ -76,33 +63,27 @@ network;
 \item vertex attributes are concatenated;
 \item edge attributes are assigned to their respective edges in
 the returned network;
-\item network attributes are stored in a list; but if
-\code{detect.edgecov==TRUE}, those network attributes that have the
-same dimension as the sociomatrices of the constituent networks,
-they are combined into a single block-diagonal matrix that is
-then stored as that attribute.
+\item network attributes are stored in a list network attribute \code{".snattr"}.
+\item a new network attribute, ".snid" identifies the original
+networks; if combined networks are combined again, ".snid"
+becomes a space-separated string of IDs from outside in.
+\item a  new network  attribute, ".snl",  containing networks  in \code{nwl}
+(preserving their names, if any) but with all edges removed.
 }
-
-In addition, two new vertex attributes, specified by
-\code{blockID.vattr} and (optionally) \code{blockName.vattr} contain,
-respectively, the index in \code{nwl} of the network from which that
-vertex came and its name, determined as follows:
 \enumerate{
 \item If \code{nwl} is a named list, names from the list are used.
 \item If not 1, but the network has an attribute \code{title}, it is used.
 \item Otherwise, a numerical index is used.
 }
-
-If \code{blockID.vattr} already exists on the constituent networks, the
-index is \emph{prepended} to the attribute.
-
-The values of \code{blockID.vattr} and \code{blockName.vattr} are stored in
-network attributes \code{".blockID.vattr"} and \code{".blockName.vattr"}.
 }
 \description{
-Given a list of compatible networks, the \code{\link[=combine_networks]{combine_networks()}} returns a single
+Given a list of compatible networks, \code{\link[=combine_networks]{combine_networks()}} returns a single
 block-diagonal network, preserving attributes that can be
 preserved.
+
+\code{\link[=uncombine_network]{uncombine_network()}} undoes \code{\link[=combine_networks]{combine_networks()}}, returning a list
+of networks, optionally mapping the edges of the combined network
+onto them.
 }
 \section{Functions}{
 \itemize{
@@ -125,15 +106,25 @@ data(samplk)
 
 o1 <- combine_networks(list(samplk1, samplk2, samplk3))
 image(as.matrix(o1))
-head(get.vertex.attribute(o1, ".NetworkID"))
+head(get.vertex.attribute(o1, ".snid"))
 o2 <- combine_networks(list(o1, o1))
 image(as.matrix(o2))
-head(get.vertex.attribute(o2, ".NetworkID", unlist=FALSE))
+head(get.vertex.attribute(o2, ".snid", unlist=FALSE))
 
 data(florentine)
-f1 <- combine_networks(list(business=flobusiness, marriage=flomarriage),
-                       blockName.vattr=".NetworkName")
+f1 <- combine_networks(list(business=flobusiness, marriage=flomarriage))
 image(as.matrix(f1))
-head(get.vertex.attribute(f1, ".NetworkID"))
-head(get.vertex.attribute(f1, ".NetworkName"))
+head(get.vertex.attribute(f1, ".snid"))
+head(names(get.network.attribute(f1, ".snl")))
+
+data(samplk)
+
+o1 <- combine_networks(list(samplk1, samplk2, samplk3))
+image(as.matrix(o1))
+
+ol <- uncombine_network(o1)
+
+}
+\seealso{
+\code{\link[=split.network]{split.network()}}
 }

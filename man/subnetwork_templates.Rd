@@ -4,15 +4,10 @@
 \alias{subnetwork_templates}
 \title{Obtain empty networks representing constituents of a combined network}
 \usage{
-subnetwork_templates(
-  nw,
-  split.vattr = nw \%n\% ".blockID.vattr",
-  names.vattr = nw \%n\% ".blockName.vattr",
-  copy.ergmlhs = c("response")
-)
+subnetwork_templates(nw, copy.ergmlhs = c("response"))
 }
 \arguments{
-\item{nw, split.vattr, names.vattr}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
+\item{nw}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
 
 \item{copy.ergmlhs}{a character vector of \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings that are to be copied into the constituent networks.}
 }

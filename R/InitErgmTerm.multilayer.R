@@ -25,9 +25,9 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
-  nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
+  nwl <- subnetwork_templates(nw, copy.ergmlhs = c())
 
   L <- ergm_LayerLogic(a$L, nw)
   # Terms on this logical layer will induce dyadic independence if its
@@ -40,7 +40,7 @@ InitErgmTerm..layer.net <- function(nw, arglist, ...){
                    " This is not supported at this time.", call. = FALSE)
 
   list(name = "_layer_net", coef.names = c(), dependence = dependence,
-       iinputs = c(unlist(.block_vertexmap(nw, ".LayerID", TRUE)),
+       iinputs = c(unlist(.block_vertexmap(nw)),
                    if (is.directed(nw)) sapply(nwl, function(nw) (nw%v%".undirected")[1]),
                    L%@%"C"))
 }
@@ -77,9 +77,9 @@ InitErgmTerm.L <- function(nw, arglist, ...){
                       defaultvalues = list(NULL, empty_env(~.)),
                       required = c(TRUE, FALSE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
-  nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
+  nwl <- subnetwork_templates(nw, copy.ergmlhs = c())
 
   Ls <- ergm_LayerLogics(a$Ls, nw)
 
@@ -133,7 +133,7 @@ InitErgmTerm.CMBL <- function(nw, arglist, ...){
                       defaultvalues = list(empty_env(~.)),
                       required = c(FALSE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   Ls <- ergm_LayerLogics(a$Ls, nw)
 
@@ -192,7 +192,7 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
                       defaultvalues = list(NULL, NULL, TRUE),
                       required = c(TRUE, FALSE, FALSE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   TYPES <- c("any", "out", "in", "path")
   TYPEREP <- setNames(c("--", "<>", "><", ">>"), TYPES)
@@ -259,7 +259,7 @@ InitErgmTerm.mutualL<-function (nw, arglist, ...) {
                       defaultvalues = list(NULL, NULL, FALSE, NULL, NULL),
                       required = c(FALSE, FALSE, FALSE, FALSE, FALSE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   ## Process the arguments
   if (!is.null(a$same) || !is.null(a$by)) {
@@ -361,7 +361,7 @@ InitErgmTerm.hammingL <- function(nw, arglist, ...){
                       defaultvalues = list(empty_env(~.)),
                       required = c(FALSE))
 
-  assert_LHS_Layer(nw)
+  assert_combined_network(nw, "Layer")
 
   Ls <- ergm_LayerLogics(a$Ls, nw)
   if (length(Ls) < 2L) ergm_Init_stop("multiple layers are required")

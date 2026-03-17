@@ -13,13 +13,16 @@ logit <- function(p) log(p/(1-p))
 times <- 1:3
 
 samplk1%e%"w" <- floor(runif(network.edgecount(samplk1), 0, 4))
+samplk1%n%"time" <- 1
 samplk2%e%"w" <- floor(runif(network.edgecount(samplk2), 0, 4))
+samplk2%n%"time" <- 2
 samplk3%e%"w" <- floor(runif(network.edgecount(samplk3), 0, 4))
+samplk3%n%"time" <- 3
 samplkl <- list(samplk1, samplk2, samplk3)
 samplks <- Networks(samplk1, samplk2, samplk3)
 
 test_that("N() summary with an LM and noncompacted stats", {
-  summ.N <- summary(samplks~N(~edges+nodematch("cloisterville"), ~1+.NetworkID), term.options=list(N.compact_stats=FALSE))
+  summ.N <- summary(samplks~N(~edges+nodematch("cloisterville"), ~1+time), term.options=list(N.compact_stats=FALSE))
   summ.l <- unlist(lapply(samplkl, function(nw) summary(~edges+nodematch("cloisterville"), basis = nw)))
   names(summ.l) <- paste0("N#", rep(1:3, each=2), "~", names(summ.l))
   expect_equal(summ.N, summ.l)
@@ -27,21 +30,21 @@ test_that("N() summary with an LM and noncompacted stats", {
 
 
 test_that("N() summary with offset and compacted stats", {
-  summ.N <- summary(samplks~N(~edges, offset=~.NetworkID))
+  summ.N <- summary(samplks~N(~edges, offset=~time))
   summ.l <- sapply(samplkl, function(nw) summary(~edges, basis = nw))
   summ.l <- c(sum(summ.l), sum(summ.l*1:3))
   expect_equal(summ.N, summ.l, ignore_attr=TRUE)
 })
 
 test_that("Valued N() summary with an LM and noncompacted stats", {
-  summ.N <- summary(samplks~N(~sum+nodematch("cloisterville", form="sum"), ~1+.NetworkID), term.options=list(N.compact_stats=FALSE), response="w")
+  summ.N <- summary(samplks~N(~sum+nodematch("cloisterville", form="sum"), ~1+time), term.options=list(N.compact_stats=FALSE), response="w")
   summ.l <- unlist(lapply(samplkl, function(nw) summary(~sum+nodematch("cloisterville", form="sum"), basis = nw, response="w")))
   expect_equal(summ.N, summ.l, ignore_attr=TRUE)
 })
 
 
 test_that("Valued N() summary with offset and compacted stats", {
-  summ.N <- summary(samplks~N(~sum, offset=~.NetworkID), response="w")
+  summ.N <- summary(samplks~N(~sum, offset=~time), response="w")
   summ.l <- sapply(samplkl, function(nw) summary(~sum, basis = nw, response="w"))
   summ.l <- c(sum(summ.l), sum(summ.l*1:3))
   expect_equal(summ.N, summ.l, ignore_attr=TRUE)
@@ -55,21 +58,21 @@ for(N.compact_stats in c(FALSE,TRUE)){
   
   test_that(paste("N() estimation with an LM and", testlab),{
     # Three networks, jointly.
-    ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+.NetworkID), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats)))
+    ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+time), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats)))
   
     nr <- sapply(lapply(pl, `[[`, "response"),length)
   
     y <- unlist(lapply(pl, `[[`, "response"))
     x <- do.call(rbind,lapply(pl, `[[`, "predictor"))
-    x <- as.data.frame(cbind(x,.NetworkID=rep(times, nr)))
+    x <- as.data.frame(cbind(x,time=rep(times, nr)))
     w <- unlist(lapply(pl, `[[`, "weights"))
-    glmfit <- glm(y~.NetworkID*nodematch.cloisterville,data=x,weights=w,family="binomial")
+    glmfit <- glm(y~time*nodematch.cloisterville,data=x,weights=w,family="binomial")
     expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE, tolerance=1e-7)
   })
   
   test_that(paste("N() estimation with an LM, subsetting, and", testlab),{
     # Ignore second (test subset).
-    ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+.NetworkID, subset=quote(.NetworkID!=2)), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats)))
+    ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+time, subset=quote(time!=2)), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats)))
     
     pl2 <- pl[-2]
     times2 <- times[-2]
@@ -78,15 +81,15 @@ for(N.compact_stats in c(FALSE,TRUE)){
     
     y <- unlist(lapply(pl2, `[[`, "response"))
     x <- do.call(rbind,lapply(pl2, `[[`, "predictor"))
-    x <- as.data.frame(cbind(x,.NetworkID=rep(times2, nr)))
+    x <- as.data.frame(cbind(x,time=rep(times2, nr)))
     w <- unlist(lapply(pl2, `[[`, "weights"))
-    glmfit <- glm(y~.NetworkID*nodematch.cloisterville,data=x,weights=w,family="binomial")
+    glmfit <- glm(y~time*nodematch.cloisterville,data=x,weights=w,family="binomial")
     expect_equal(coef(glmfit),coef(ergmfit), ignore_attr=TRUE, tolerance=1e-7)
   })
     
   test_that(paste("N() estimation with an LM, subsetting down to only 1 network, and", testlab),{
     # Ignore first and third (test subset).
-    expect_warning(ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+.NetworkID, subset=quote(.NetworkID==2)), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats))), ".*model is nonidentifiable.*")
+    expect_warning(ergmfit <- ergm(samplks~N(~edges+nodematch("cloisterville"), ~1+time, subset=quote(time==2)), control=control.ergm(term.options=list(N.compact_stats=N.compact_stats))), ".*model is nonidentifiable.*")
     
     pl2 <- pl[2]
     times2 <- times[2]
@@ -95,9 +98,9 @@ for(N.compact_stats in c(FALSE,TRUE)){
     
     y <- unlist(lapply(pl2, `[[`, "response"))
     x <- do.call(rbind,lapply(pl2, `[[`, "predictor"))
-    x <- as.data.frame(cbind(x,.NetworkID=rep(times2, nr)))
+    x <- as.data.frame(cbind(x,time=rep(times2, nr)))
     w <- unlist(lapply(pl2, `[[`, "weights"))
-    glmfit <- glm(y~.NetworkID*nodematch.cloisterville,data=x,weights=w,family="binomial")
+    glmfit <- glm(y~time*nodematch.cloisterville,data=x,weights=w,family="binomial")
     # Note that unlike glmift, ergm cannot detect nonidentifiability at
     # this time.
     if(N.compact_stats){
@@ -122,10 +125,10 @@ test_that("N() warns on parameter name mismatch",{
 
 test_that("N() stops if given a non-multi-net object with a sensible error message.",{
   expect_error(ergm_model(samplk1 ~ N(~edges)),
-               "In term 'N' in package 'ergm\\.multi': The LHS of the model is not a multi-network 'Networks\\(\\)' construct\\.")
+               "In term 'N' in package 'ergm\\.multi': .* not a multi-network construct .* by 'Networks\\(\\)'.*")
 })
 
 test_that("gofN() stops if given a non-multi-net fit with a sensible error message.",{
   expect_error(gofN(ergm(samplk1 ~ edges)),
-               "The LHS of the model is not a multi-network 'Networks\\(\\)' construct\\.")
+               "This network is not a multi-network construct .* by 'Networks\\(\\)'.*")
 })
