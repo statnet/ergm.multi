@@ -96,7 +96,7 @@ as_tibble.combined_networks<-function(x,attrnames=(match.arg(unit)%in%c("vertice
 
   out <- al[attrnames] %>% lapply(simplify_simple, ...) %>% as_tibble()
 
-  combiner <- x%n%".combiner"
+  combiner <- (x%n%".combiner")[1]
   if (!is.null(i <- ergm.multi_combiner(combiner)[["id"]])) out[[i]] <- seq_len(nrow(out))
   if (!is.null(i <- ergm.multi_combiner(combiner)[["name"]])) out[[i]] <- names(x%n%".snl")
 

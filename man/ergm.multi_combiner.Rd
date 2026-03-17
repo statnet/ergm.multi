@@ -7,7 +7,8 @@
 ergm.multi_combiner(combiner, description = NULL)
 }
 \arguments{
-\item{combiner}{the combiner name (typically \code{nw \%n\% ".combiner"})}
+\item{combiner}{the combiner name (typically the first element of
+\code{nw \%n\% ".combiner"})}
 
 \item{description}{a named character vector or list with elements
 \code{constructor}, \code{element}, \code{elements}, \code{construct}, \code{id}, and

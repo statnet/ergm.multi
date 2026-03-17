@@ -218,7 +218,8 @@ uncombine_network <- function(nw, populate = TRUE) {
 #' This is used primarily by developers to provide informative error
 #' messages.
 #'
-#' @param combiner the combiner name (typically `nw %n% ".combiner"`)
+#' @param combiner the combiner name (typically the first element of
+#'   `nw %n% ".combiner"`)
 #'
 #' @param description a named character vector or list with elements
 #'   `constructor`, `element`, `elements`, `construct`, `id`, and
@@ -357,11 +358,11 @@ as.networkLite.combined_networks <- function(x, ...){
 #' @keywords internal
 #' @export
 assert_combined_network <- function(nw, combiners, term = TRUE, call = rlang::caller_env()) {
-  if (!(nw %n% ".combiner" %||% "") %in% combiners) {
+  if (!any(nw%n%".combiner" %in% combiners)) {
     info <- map(combiners, ergm.multi_combiner)
     valid <- paste.and(paste0(map_chr(info, "construct"), " constructed by ", sQuote(map_chr(info, "constructor"))),
                        con = "nor")
-    msg <- paste0("This network is not a ", valid, " at its top level.")
+    msg <- paste0("This network is not a ", valid, " (nor compatible) at its top level.")
     if (term) ergm_Init_stop(msg)
     else abort(msg, call = call)
     FALSE
