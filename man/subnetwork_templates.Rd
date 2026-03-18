@@ -4,12 +4,15 @@
 \alias{subnetwork_templates}
 \title{Obtain empty networks representing constituents of a combined network}
 \usage{
-subnetwork_templates(nw, copy.ergmlhs = c("response"))
+subnetwork_templates(nw, copy.ergmlhs = c("response"), subset = TRUE)
 }
 \arguments{
 \item{nw}{see \code{\link[=uncombine_network]{uncombine_network()}}.}
 
-\item{copy.ergmlhs}{a character vector of \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings that are to be copied into the constituent networks.}
+\item{copy.ergmlhs}{a character vector of \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings
+that are to be copied into the constituent networks.}
+
+\item{subset}{indices of the constituent networks to return.}
 }
 \value{
 A list of \code{\link[network:network]{network}}s.

@@ -252,15 +252,16 @@ ergm.multi_combiner <- local({
 #' This utility uncombines a [combine_networks()] network using subnetwork cache (which contains only empty networks). It is used primarily by initialisation functions.
 #'
 #' @param nw see [uncombine_network()].
-#'
-#' @param copy.ergmlhs a character vector of [`%ergmlhs%`] settings that are to be copied into the constituent networks.
+#' @param copy.ergmlhs a character vector of [`%ergmlhs%`] settings
+#'   that are to be copied into the constituent networks.
+#' @param subset indices of the constituent networks to return.
 #'
 #' @return A list of [`network`]s.
 #'
 #' @keywords internal
 #' @export
-subnetwork_templates <- function(nw, copy.ergmlhs = c("response")){
-  nwl <- uncombine_network(nw, populate = FALSE)
+subnetwork_templates <- function(nw, copy.ergmlhs = c("response"), subset = TRUE) {
+  nwl <- uncombine_network(nw, populate = FALSE)[subset]
 
   if (length(copy.ergmlhs)) nwl <- map(nwl, function(nw1) {
     for (name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name

@@ -162,10 +162,8 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .combiner = "
 
   auxiliaries <- base_env(~.subnets)
 
-  nwl <- subnetwork_templates(nw)
-  nwnames <- names(nwl)
-  nn <- length(nwl)
   nattrs <- as_tibble(nw, unit="networks")
+  nn <- nrow(nattrs)
 
   lmi <- get_lminfo(nattrs, lm=a$lm, subset=a$subset, contrasts=a$contrasts, offset=a$offset, weights=a$weights)
 
@@ -175,7 +173,7 @@ InitErgmTerm.N <- function(nw, arglist, ..., N.compact_stats=TRUE, .combiner = "
   weights <- lmi$weights
   offset <- lmi$offset
   nm <- sum(subset)
-  nwl <- nwl[subset]
+  nwl <- subnetwork_templates(nw, subset = subset)
   rm(lmi)
 
   ms <- lapply(nwl, function(nw1){

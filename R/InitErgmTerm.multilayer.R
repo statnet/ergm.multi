@@ -79,15 +79,13 @@ InitErgmTerm.L <- function(nw, arglist, ...){
 
   assert_combined_network(nw, "Layer")
 
-  nwl <- subnetwork_templates(nw, copy.ergmlhs = c())
-
   Ls <- ergm_LayerLogics(a$Ls, nw)
 
   w <- rep(1, length(Ls))
   have.LHS <- lengths(Ls) == 3
   w[have.LHS] <- as.numeric(sapply(lapply(Ls[have.LHS], "[[", 2), eval, environment(Ls[[1]])))
 
-  nw1 <- nwl[[1]]
+  nw1 <- subnetwork_templates(nw, copy.ergmlhs = c())[[1L]]
   m <- ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
 
   ## FIXME: Is this consistent with extended state API, or do we need to have a different "model" for each layer?
