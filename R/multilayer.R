@@ -575,16 +575,10 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)
 
-  nw %ergmlhs% "constraints" <-
-      if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
-        base_env(~blockdiag(".LayerID", noncontig = "split"))
-      else
-        append_rhs.formula(nwl[[1]] %ergmlhs% "constraints", list(call("blockdiag", ".LayerID", noncontig = "split")), TRUE)
+  nw <- add_con(nw, blockdiag_term_list(".LayerID"), nwl[[1]])
 
-  if(any(symm)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("upper_tri",".undirected")), TRUE)
-  if(any(blockout!=0)||!is.null(.active)) nw %ergmlhs% "constraints" <- append_rhs.formula(nw %ergmlhs% "constraints", list(call("blacklist_block")), TRUE)
-
-  if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]] %ergmlhs% "obs.constraints"
+  if(any(symm)) nw <- add_con(nw, term_list(call("upper_tri", ".undirected"), env = baseenv()))
+  if(any(blockout!=0)||!is.null(.active)) nw <- add_con(nw, term_list(call("blacklist_block"), env = baseenv()))
 
   nw
 }

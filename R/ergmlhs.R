@@ -53,13 +53,26 @@ combine_ergmlhs <- function(nwl, ignore.settings=c()){
 #' @export
 ergmlhs_remove_blockdiag <- function(nw, vattr) {
   if (! vattr %in% list.vertex.attributes(nw)) {
-    nw %ergmlhs% "constraints" <- filter_rhs.formula(nw %ergmlhs% "constraints", function(trm)
-      ! identical(trm, call("blockdiag", vattr, noncontig = "split")))
+    todel <- blockdiag_term_list(vattr)
 
-    ## TODO: filter_rhs.formula() should probably return NULL when it
-    ## deleted all the terms, so if this is ever the case, the
-    ## following could be removed.
-    if (length(nw %ergmlhs% "constraints") < 2) nw %ergmlhs% "constraints" <- NULL
+    con <- ergm_flatten_conterm_list(nw %ergmlhs% "constraints")
+    nw %ergmlhs% "constraints" <- con[map(seq_along(con), \(i) con[i]) |>
+                                      map_lgl(identical, todel) |>
+                                      (`!`)()]
   }
   nw
+}
+
+blockdiag_term_list <- function(vattr) {
+  term_list(call("blockdiag", vattr, noncontig = "split"), env = baseenv())
+}
+
+add_con <- function(x, y, from = x) {
+  con <- ergm_flatten_conterm_list(from %ergmlhs% "constraints") %||%
+    term_list(list())
+  y <- ergm_flatten_conterm_list(y)
+
+  x %ergmlhs% "constraints" <- unique(c(con, y))
+  x %ergmlhs% "obs.constraints" <- from %ergmlhs% "obs.constraints"
+  x
 }

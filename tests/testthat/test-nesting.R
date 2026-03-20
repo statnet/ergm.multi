@@ -21,12 +21,12 @@ test_that("simulation of two multilayer networks with heterogeneous layer counts
   expect_error(unLayer(nw1), ".*not a multilayer network at the top level.*")
   unw <- unNetworks(nw1)
   expect_length(unw, 2L)
-  expect_identical(unw[[1]]  %ergmlhs% "constraints", statnet.common::base_env(~blockdiag(".LayerID", noncontig = "split")))
+  expect_identical(unw[[1]]  %ergmlhs% "constraints", statnet.common::term_list(quote(blockdiag(".LayerID", noncontig = "split")), env = baseenv()))
  
   uunw1 <- unLayer(unw[[1]])
   uunw2 <- unLayer(unw[[2]])
   expect_length(uunw1, 3L)
   expect_length(uunw2, 2L)
 
-  expect_identical(uunw1[[1]]  %ergmlhs% "constraints", NULL)
+  expect_length(uunw1[[1]]  %ergmlhs% "constraints", 0L)
 })

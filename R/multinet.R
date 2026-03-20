@@ -53,13 +53,7 @@ Networks <- function(...){
   nw <- combine_networks(nwl, blockID.vattr=".NetworkID", blockName.vattr=".NetworkName", ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
   nw %n% "ergm" <- combine_ergmlhs(nwl)
-
-  nw %ergmlhs% "constraints" <-
-      if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
-        base_env(~blockdiag(".NetworkID", noncontig = "split"))
-      else
-        append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag", ".NetworkID", noncontig = "split")), TRUE)
-  if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]]%ergmlhs%"obs.constraints"
+  nw <- add_con(nw, blockdiag_term_list(".NetworkID"), nwl[[1]])
 
   nw
 }
