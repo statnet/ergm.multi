@@ -527,7 +527,7 @@ subnetwork_templates <- function(nw, split.vattr=nw%n%".blockID.vattr", names.va
     for (name in copy.ergmlhs) nw1%ergmlhs%name <- nw%ergmlhs%name
     nw1
   })
-  else nwl
+  nwl
 }
 
 #' Calculate a vector that maps the combined (block-diagonal) LHS network Vertex indices within-layer/within-network Vertex and a Vertex to layer/network lookup table.
