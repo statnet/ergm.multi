@@ -28,15 +28,15 @@ test_that("multilayer heterogeneous layers messages", {
 
   expect_message(expect_message(
     Layer(nw12, nw1),
-    "Vertex attribute\\(s\\) 'mode' are not found in the first layer.*"),
-    "Network attribute\\(s\\) 'nattr' are not found in the first layer.*"
+    "Vertex attribute\\(s\\) \"mode\" are not found in the first layer.*"),
+    "Network attribute\\(s\\) \"nattr\" are not found in the first layer.*"
   )
 
   nw12 %v% "mode" <- rep(1:2,c(15,5))
   nw12 %n% "nattr" <- "def"
   expect_message(expect_message(
     Layer(nw1, nw12, .active=list(~mode==1, ~TRUE)),
-    "Vertex attribute\\(s\\) 'mode' have values different from those in the first layer.*"),
-    "Network attribute\\(s\\) 'nattr' have values different from those in the first layer.*"
+    "Vertex attribute\\(s\\) \"mode\" have values different from those in the first layer.*"),
+    "Network attribute\\(s\\) \"nattr\" have values different from those in the first layer.*"
   )
 })

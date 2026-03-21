@@ -32,7 +32,20 @@ ctrl <- control.simulate.formula(MCMC.burnin=n^2*2, MCMC.interval=n)
 
 test_that("twostarL statistics for directed networks", {
   nw1 <- nw2 <- network.initialize(n, directed = TRUE)
-  lnw <- Layer(nw1, nw2)
+  # Duplicate layer name.
+  expect_warning(expect_message(expect_error(lnw <- Layer(nw1, `1` = nw2),
+                                             "Duplicate layer names."),
+                                "Layer\\(s\\) 1 do not have specified names.*"),
+                 "Using numeric layer names \\(\"1\"\\) is ambiguous.")
+
+  # Reserved attribute and non-duplicate numeric layer name.
+  nw1 %v% ".undirected" <- FALSE
+  expect_message(expect_warning(lnw <- Layer(nw1, `123` = nw2),
+                                "Using numeric layer names \\(\"123\"\\) is ambiguous."),
+                 "Layer\\(s\\) 1 do not have specified names.*")
+
+  # OK numeric layer name.
+  expect_message(lnw <- Layer(`1` = nw1, nw2), "Layer\\(s\\) 2 do not have .*")
 
   sim <- suppressWarnings(simulate(lnw~
                     twostarL(c(~`1`,~`2`), "out",FALSE)+

@@ -27,14 +27,18 @@ network.layercount <- function(x, ...) {
   map(nwl, `%ergmlhs%`, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
 }
 
-
-.varying_attributes <- function(nwl, lister, getter, type, ignore = c()){
-  attrs1 <- lister(nwl[[1]]) %>% setdiff(ignore)
-  attrs <- nwl[-1] %>% map(lister) %>% map(setdiff, ignore)
+.varying_attributes <- function(nwl, lister, getter, type, ignore = c(), reserved = c()) {
+  attrs1 <- lister(nwl[[1]]) %>% setdiff(c(ignore, reserved))
+  attrs <- nwl[-1] %>% map(lister) %>% map(setdiff, c(ignore, reserved))
   extra_attrs <- attrs %>% unlist() %>% unique() %>% setdiff(attrs1)
 
+  for (res in reserved) {
+    found <- names(nwl)[map_lgl(c(list(attrs1), attrs), \(a) res %in% a)]
+    if (length(found)) warning(type, " attribute ", dQuote(res), " found in layer(s) ", dQuote(found), " is reserved by ", sQuote("Layer()"), " and will be overwritten.", immediate. = TRUE)
+  }
+
   if(length(extra_attrs))
-    message(type, " attribute(s) ", paste.and(sQuote(extra_attrs)), " are not found in the first layer and will not be visible to the ", sQuote("formula"), " in ", sQuote("L(formula, Ls)"), ".")
+    message(type, " attribute(s) ", paste.and(dQuote(extra_attrs)), " are not found in the first layer and will not be visible to the ", sQuote("formula"), " in ", sQuote("L(formula, Ls)"), ".")
 
   common_attrs <- attrs %>% map(intersect, attrs1)
   differing <-
@@ -44,7 +48,7 @@ network.layercount <- function(x, ...) {
         function(nw, al) if(a %in% al) identical(getter(nw, a, unlist = FALSE), getter(nwl[[1]], a, unlist = FALSE)) else TRUE
       ) %>% all())
   if(any(differing))
-    message(type, " attribute(s) ", paste.and(sQuote(attrs1[differing])), " have values different from those in the first layer; ", sQuote("formula"), " in ", sQuote("L(formula, Ls)"), " will not see them.")
+    message(type, " attribute(s) ", paste.and(dQuote(attrs1[differing])), " have values different from those in the first layer; ", sQuote("formula"), " in ", sQuote("L(formula, Ls)"), " will not see them.")
 
   length(extra_attrs) || any(differing)
 }
@@ -52,12 +56,8 @@ network.layercount <- function(x, ...) {
 
 .layer_namemap <- function(nw) {
   if (is(nw, "network")) {
-    nwnames <- get_combining_attr(nw, ".LayerName", missing = "NULL")
-    if (is.numeric(nwnames)) nwnames <- NULL
-    nwids <- get_combining_attr(nw, ".LayerID")
-
-    o <- structure(nwids, names = nwnames %||% as.character(nwids))
-    o[!duplicated(o)]
+    nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
+    setNames(seq_along(nwl), names(nwl))
   } else nw
 }
 
@@ -512,9 +512,22 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
+  # Perform some checks and imputations for layer names.
+  if (is.null(nnames <- names(nwl))) nnames <- as.character(seq_along(nwl))
+  else if (any(blank <- nnames == "")) {
+    message("Layer(s) ", paste.and(which(blank)), " do not have specified names; they have been imputed with the corresponding layer number.")
+    nnames[blank] <- as.character(seq_along(nnames)[blank])
+  }
+  if(any(weird <-
+    regexpr("^[0-9]+$", nnames) != -1L # Names that are integers are potentially problematic,
+    & nnames != seq_along(nnames) # but not if they happen to match layer IDs.
+  )) warning("Using numeric layer names (", paste.and(dQuote(nnames[weird])), ") is ambiguous.", immediate. = TRUE)
+  if (anyDuplicated(nnames)) stop("Duplicate layer names.")
+  names(nwl) <- nnames
+
   ## If network or vertex attributes differ from the first network, warn.
   .varying_attributes(nwl, list.network.attributes, get.network.attribute, "Network", ignore = c("directed", "bipartite", "mnext", ".block_blacklist"))
-  .varying_attributes(nwl, list.vertex.attributes, get.vertex.attribute, "Vertex", ignore = c(".undirected", ".bipartite", ".ubid"))
+  .varying_attributes(nwl, list.vertex.attributes, get.vertex.attribute, "Vertex", ignore = c(".ubid"), reserved = c(".undirected", ".bipartite"))
 
   if(!is.null(.active)){
     if(!is.list(.active) || length(.active) != length(nwl)) stop(sQuote(".active="), " argument if given must be a list of attribute specifications, one for each layer.")
@@ -554,19 +567,6 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
 
   # nwl is now a list of networks with homogeneous directedness, some
   # networks tagged with vertex attribute .undirected.
-
-  # Perform some checks and imputations for layer names.
-  nnames <- names(nwl)
-  if(!is.null(nnames) && any(blank<-(nnames==""))){
-    warning("Only some of the layers have specified names; they have been imputed with the corresponding layer number.")
-    nnames[blank] <- as.character(seq_along(nnames)[blank])
-  }
-  if(any(
-  regexpr('^[0-9]+$',nnames)!=-1 # Names that are integers are potentially problematic,
-  & nnames!=seq_along(nnames) # but not if they happen to match layer IDs.
-  )) warning("Using numeric layer names is ambiguous.")
-  if(anyDuplicated(nnames)) stop("Duplicate layer names.")
-  names(nwl) <- nnames
 
   if(!.same_constraints(nwl, "constraints")) stop("Layers have differing constraint structures. This is not supported at this time.")
   if(!.same_constraints(nwl, "obs.constraints")) stop("Layers have differing observation processes. This is not supported at this time.")
