@@ -54,6 +54,24 @@ network.layercount <- function(x, ...) {
 }
 
 
+.check_layer_names <- function(nwl) {
+  if (is.null(nnames <- names(nwl))) nnames <- as.character(seq_along(nwl))
+  else if (any(blank <- nnames == "")) {
+    message("Layer(s) ", paste.and(which(blank)), " do not have specified names; they have been imputed with the corresponding layer number.")
+    nnames[blank] <- as.character(seq_along(nnames)[blank])
+  }
+
+  if (any(weird <-
+            regexpr("^[0-9]+$", nnames) != -1L # Names that are integers are potentially problematic,
+          & nnames != seq_along(nnames) # but not if they happen to match layer IDs.
+          )) warning("Using numeric layer names (", paste.and(dQuote(nnames[weird])), ") is ambiguous.", immediate. = TRUE)
+
+  if (anyDuplicated(nnames)) stop("Duplicate layer names.")
+
+  setNames(nwl, nnames)
+}
+
+
 .layer_namemap <- function(nw) {
   if (is(nw, "network")) {
     nwl <- subnetwork_templates(nw, ".LayerID", ".LayerName", copy.ergmlhs = c())
@@ -513,17 +531,7 @@ Layer <- function(..., .symmetric=NULL, .bipartite=NULL, .active=NULL){
   }else stop("Unrecognized format for multilayer specification. See help for information.")
 
   # Perform some checks and imputations for layer names.
-  if (is.null(nnames <- names(nwl))) nnames <- as.character(seq_along(nwl))
-  else if (any(blank <- nnames == "")) {
-    message("Layer(s) ", paste.and(which(blank)), " do not have specified names; they have been imputed with the corresponding layer number.")
-    nnames[blank] <- as.character(seq_along(nnames)[blank])
-  }
-  if(any(weird <-
-    regexpr("^[0-9]+$", nnames) != -1L # Names that are integers are potentially problematic,
-    & nnames != seq_along(nnames) # but not if they happen to match layer IDs.
-  )) warning("Using numeric layer names (", paste.and(dQuote(nnames[weird])), ") is ambiguous.", immediate. = TRUE)
-  if (anyDuplicated(nnames)) stop("Duplicate layer names.")
-  names(nwl) <- nnames
+  nwl <- .check_layer_names(nwl)
 
   ## If network or vertex attributes differ from the first network, warn.
   .varying_attributes(nwl, list.network.attributes, get.network.attribute, "Network", ignore = c("directed", "bipartite", "mnext", ".block_blacklist"))
