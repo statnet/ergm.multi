@@ -30,9 +30,12 @@
 #' @param ... additional arguments to methods.
 #' @export
 print.combined_networks<-function(x, ...) {
+  x.orig <- x
   .print_combined_networks_info(x)
   delete.network.attribute(x, c(".snl", ".snattr", ".combiner", ".bm"))
+  delete.vertex.attribute(x, c(".snid", ".bipartite", ".undirected", ".ubid"))
   NextMethod()
+  x.orig
 }
 
 #' @describeIn combine_networks A wrapper around
@@ -49,8 +52,11 @@ summary.combined_networks<-function (object, ...) {
 #'   information and omit some internal variables.
 #' @export
 print.summary.combined_networks<-function(x, ...) {
+  x.orig <- x
   .print_combined_networks_info(x)
   delete.network.attribute(x, c(".snl", ".snattr", ".combiner", ".bm"))
+  delete.vertex.attribute(x, c(".snid", ".bipartite", ".undirected", ".ubid"))
   NextMethod()
+  x.orig
 }
 
