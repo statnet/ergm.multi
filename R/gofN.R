@@ -32,7 +32,7 @@
 #' @param GOF a one-sided [`ergm`] formula specifying network
 #'   statistics whose goodness of fit to test, or [`NULL`]; if `NULL`,
 #'   uses the original model.
-#' @param subset argument for the [`N`][N-ergmTerm] term.
+#' @param subset argument for the \ergmTerm{ergm.multi}{N}{()} term.
 #' @param \dots additional arguments to functions ([simulate.ergm()]
 #'   and [summary.ergm_model()]) for the constructor.
 #' @param control See [control.gofN.ergm()].

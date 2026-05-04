@@ -48,7 +48,8 @@ used to specify multimode models.}
 
 }
 
-See \code{\link[=Layer]{Layer()}} and \code{\link[=L-ergmTerm]{ergmTerm?L}} for examples.
+See \code{\link[=Layer]{Layer()}} and \ergmTerm{ergm.multi}{L}{()} (\code{ergmTerm?L}) for
+examples.
 }
 
 \section{Multi-network models}{
@@ -78,8 +79,8 @@ operators and the network-level specification with an
 
 }
 
-See \code{\link[=Networks]{Networks()}}, \code{\link[=N-ergmTerm]{ergmTerm?N}} for specification,
-\code{\link[=gofN]{gofN()}} for diagnostic facilities, and
+See \code{\link[=Networks]{Networks()}}, \ergmTerm{ergm.multi}{N}{()} (\code{ergmTerm?N}) for
+specification, \code{\link[=gofN]{gofN()}} for diagnostic facilities, and
 \code{vignette("Goeyvaerts_reproduction")} for a demonstration.
 }
 

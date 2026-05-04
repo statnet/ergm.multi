@@ -3,7 +3,7 @@
 \name{mutualL-ergmTerm}
 \alias{mutualL-ergmTerm}
 \alias{InitErgmTerm.mutualL}
-\title{Mutuality}
+\title{Cross-Layer Mutuality}
 \usage{
 # binary: mutualL(same=NULL, diff=FALSE, by=NULL, keep=NULL, Ls=NULL)
 }
@@ -29,9 +29,10 @@ ordinarily result in multiple statistics.}
 \item{Ls}{a list (constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}} of one or two Layer Logic specifications (c.f. Layer Logic section in the \code{\link[=Layer]{Layer()}} documentation). If given, the statistic will count the number of dyads where a tie in \code{Ls[[1]]} reciprocates a tie in \code{Ls[[2]]} and vice versa. (Note that dyad that has mutual ties in \code{Ls[[1]]} and in \code{Ls[[2]]} will add 2 to this statistic.) If a formula is given, it is replicated.}
 }
 \description{
-In binary ERGMs, equal to the number of
-pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
-and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
+The number of pairs of actors \eqn{i} and \eqn{j} for
+which \eqn{(i\stackrel{l_1}{\rightarrow}j)}{(i,j) on `Ls[[1]]`}
+and \eqn{(j{\stackrel{l_2}\rightarrow}i)}{(j,i) on `Ls[[2]]`}
+both exist.
 }
 \details{
 This term can only be used with directed networks.

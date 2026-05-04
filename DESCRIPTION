@@ -1,6 +1,6 @@
 Package: ergm.multi
-Version: 0.3.0-4275
-Date: 2026-03-23
+Version: 0.3.0-4278
+Date: 2026-05-04
 Title: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 Authors@R: c(person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
              person(c("Mark", "S."), "Handcock", role=c("ctb"), email="handcock@stat.ucla.edu"),
@@ -35,13 +35,12 @@ Suggests:
     ggrepel (>= 0.9.6),
     Rglpk,
     generics (>= 0.1.4)
-RdMacros: Rdpack
+RdMacros: Rdpack, ergm
 BugReports: https://github.com/statnet/ergm.multi/issues
 Description: A set of extensions for the 'ergm' package to fit multilayer/multiplex/multirelational networks and samples of multiple networks. 'ergm.multi' is a part of the Statnet suite of packages for network analysis. See Krivitsky, Koehly, and Marcum (2020) <doi:10.1007/s11336-020-09720-7> and Krivitsky, Coletti, and Hens (2023) <doi:10.1080/01621459.2023.2242627>.
 License: GPL-3 + file LICENSE
 URL: https://statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.3.3.9000
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
@@ -50,3 +49,4 @@ Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::EpiModel/networkLite@main,
     github::statnet/ergm@master
+Config/roxygen2/version: 8.0.0

@@ -217,10 +217,11 @@ InitErgmTerm.twostarL<-function(nw, arglist,  ...) {
 ################################################################################
 
 #' @templateVar name mutualL
-#' @title Mutuality
-#' @description In binary ERGMs, equal to the number of
-#'   pairs of actors \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)}
-#'   and \eqn{(j{\rightarrow}i)}{(j,i)} both exist.
+#' @title Cross-Layer Mutuality
+#' @description The number of pairs of actors \eqn{i} and \eqn{j} for
+#'   which \eqn{(i\stackrel{l_1}{\rightarrow}j)}{(i,j) on `Ls[[1]]`}
+#'   and \eqn{(j{\stackrel{l_2}\rightarrow}i)}{(j,i) on `Ls[[2]]`}
+#'   both exist.
 #'
 #' @details This term can only be used with directed networks.
 #'

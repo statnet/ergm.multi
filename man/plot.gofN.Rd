@@ -54,7 +54,7 @@
 
 \item{xlab}{horizontal axis label; defaults to a character representation of \code{against}.}
 
-\item{ylim}{vertical range for the plots, interpreted as in \code{\link[graphics:plot.default]{graphics::plot()}}; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the \verb{which=} argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.}
+\item{ylim}{vertical range for the plots, interpreted as in \code{\link[graphics:plot]{graphics::plot()}}; can be specified as a list with 3 elements, giving the range for the corresponding plot according to the plot numbers for the \verb{which=} argument, and can be used to ensure that, e.g., diagnostic plots for different models are on the same scale.}
 
 \item{cex.id}{scaling factor for characters used to label extreme points; see \code{\link[=plot.lm]{plot.lm()}}.}
 
@@ -93,5 +93,5 @@ respective defaults. They may have elements \code{default} (for
 }
 
 \seealso{
-\code{\link[=gofN]{gofN()}} for examples, \code{\link[=plot.lm]{plot.lm()}}, \code{\link[graphics:plot.default]{graphics::plot()}} for regression diagnostic plots and their parameters.
+\code{\link[=gofN]{gofN()}} for examples, \code{\link[=plot.lm]{plot.lm()}}, \code{\link[graphics:plot]{graphics::plot()}} for regression diagnostic plots and their parameters.
 }

@@ -77,7 +77,7 @@ version of \CRANpkg{ergm} running on the slave
 nodes is the same as that running on the master node.}
 
 \item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
-processes inherit the \code{\link[ergm:ergm-parallel]{set.MT_terms()}} setting.}
+processes inherit the \code{\link[ergm:set.MT_terms]{set.MT_terms()}} setting.}
 }
 \description{
 \code{control.gofN.ergm} (or its alias, \code{control.gofN}) is

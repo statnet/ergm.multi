@@ -23,9 +23,9 @@
 \description{
 A method to obtain a network attribute table from a
 \code{\link{combined_networks}} object, falling back to the
-\code{\link[network:as.matrix.network]{network::as_tibble.network()}} if vertex or edge attributes are
+\code{\link[network:as_tibble.network]{network::as_tibble.network()}} if vertex or edge attributes are
 required.
 }
 \seealso{
-\code{\link[network:as.matrix.network]{network::as_tibble.network()}}
+\code{\link[network:as_tibble.network]{network::as_tibble.network()}}
 }

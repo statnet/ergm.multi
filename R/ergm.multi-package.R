@@ -53,7 +53,8 @@
 #'
 #'   }
 #'
-#'   See [Layer()] and [`ergmTerm?L`][L-ergmTerm] for examples.
+#'   See [Layer()] and \ergmTerm{ergm.multi}{L}{()} (`ergmTerm?L`) for
+#'   examples.
 #'
 #'
 #' @section Multi-network models: Joint modeling of independent
@@ -82,8 +83,8 @@
 #'
 #'   }
 #'
-#'   See [Networks()], [`ergmTerm?N`][N-ergmTerm] for specification,
-#'   [gofN()] for diagnostic facilities, and
+#'   See [Networks()], \ergmTerm{ergm.multi}{N}{()} (`ergmTerm?N`) for
+#'   specification, [gofN()] for diagnostic facilities, and
 #'   `vignette("Goeyvaerts_reproduction")` for a demonstration.
 #'
 #' @name ergm.multi-package

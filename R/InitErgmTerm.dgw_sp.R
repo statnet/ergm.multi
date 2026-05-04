@@ -362,8 +362,15 @@ InitErgmTerm.nspL <- InitErgmTerm.dnspL
 ################################################################################
 
 #' @templateVar name dgwnspL
-#' @title Geometrically weighted non-edgewise shared partner distribution on layers
-#' @description This term is just like [`gwespL`][gwespL-ergmTerm] and [`gwdspL`][gwdspL-ergmTerm] except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
+#' @title Geometrically weighted non-edgewise shared partner
+#'   distribution on layers
+#' @description This term is just like
+#'   \ergmTerm{ergm.multi}{gwespL}{()} and
+#'   \ergmTerm{ergm.multi}{gwdspL}{()} except it adds a statistic
+#'   equal to the geometrically weighted nonedgewise (that is, over
+#'   dyads that do not have an edge) shared partner distribution with
+#'   decay parameter. For a directed network, multiple shared partner
+#'   definitions are possible.
 #'
 #' @usage
 #' # binary: dgwnspL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,

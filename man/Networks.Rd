@@ -26,7 +26,7 @@ Due to certain optimizations, the resulting \code{\link[network:network]{network
 \description{
 A function for specifying the LHS of a multi-network
 (a.k.a. multilevel) ERGM. Typically used in conjunction with the
-\code{\link[=N-ergmTerm]{N()}} term operator.
+\ergmTerm{ergm.multi}{N}{()} term operator.
 
 \code{unNetworks()} extracts the networks into a list.
 }

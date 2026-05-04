@@ -11,7 +11,7 @@
 #'
 #' A function for specifying the LHS of a multi-network
 #' (a.k.a. multilevel) ERGM. Typically used in conjunction with the
-#' [`N()`][N-ergmTerm] term operator.
+#' \ergmTerm{ergm.multi}{N}{()} term operator.
 #'
 #' @param ... network specification, in one of two formats:
 #' 

@@ -11,7 +11,7 @@ assert_combined_network(nw, combiners, term = TRUE, call = rlang::caller_env())
 
 \item{combiners}{a character vector listing valid combiners supported by the function}
 
-\item{term}{whether this is a term that should use \code{\link[ergm:ergm-errors]{ergm_Init_stop()}} or some other function, which should use \code{\link[rlang:abort]{rlang::abort()}}}
+\item{term}{whether this is a term that should use \code{\link[ergm:ergm_Init_stop]{ergm_Init_stop()}} or some other function, which should use \code{\link[rlang:abort]{rlang::abort()}}}
 
 \item{call}{for \code{term_trace == FALSE} where to report the error message from}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ergmlhs.R
 \name{combine_ergmlhs}
 \alias{combine_ergmlhs}
-\title{Combine the \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings of a list of networks}
+\title{Combine the \code{\link[ergm:\%ergmlhs\%]{\%ergmlhs\%}} settings of a list of networks}
 \usage{
 combine_ergmlhs(nwl, ignore.settings = c())
 }
@@ -19,7 +19,7 @@ A \code{\link{list}} of settings, suitable for being assigned as the
 }
 \description{
 This is a helper function to go through the \code{\link[network:network]{network}} objects in the list
-and accumulate their \code{\link[ergm:ergmlhs]{\%ergmlhs\%}} settings, printing a message if
+and accumulate their \code{\link[ergm:\%ergmlhs\%]{\%ergmlhs\%}} settings, printing a message if
 the settings clash. Later networks' settings overwrite the earlier.
 }
 \keyword{internal}

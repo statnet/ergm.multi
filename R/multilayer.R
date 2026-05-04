@@ -297,9 +297,9 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'   network: if not all layers have the same bipartedness, all layers
 #'   will appear as unipartite to the statistics, and if any are
 #'   directed, all will be. However, [certain operator
-#'   terms][ergmTerm], particularly `Symmetrize()` and `S()`, can be
-#'   used to construct a bipartite subgraph of a unipartite graph or
-#'   change directedness.
+#'   terms][ergmTerm], particularly \ergmTerm{ergm}{Symmetrize}{()}
+#'   and \ergmTerm{ergm}{S}{()}, can be used to construct a bipartite
+#'   subgraph of a unipartite graph or change directedness.
 #'
 #' @section Specifying models for multilayer networks:
 #' In order to fit a model for multilayer
@@ -311,20 +311,22 @@ direct.network <- function(x, rule=c("both", "upper", "lower")){
 #'
 #' Some terms are *layer-aware*, however. By convention, layer-aware
 #' terms have capital `L` appended to them. For example,
-#' [`mutualL`][mutualL-ergmTerm] is a layer-aware generalization of
-#' [`mutual`][mutual-ergmTerm]. These terms have one or more explicit
-#' (usually optional) layer specification arguments. By convention, an
-#' argument that requires one layer specification is named \code{L=} and
-#' one that requires a list of specifications (constructed by [list()]
-#' or [c()]) is named \code{Ls=}; and a specification of the form `~.` is a
-#' placeholder for all observed layers.
+#' \ergmTerm{ergm.multi}{mutualL}{} is a layer-aware generalization of
+#' \ergmTerm{ergm.multi}{mutual}{}. These terms have one or more
+#' explicit (usually optional) layer specification arguments. By
+#' convention, an argument that requires one layer specification is
+#' named \code{L=} and one that requires a list of specifications
+#' (constructed by [list()] or [c()]) is named \code{Ls=}; and a
+#' specification of the form `~.` is a placeholder for all observed
+#' layers.
 #'
-#' Operator [`L(formula, Ls=...)`][L-ergmTerm] can be used to evaluate
-#' arbitrary terms in the `formula` on specified layers. Note that for
-#' the purposes of the terms in the `formula`, nonstandard network and
-#' vertex attributes will be taken from the *first* network in the
-#' list. The subsequent networks' attributes will be ignored by it
-#' (but not by `Ls`: see Alternative ways to specify layers below).
+#' Operator \ergmTerm{ergm.multi}{L}{(formula, Ls = ...)} can be used
+#' to evaluate arbitrary terms in the `formula` on specified
+#' layers. Note that for the purposes of the terms in the `formula`,
+#' nonstandard network and vertex attributes will be taken from the
+#' *first* network in the list. The subsequent networks' attributes
+#' will be ignored by it (but not by `Ls`: see Alternative ways to
+#' specify layers below).
 #'
 #' Layer specification documentation follows.
 #'

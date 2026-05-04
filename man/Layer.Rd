@@ -54,9 +54,9 @@ ERGM in the framework of \insertCite{KrKo20e;textual}{ergm.multi}.
 The resulting network will be the "least common denominator"
 network: if not all layers have the same bipartedness, all layers
 will appear as unipartite to the statistics, and if any are
-directed, all will be. However, \link[ergm:ergmTerm]{certain operator terms}, particularly \code{Symmetrize()} and \code{S()}, can be
-used to construct a bipartite subgraph of a unipartite graph or
-change directedness.
+directed, all will be. However, \link[ergm:ergmTerm]{certain operator terms}, particularly \ergmTerm{ergm}{Symmetrize}{()}
+and \ergmTerm{ergm}{S}{()}, can be used to construct a bipartite
+subgraph of a unipartite graph or change directedness.
 }
 \section{Specifying models for multilayer networks}{
 
@@ -69,20 +69,22 @@ sum their statistics over the observed layers.
 
 Some terms are \emph{layer-aware}, however. By convention, layer-aware
 terms have capital \code{L} appended to them. For example,
-\code{\link[=mutualL-ergmTerm]{mutualL}} is a layer-aware generalization of
-\code{\link[ergm:mutual-ergmTerm-22863009]{mutual}}. These terms have one or more explicit
-(usually optional) layer specification arguments. By convention, an
-argument that requires one layer specification is named \code{L=} and
-one that requires a list of specifications (constructed by \code{\link[=list]{list()}}
-or \code{\link[=c]{c()}}) is named \code{Ls=}; and a specification of the form \code{~.} is a
-placeholder for all observed layers.
+\ergmTerm{ergm.multi}{mutualL}{} is a layer-aware generalization of
+\ergmTerm{ergm.multi}{mutual}{}. These terms have one or more
+explicit (usually optional) layer specification arguments. By
+convention, an argument that requires one layer specification is
+named \code{L=} and one that requires a list of specifications
+(constructed by \code{\link[=list]{list()}} or \code{\link[=c]{c()}}) is named \code{Ls=}; and a
+specification of the form \code{~.} is a placeholder for all observed
+layers.
 
-Operator \code{\link[=L-ergmTerm]{L(formula, Ls=...)}} can be used to evaluate
-arbitrary terms in the \code{formula} on specified layers. Note that for
-the purposes of the terms in the \code{formula}, nonstandard network and
-vertex attributes will be taken from the \emph{first} network in the
-list. The subsequent networks' attributes will be ignored by it
-(but not by \code{Ls}: see Alternative ways to specify layers below).
+Operator \ergmTerm{ergm.multi}{L}{(formula, Ls = ...)} can be used
+to evaluate arbitrary terms in the \code{formula} on specified
+layers. Note that for the purposes of the terms in the \code{formula},
+nonstandard network and vertex attributes will be taken from the
+\emph{first} network in the list. The subsequent networks' attributes
+will be ignored by it (but not by \code{Ls}: see Alternative ways to
+specify layers below).
 
 Layer specification documentation follows.
 \subsection{Layer Logic}{

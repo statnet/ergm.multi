@@ -5,7 +5,8 @@
 \alias{InitErgmTerm.dgwnspL}
 \alias{InitErgmTerm.gwnspL}
 \alias{gwnspL-ergmTerm}
-\title{Geometrically weighted non-edgewise shared partner distribution on layers}
+\title{Geometrically weighted non-edgewise shared partner
+distribution on layers}
 \usage{
 # binary: dgwnspL(decay, fixed=FALSE, cutoff=30, type="OTP", L.base=NULL,
 #                 Ls.path=NULL, L.in_order=FALSE)
@@ -44,7 +45,13 @@ types \code{"OSP"} and \code{"ISP"} , the first tie is considered to be the
 one incident on the tail of the base tie.)}
 }
 \description{
-This term is just like \code{\link[=gwespL-ergmTerm]{gwespL}} and \code{\link[=gwdspL-ergmTerm]{gwdspL}} except it adds a statistic equal to the geometrically weighted nonedgewise (that is, over dyads that do not have an edge) shared partner distribution with decay parameter. For a directed network, multiple shared partner definitions are possible.
+This term is just like
+\ergmTerm{ergm.multi}{gwespL}{()} and
+\ergmTerm{ergm.multi}{gwdspL}{()} except it adds a statistic
+equal to the geometrically weighted nonedgewise (that is, over
+dyads that do not have an edge) shared partner distribution with
+decay parameter. For a directed network, multiple shared partner
+definitions are possible.
 
 \code{gdwnspL} and \code{dgwnspL} are aliases for consistency with \pkg{ergm}.
 }
