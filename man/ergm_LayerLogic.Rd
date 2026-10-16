@@ -141,7 +141,7 @@ or character) for the subset of layers.
 \item \code{toString(ergm_LayerLogics)}: A method to generate coefficient names
 associated with the Layer Logics.
 
-\item \code{[}: Indexing for lists of
+\item \code{ergm_LayerLogics[]}: Indexing for lists of
 \code{ergm_LayerLogic}s, updating metadata.
 
 \item \code{ERGM_LAYER_SPEC}: variable type for format specification when one logical layer is required.

@@ -56,29 +56,39 @@ import(stats)
 import(tibble)
 importFrom(Rdpack,reprompt)
 importFrom(glue,glue)
-importFrom(grDevices,adjustcolor)
-importFrom(grDevices,dev.interactive)
-importFrom(grDevices,devAskNewPage)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,boxplot)
-importFrom(graphics,lines)
-importFrom(graphics,panel.smooth)
-importFrom(graphics,plot)
-importFrom(graphics,points)
-importFrom(graphics,text)
+importFrom(grDevices,
+  adjustcolor,
+  dev.interactive,
+  devAskNewPage
+)
+importFrom(graphics,
+  abline,
+  axis,
+  boxplot,
+  lines,
+  panel.smooth,
+  plot,
+  points,
+  text
+)
 importFrom(methods,is)
 importFrom(networkLite,as.networkLite)
 importFrom(parallel,clusterCall)
-importFrom(rlang,"%@%")
-importFrom(rlang,"%@%<-")
-importFrom(rlang,abort)
-importFrom(rlang,eval_tidy)
-importFrom(rlang,quo)
-importFrom(statnet.common,ERRVL)
-importFrom(statnet.common,eval_lhs.formula)
-importFrom(statnet.common,statnetStartupMessage)
+importFrom(rlang,
+  "%@%",
+  "%@%<-",
+  abort,
+  eval_tidy,
+  quo
+)
+importFrom(statnet.common,
+  ERRVL,
+  eval_lhs.formula,
+  statnetStartupMessage
+)
 importFrom(tibble,lst)
-importFrom(utils,head)
-importFrom(utils,modifyList)
+importFrom(utils,
+  head,
+  modifyList
+)
 useDynLib(ergm.multi)

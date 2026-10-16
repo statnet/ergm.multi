@@ -85,7 +85,7 @@ used for a variety of diagnostics and diagnostic plots developed by
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{[}: Extract a subset of statistics for which goodness-of-fit had been computed.
+\item \code{gofN[]}: Extract a subset of statistics for which goodness-of-fit had been computed.
 
 \item \code{augment(gofN)}: a method for constructing a \code{\link[tibble:tibble]{tibble}} of network attributes augmented with goodness of fit information. Columns include:\describe{
 \item{network attributes}{the attributes of each of the networks}

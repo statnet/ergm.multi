@@ -1,6 +1,6 @@
 Package: ergm.multi
-Version: 0.3.0-4278
-Date: 2026-05-04
+Version: 0.3.0-4280
+Date: 2026-10-16
 Title: Fit, Simulate and Diagnose Exponential-Family Models for Multiple or Multilayer Networks
 Authors@R: c(person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
              person(c("Mark", "S."), "Handcock", role=c("ctb"), email="handcock@stat.ucla.edu"),
@@ -49,4 +49,4 @@ Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::EpiModel/networkLite@main,
     github::statnet/ergm@master
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.1
